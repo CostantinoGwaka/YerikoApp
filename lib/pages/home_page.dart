@@ -1,9 +1,9 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_finance_app/pages/daily_page.dart';
-import 'package:flutter_finance_app/pages/transection_page.dart';
-import 'package:flutter_finance_app/theme/colors.dart';
+import 'package:yeriko_app/pages/daily_page.dart';
+import 'package:yeriko_app/pages/transection_page.dart';
+import 'package:yeriko_app/theme/colors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

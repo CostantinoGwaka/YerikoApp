@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_finance_app/pages/home_page.dart';
-import 'package:flutter_finance_app/theme/colors.dart';
+import 'package:yeriko_app/pages/home_page.dart';
+import 'package:yeriko_app/theme/colors.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

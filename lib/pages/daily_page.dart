@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_finance_app/theme/colors.dart';
+import 'package:yeriko_app/theme/colors.dart';
 import 'package:icon_badge/icon_badge.dart';
 
 class DailyPage extends StatefulWidget {

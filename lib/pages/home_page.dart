@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: primary,
         icons: iconItems,
         splashColor: secondary,
-        inactiveColor: black.withOpacity(0.5),
+        inactiveColor: black.withValues(alpha: 0.5),
         gapLocation: GapLocation.center,
         activeIndex: pageIndex,
         notchSmoothness: NotchSmoothness.softEdge,

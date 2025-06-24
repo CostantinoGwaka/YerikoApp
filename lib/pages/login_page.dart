@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
               margin: const EdgeInsets.symmetric(horizontal: 25),
               decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
                 BoxShadow(
-                  color: grey.withOpacity(0.03),
+                  color: grey.withAlpha((0.03 * 255).round()),
                   spreadRadius: 10,
                   blurRadius: 3,
                   // changes position of shadow
@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
               margin: const EdgeInsets.symmetric(horizontal: 25),
               decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
                 BoxShadow(
-                  color: grey.withOpacity(0.03),
+                  color: grey.withAlpha((0.03 * 255).round()),
                   spreadRadius: 10,
                   blurRadius: 3,
                   // changes position of shadow

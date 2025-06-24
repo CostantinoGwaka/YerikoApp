@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:yeriko_app/theme/colors.dart';
 import 'package:icon_badge/icon_badge.dart';
 
@@ -24,7 +23,7 @@ class _DailyPageState extends State<DailyPage> {
             margin: const EdgeInsets.only(top: 25, left: 25, right: 25, bottom: 10),
             decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
               BoxShadow(
-                color: grey.withOpacity(0.03),
+                color: grey.withAlpha((0.03 * 255).round()),
                 spreadRadius: 10,
                 blurRadius: 3,
                 // changes position of shadow
@@ -100,7 +99,7 @@ class _DailyPageState extends State<DailyPage> {
                       Container(
                         width: 0.5,
                         height: 40,
-                        color: black.withOpacity(0.3),
+                        color: black.withAlpha((0.3 * 255).round()),
                       ),
                       const Column(
                         children: [
@@ -120,7 +119,7 @@ class _DailyPageState extends State<DailyPage> {
                       Container(
                         width: 0.5,
                         height: 40,
-                        color: black.withOpacity(0.3),
+                        color: black.withAlpha((0.3 * 255).round()),
                       ),
                       const Column(
                         children: [
@@ -169,7 +168,9 @@ class _DailyPageState extends State<DailyPage> {
                           hideZero: true,
                           top: -1,
                           onTap: () {
-                            print('test');
+                            if (kDebugMode) {
+                              print('test');
+                            }
                           },
                         ),
                       ],
@@ -209,7 +210,7 @@ class _DailyPageState extends State<DailyPage> {
                         ),
                         decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
                           BoxShadow(
-                            color: grey.withOpacity(0.03),
+                            color: grey.withAlpha((0.03 * 255).round()),
                             spreadRadius: 10,
                             blurRadius: 3,
                             // changes position of shadow
@@ -249,22 +250,22 @@ class _DailyPageState extends State<DailyPage> {
                                         Text(
                                           "Sending Payment to Clients",
                                           style: TextStyle(
-                                              fontSize: 12, color: black.withOpacity(0.5), fontWeight: FontWeight.w400),
+                                              fontSize: 12,
+                                              color: black.withAlpha((0.5 * 255).round()),
+                                              fontWeight: FontWeight.w400),
                                         ),
                                       ]),
                                 ),
                               ),
                               Expanded(
-                                child: Container(
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        "\$150",
-                                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
-                                      )
-                                    ],
-                                  ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      "\$150",
+                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
+                                    )
+                                  ],
                                 ),
                               )
                             ],
@@ -288,7 +289,7 @@ class _DailyPageState extends State<DailyPage> {
                         ),
                         decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
                           BoxShadow(
-                            color: grey.withOpacity(0.03),
+                            color: grey.withAlpha((0.03 * 255).round()),
                             spreadRadius: 10,
                             blurRadius: 3,
                             // changes position of shadow
@@ -328,22 +329,23 @@ class _DailyPageState extends State<DailyPage> {
                                         Text(
                                           "Receiving Payment from company",
                                           style: TextStyle(
-                                              fontSize: 12, color: black.withOpacity(0.5), fontWeight: FontWeight.w400),
+                                            fontSize: 12,
+                                            color: black.withValues(alpha: 0.5),
+                                            fontWeight: FontWeight.w400,
+                                          ),
                                         ),
                                       ]),
                                 ),
                               ),
                               Expanded(
-                                child: Container(
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        "\$250",
-                                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
-                                      )
-                                    ],
-                                  ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      "\$250",
+                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
+                                    )
+                                  ],
                                 ),
                               )
                             ],
@@ -367,7 +369,7 @@ class _DailyPageState extends State<DailyPage> {
                         ),
                         decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
                           BoxShadow(
-                            color: grey.withOpacity(0.03),
+                            color: grey.withValues(alpha: 0.03),
                             spreadRadius: 10,
                             blurRadius: 3,
                             // changes position of shadow
@@ -407,22 +409,22 @@ class _DailyPageState extends State<DailyPage> {
                                         Text(
                                           "Loan for the Car",
                                           style: TextStyle(
-                                              fontSize: 12, color: black.withOpacity(0.5), fontWeight: FontWeight.w400),
+                                              fontSize: 12,
+                                              color: black.withValues(alpha: 0.5),
+                                              fontWeight: FontWeight.w400),
                                         ),
                                       ]),
                                 ),
                               ),
                               Expanded(
-                                child: Container(
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        "\$400",
-                                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
-                                      )
-                                    ],
-                                  ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      "\$400",
+                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
+                                    )
+                                  ],
                                 ),
                               )
                             ],

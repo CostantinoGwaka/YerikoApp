@@ -31,7 +31,8 @@ class _TransectionPageState extends State<TransectionPage> {
         children: [
           Container(
             decoration: BoxDecoration(
-                color: primary, boxShadow: [BoxShadow(color: grey.withOpacity(0.01), spreadRadius: 10, blurRadius: 3)]),
+                color: primary,
+                boxShadow: [BoxShadow(color: grey.withAlpha((0.01 * 255).toInt()), spreadRadius: 10, blurRadius: 3)]),
             child: const Padding(
               padding: EdgeInsets.only(top: 20, bottom: 25, right: 20, left: 20),
               child: Column(
@@ -92,7 +93,7 @@ class _TransectionPageState extends State<TransectionPage> {
                       margin: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
                         BoxShadow(
-                          color: grey.withOpacity(0.03),
+                          color: grey.withAlpha((0.03 * 255).toInt()),
                           spreadRadius: 10,
                           blurRadius: 3,
                           // changes position of shadow
@@ -102,7 +103,9 @@ class _TransectionPageState extends State<TransectionPage> {
                         child: Text(
                           "Income",
                           style: TextStyle(
-                              color: Colors.black.withOpacity(0.5), fontSize: 13, fontWeight: FontWeight.w600),
+                              color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -111,7 +114,7 @@ class _TransectionPageState extends State<TransectionPage> {
                       margin: const EdgeInsets.symmetric(horizontal: 5),
                       decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
                         BoxShadow(
-                          color: grey.withOpacity(0.03),
+                          color: grey.withValues(alpha: (0.03 * 255)),
                           spreadRadius: 10,
                           blurRadius: 3,
                           // changes position of shadow
@@ -121,7 +124,10 @@ class _TransectionPageState extends State<TransectionPage> {
                         child: Text(
                           "Expense",
                           style: TextStyle(
-                              color: Colors.black.withOpacity(0.5), fontSize: 13, fontWeight: FontWeight.w600),
+                            color: Colors.black.withValues(alpha: (0.5 * 255)),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
@@ -155,7 +161,7 @@ class _TransectionPageState extends State<TransectionPage> {
                   ),
                   decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
                     BoxShadow(
-                      color: grey.withOpacity(0.03),
+                      color: grey.withValues(alpha: (0.03 * 255)),
                       spreadRadius: 10,
                       blurRadius: 3,
                       // changes position of shadow
@@ -199,22 +205,23 @@ class _TransectionPageState extends State<TransectionPage> {
                                   Text(
                                     "Payment from Andrea",
                                     style: TextStyle(
-                                        fontSize: 12, color: black.withOpacity(0.5), fontWeight: FontWeight.w400),
+                                      fontSize: 12,
+                                      color: black.withValues(alpha: (0.5 * 255)),
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
                                 ]),
                           ),
                         ),
                         Expanded(
-                          child: Container(
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  "\$30.00",
-                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
-                                )
-                              ],
-                            ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                "\$30.00",
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
+                              )
+                            ],
                           ),
                         )
                       ],

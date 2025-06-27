@@ -1,6 +1,7 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:yeriko_app/pages/daily_page.dart';
 import 'package:yeriko_app/pages/transection_page.dart';
 import 'package:yeriko_app/theme/colors.dart';
@@ -34,7 +35,11 @@ class _HomePageState extends State<HomePage> {
           // height: 30,
           // width: 40,
           child: FloatingActionButton(
-            onPressed: () {},
+            onPressed: () {
+              // TODO: Implement call functionality here
+              // Example: launch a phone call using url_launcher
+              launchUrl(Uri.parse('tel:0659515042'));
+            },
             backgroundColor: buttoncolor,
             child: Icon(
               Icons.call,
@@ -81,7 +86,8 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  setTabs(index) {
+  // ignore: strict_top_level_inference
+  void setTabs(index) {
     setState(() {
       pageIndex = index;
     });

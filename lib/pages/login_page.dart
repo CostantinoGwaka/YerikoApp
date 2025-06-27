@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
           //end here
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Success! You have Login successfully")),
+            SnackBar(content: Text("Umefanikiwa! Umeingia kwenye mfumo kwa mafanikio")),
           );
         } else if (response.statusCode == 404) {
           //end here
@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
           });
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(jsonResponse['message'] ?? "User not found in our system")),
+            SnackBar(content: Text(jsonResponse['message'] ?? "Mtumiaji hakupatikana kwenye mfumo wetu")),
           );
         }
       }
@@ -105,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please check your internet connection :$e")),
+        SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }
@@ -177,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                       decoration: const InputDecoration(
                         prefixIcon: Icon(Icons.phone_android),
                         prefixIconColor: black,
-                        hintText: "Namba ya simu (10 digits)",
+                        hintText: "Namba ya simu (tarakimu 10)",
                         border: InputBorder.none,
                         counterText: "", // Hide the character counter
                       ),

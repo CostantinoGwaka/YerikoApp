@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:yeriko_app/main.dart';
+
 const String accessToken = 'accessToken';
 const String userInfo = 'userInfo';
 const String fTimeValue = '0';
@@ -22,3 +26,8 @@ String getFirstWord(String inputString) {
     return ' ';
   }
 }
+
+Future<Map<String, String>> get authHeader async => {
+      'Content-Type': 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer ${userData!.accessToken}',
+    };

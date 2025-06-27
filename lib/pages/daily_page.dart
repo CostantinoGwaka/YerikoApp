@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:yeriko_app/main.dart';
+import 'package:yeriko_app/models/user_total_model.dart';
 import 'package:yeriko_app/pages/login_page.dart';
 import 'package:yeriko_app/shared/localstorage/index.dart';
 import 'package:yeriko_app/theme/colors.dart';
@@ -21,6 +22,13 @@ class DailyPage extends StatefulWidget {
 
 class _DailyPageState extends State<DailyPage> {
   bool _isLoading = false;
+  UserTotalsResponse? userTotalData;
+
+  @override
+  void initState() {
+    super.initState();
+    getTotalSummary("1", "2025");
+  }
 
   Future<dynamic> logout(BuildContext context) async {
     try {
@@ -82,6 +90,57 @@ class _DailyPageState extends State<DailyPage> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Please check your internet connection :$e")),
+      );
+    }
+  }
+
+  Future<dynamic> getTotalSummary(String userId, String year) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      if (userId == "" || year == "") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Please make sure you have provide username and password")),
+        );
+      } else {
+        String myApi = "$baseUrl/monthly/total/2/2020";
+        final response = await http.get(
+          Uri.parse(myApi),
+          headers: await authHeader,
+        );
+
+        var jsonResponse = json.decode(response.body);
+
+        if (response.statusCode == 200 && jsonResponse != null) {
+          setState(() {
+            _isLoading = false;
+          });
+
+          userTotalData = UserTotalsResponse.fromJson(jsonResponse);
+        } else if (response.statusCode == 404) {
+          //end here
+          setState(() {
+            _isLoading = false;
+          });
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(jsonResponse['message'])),
+          );
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }
@@ -184,18 +243,38 @@ class _DailyPageState extends State<DailyPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const Column(
+                      Column(
                         children: [
-                          Text(
-                            "\$8900",
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: mainFontColor),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
+                          _isLoading
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : Text(
+                                  (userTotalData != null && userTotalData!.response.isNotEmpty)
+                                      ? userTotalData!.response
+                                          .firstWhere(
+                                            (e) => e.name == "totalMonthly",
+                                            // orElse: () => UserTotalItem(name: "totalMonthly", total: 0),
+                                          )
+                                          .total
+                                          .toString()
+                                      : "0",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: mainFontColor,
+                                  ),
+                                ),
+                          SizedBox(height: 5),
                           Text(
                             "Jumla Kuu",
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w100, color: black),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w100,
+                              color: black,
+                            ),
                           ),
                         ],
                       ),
@@ -204,18 +283,38 @@ class _DailyPageState extends State<DailyPage> {
                         height: 40,
                         color: black.withAlpha((0.3 * 255).round()),
                       ),
-                      const Column(
+                      Column(
                         children: [
+                          _isLoading
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : Text(
+                                  (userTotalData != null && userTotalData!.response.isNotEmpty)
+                                      ? userTotalData!.response
+                                          .firstWhere(
+                                            (e) => e.name == "totalMonthlyByCurrent",
+                                            // orElse: () => UserTotalItem(name: "totalMonthly", total: 0),
+                                          )
+                                          .total
+                                          .toString()
+                                      : "0",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: mainFontColor,
+                                  ),
+                                ),
+                          SizedBox(height: 5),
                           Text(
-                            "\$5500",
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: mainFontColor),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            "Jumla Mwaka",
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w100, color: black),
+                            "Jumla Kuu",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w100,
+                              color: black,
+                            ),
                           ),
                         ],
                       ),

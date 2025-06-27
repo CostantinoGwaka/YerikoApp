@@ -35,7 +35,6 @@ class _MyAppState extends State<MyApp> {
           LoginResponseModel user = LoginResponseModel.fromJson(userMap);
           userData = user;
         });
-        print("userMap ${userData!.accessToken}");
       } else {
         userData = null;
       }

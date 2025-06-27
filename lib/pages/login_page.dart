@@ -1,6 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:yeriko_app/models/auth_model.dart';
 import 'package:yeriko_app/pages/home_page.dart';
+import 'package:yeriko_app/shared/localstorage/index.dart';
 import 'package:yeriko_app/theme/colors.dart';
+import 'package:yeriko_app/utils/url.dart';
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,8 +18,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _email = TextEditingController(text: "Username@gmail.com");
-  TextEditingController password = TextEditingController(text: "abcdef123456");
+  final TextEditingController _phone = TextEditingController();
+  TextEditingController _password = TextEditingController();
+  bool isPasswordVisible = false;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -21,28 +31,117 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future<dynamic> login(BuildContext context, String username, String password) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      if (username == "" || password == "") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Please make sure you have provide username and password")),
+        );
+      } else {
+        String myApi = "$baseUrl/auth/login";
+        final response = await http.post(
+          Uri.parse(myApi),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            "userName": username,
+            "password": password,
+          }),
+        );
+
+        var jsonResponse = json.decode(response.body);
+
+        if (response.statusCode == 200 && jsonResponse != null) {
+          setState(() {
+            _isLoading = false;
+          });
+
+          setState(() {
+            _phone.clear();
+            _password.clear();
+          });
+
+          final loginModel = LoginResponseModel.fromJson(jsonResponse);
+
+          final jsonString = jsonEncode(loginModel.toJson());
+          await LocalStorage.setStringItem("user_data", jsonString);
+
+          Navigator.push(
+            // ignore: use_build_context_synchronously
+            context,
+            PageTransition(type: PageTransitionType.fade, child: const HomePage()),
+          );
+
+          //end here
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Success! You have Login successfully")),
+          );
+        } else if (response.statusCode == 404) {
+          //end here
+          setState(() {
+            _isLoading = false;
+          });
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(jsonResponse['message'])),
+          );
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(jsonResponse['message'] ?? "User not found in our system")),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please check your internet connection :$e")),
+      );
+    }
+  }
+
   Widget getBody() {
     return SafeArea(
         child: Center(
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 50,
-          ),
-          Container(
-            width: 70,
-            height: 70,
-            decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                    image: NetworkImage(
-                        "https://images.unsplash.com/photo-1531256456869-ce942a665e80?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MTI4fHxwcm9maWxlfGVufDB8fDB8&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"),
-                    fit: BoxFit.cover)),
-          ),
-          const SizedBox(
-            height: 50,
-          ),
-          Container(
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            // Column(
+            //   children: [
+            //     const SizedBox(height: 2),
+            //     Text(
+            //       "YERIKO APP",
+            //       style: TextStyle(
+            //         fontSize: 32,
+            //         fontWeight: FontWeight.bold,
+            //         letterSpacing: 2,
+            //         color: buttoncolor,
+            //         shadows: [
+            //           Shadow(
+            //             color: Colors.black26,
+            //             blurRadius: 8,
+            //             offset: Offset(0, 3),
+            //           ),
+            //         ],
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            const SizedBox(
+              height: 50,
+            ),
+            Container(
               width: double.infinity,
               margin: const EdgeInsets.symmetric(horizontal: 25),
               decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
@@ -50,7 +149,6 @@ class _LoginPageState extends State<LoginPage> {
                   color: grey.withAlpha((0.03 * 255).round()),
                   spreadRadius: 10,
                   blurRadius: 3,
-                  // changes position of shadow
                 ),
               ]),
               child: Padding(
@@ -59,104 +157,185 @@ class _LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Email Address",
+                      "Namba ya simu",
                       style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13, color: Color(0xff67727d)),
                     ),
                     TextField(
-                      controller: _email,
+                      controller: _phone,
                       cursorColor: black,
-                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500, color: black),
+                      keyboardType: TextInputType.phone, // Show numeric keyboard
+                      maxLength: 10, // Limit to 10 characters
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly, // Only allow digits
+                        LengthLimitingTextInputFormatter(10), // Enforce 10 digit limit
+                      ],
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
+                        color: black,
+                      ),
                       decoration: const InputDecoration(
-                          prefixIcon: Icon(Icons.email_outlined),
-                          prefixIconColor: black,
-                          hintText: "Email",
-                          border: InputBorder.none),
+                        prefixIcon: Icon(Icons.phone_android),
+                        prefixIconColor: black,
+                        hintText: "Namba ya simu (10 digits)",
+                        border: InputBorder.none,
+                        counterText: "", // Hide the character counter
+                      ),
                     ),
                   ],
-                ),
-              )),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(horizontal: 25),
-              decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
-                BoxShadow(
-                  color: grey.withAlpha((0.03 * 255).round()),
-                  spreadRadius: 10,
-                  blurRadius: 3,
-                  // changes position of shadow
-                ),
-              ]),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20, top: 15, bottom: 5, right: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Password",
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13, color: Color(0xff67727d)),
-                    ),
-                    TextField(
-                      obscureText: true,
-                      controller: password,
-                      cursorColor: black,
-                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500, color: black),
-                      decoration: const InputDecoration(
-                          prefixIcon: Icon(Icons.lock_outline_rounded),
-                          prefixIconColor: Colors.black,
-                          suffixIcon: Icon(Icons.remove_red_eye_outlined),
-                          suffixIconColor: Colors.black,
-                          hintText: "Password",
-                          border: InputBorder.none),
-                    ),
-                  ],
-                ),
-              )),
-          const SizedBox(
-            height: 20,
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomePage(),
-                  ));
-            },
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.symmetric(horizontal: 25),
-              decoration: BoxDecoration(color: buttoncolor, borderRadius: BorderRadius.circular(25)),
-              child: const Center(
-                child: Text(
-                  "Login",
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 26.0, right: 26.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Signup",
-                  style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w300),
-                ),
-                Text(
-                  "Forgot Password?",
-                  style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w300),
-                ),
-              ],
+            const SizedBox(
+              height: 20,
             ),
-          )
-        ],
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 25),
+              decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
+                BoxShadow(
+                  color: grey.withAlpha((0.03 * 255).round()),
+                  spreadRadius: 10,
+                  blurRadius: 3,
+                ),
+              ]),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20, top: 15, bottom: 5, right: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Nenosiri",
+                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13, color: Color(0xff67727d)),
+                    ),
+                    TextField(
+                      obscureText: !isPasswordVisible, // Toggle based on state
+                      controller: _password,
+                      cursorColor: black,
+                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500, color: black),
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.lock_outline_rounded),
+                        prefixIconColor: Colors.black,
+                        suffixIcon: IconButton(
+                          icon: Icon(isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                          color: Colors.black,
+                          onPressed: () {
+                            setState(() {
+                              isPasswordVisible = !isPasswordVisible;
+                            });
+                          },
+                        ),
+                        hintText: "Nenosiri",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+
+            GestureDetector(
+              onTap: _isLoading
+                  ? null
+                  : () async {
+                      // Disable tap when loading
+                      if (_phone.text.length == 10 && _password.text.isNotEmpty) {
+                        // Start loading
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        login(context, _phone.text, _password.text);
+                        // try {
+                        //   // Simulate login process (replace with your actual login logic)
+                        //   await Future.delayed(const Duration(seconds: 2));
+
+                        //   // Navigate to HomePage if login is successful
+                        //   if (mounted) {
+                        //     // Check if widget is still mounted
+                        //     Navigator.pushReplacement(
+                        //       context,
+                        //       MaterialPageRoute(builder: (context) => const HomePage()),
+                        //     );
+                        //   }
+                        // } catch (e) {
+                        //   // Handle login error
+                        //   if (mounted) {
+                        //     ScaffoldMessenger.of(context).showSnackBar(
+                        //       const SnackBar(content: Text("Login failed. Please try again.")),
+                        //     );
+                        //   }
+                        // } finally {
+                        //   // Stop loading
+                        //   if (mounted) {
+                        //     setState(() {
+                        //       _isLoading = false;
+                        //     });
+                        //   }
+                        // }
+                      } else {
+                        // Show validation error
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Please enter a valid phone number and password.")),
+                        );
+                      }
+                    },
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.symmetric(horizontal: 25),
+                decoration: BoxDecoration(
+                    color: _isLoading
+                        ? buttoncolor.withAlpha((0.7 * 255).toInt())
+                        : buttoncolor, // Dim button when loading
+                    borderRadius: BorderRadius.circular(25)),
+                child: Center(
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.login, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              "Ingia",
+                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            const Padding(
+              padding: EdgeInsets.only(left: 26.0, right: 26.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "",
+                    style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w300),
+                  ),
+                  Text(
+                    "",
+                    style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w300),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     ));
   }

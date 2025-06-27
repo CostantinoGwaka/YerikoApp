@@ -1,8 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:yeriko_app/main.dart';
+import 'package:yeriko_app/pages/login_page.dart';
+import 'package:yeriko_app/shared/localstorage/index.dart';
 import 'package:yeriko_app/theme/colors.dart';
 import 'package:icon_badge/icon_badge.dart';
+import 'package:yeriko_app/utils/url.dart';
+import 'package:http/http.dart' as http;
 
 class DailyPage extends StatefulWidget {
   const DailyPage({super.key});
@@ -12,6 +20,72 @@ class DailyPage extends StatefulWidget {
 }
 
 class _DailyPageState extends State<DailyPage> {
+  bool _isLoading = false;
+
+  Future<dynamic> logout(BuildContext context) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      String myApi = "$baseUrl/auth/logout";
+      final response = await http.post(
+        Uri.parse(myApi),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      var jsonResponse = json.decode(response.body);
+
+      if (response.statusCode == 200 && jsonResponse != null) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        await LocalStorage.clearSharedPrefs();
+
+        Navigator.push(
+          // ignore: use_build_context_synchronously
+          context,
+          PageTransition(
+            type: PageTransitionType.fade,
+            child: const LoginPage(),
+          ),
+        );
+
+        //end here
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Success! You have Logout successfully")),
+        );
+      } else if (response.statusCode == 404) {
+        //end here
+        setState(() {
+          _isLoading = false;
+        });
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(jsonResponse['message'])),
+        );
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(jsonResponse['message'] ?? "User not found in our system")),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please check your internet connection :$e")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -33,41 +107,70 @@ class _DailyPageState extends State<DailyPage> {
               padding: const EdgeInsets.only(top: 20, bottom: 25, right: 20, left: 20),
               child: Column(
                 children: [
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [Icon(Icons.bar_chart), Icon(Icons.more_vert)],
+                    children: [
+                      Icon(Icons.bar_chart),
+                      PopupMenuButton<String>(
+                        icon: Icon(Icons.more_vert),
+                        onSelected: (value) {
+                          if (value == 'logout') {
+                            logout(context);
+                          }
+                        },
+                        itemBuilder: (BuildContext context) => [
+                          PopupMenuItem<String>(
+                            value: 'logout',
+                            child: Row(
+                              children: [
+                                if (_isLoading)
+                                  SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                else ...[
+                                  Icon(Icons.logout, color: Colors.black54),
+                                  SizedBox(width: 8),
+                                ],
+                                Text('Toka'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   const SizedBox(
                     height: 15,
                   ),
                   Column(
                     children: [
-                      Container(
-                        width: 70,
-                        height: 70,
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                                image: NetworkImage(
-                                    "https://images.unsplash.com/photo-1531256456869-ce942a665e80?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MTI4fHxwcm9maWxlfGVufDB8fDB8&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"),
-                                fit: BoxFit.cover)),
+                      CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: MediaQuery.of(context).size.height / 20,
+                        child: CircleAvatar(
+                          radius: MediaQuery.of(context).size.height / 8,
+                          backgroundColor: Colors.white,
+                          backgroundImage: const AssetImage("assets/avatar.png"),
+                        ),
                       ),
                       const SizedBox(
                         height: 10,
                       ),
                       SizedBox(
                         width: (size.width - 40) * 0.6,
-                        child: const Column(
+                        child: Column(
                           children: [
                             Text(
-                              "Abbie Wilson",
+                              userData!.userDetails.userFullName,
                               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: mainFontColor),
                             ),
                             SizedBox(
                               height: 10,
                             ),
                             Text(
-                              "Software Developer",
+                              "+255 ${userData!.userDetails.phone}",
                               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: black),
                             ),
                           ],
@@ -91,7 +194,7 @@ class _DailyPageState extends State<DailyPage> {
                             height: 5,
                           ),
                           Text(
-                            "Income",
+                            "Jumla Kuu",
                             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w100, color: black),
                           ),
                         ],
@@ -111,27 +214,7 @@ class _DailyPageState extends State<DailyPage> {
                             height: 5,
                           ),
                           Text(
-                            "Expenses",
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w100, color: black),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        width: 0.5,
-                        height: 40,
-                        color: black.withAlpha((0.3 * 255).round()),
-                      ),
-                      const Column(
-                        children: [
-                          Text(
-                            "\$890",
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: mainFontColor),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            "Loan",
+                            "Jumla Mwaka",
                             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w100, color: black),
                           ),
                         ],

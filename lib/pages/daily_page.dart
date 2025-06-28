@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:yeriko_app/main.dart';
+import 'package:yeriko_app/models/other_collection_model.dart';
 import 'package:yeriko_app/models/user_collection_model.dart';
 import 'package:yeriko_app/models/user_total_model.dart';
 import 'package:yeriko_app/pages/login_page.dart';
+import 'package:yeriko_app/pages/supports_pages/other_collection.dart';
 import 'package:yeriko_app/pages/supports_pages/view_collection.dart';
 import 'package:yeriko_app/shared/localstorage/index.dart';
 import 'package:yeriko_app/theme/colors.dart';
@@ -24,6 +26,7 @@ class _DailyPageState extends State<DailyPage> {
   bool _isLoading = false;
   UserTotalsResponse? userTotalData;
   CollectionResponse? collections;
+  OtherCollectionResponse? otherCollectionResponse;
   // UserCollectionResponse userCollectionData;
 
   @override
@@ -31,6 +34,7 @@ class _DailyPageState extends State<DailyPage> {
     super.initState();
     if (userData != null && currentYear != null) {
       getTotalSummary(userData!.user.id, currentYear!.data.churchYear);
+      getUserOtherCollections();
     }
   }
 
@@ -159,6 +163,49 @@ class _DailyPageState extends State<DailyPage> {
     return null;
   }
 
+  Future<OtherCollectionResponse?> getUserOtherCollections() async {
+    try {
+      if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Please provide username and password")),
+          );
+        }
+        // setState(() => _isLoading = false);
+        return null;
+      }
+
+      final String myApi = "$baseUrl/monthly/get_all_other_collection_by_user.php?userId=${userData!.user.id}";
+      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse != null) {
+          // setState(() => _isLoading = false);
+          otherCollectionResponse = OtherCollectionResponse.fromJson(jsonResponse);
+          return otherCollectionResponse;
+        }
+      } else {
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: ${response.statusCode}")),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Check your internet connection: $e")),
+        );
+      }
+    }
+
+    // 🔁 Always return something to complete Future
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -168,8 +215,25 @@ class _DailyPageState extends State<DailyPage> {
       child: SingleChildScrollView(
         child: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 20.0, bottom: 2),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    DateFormat('MMM d, yyyy').format(DateTime.now()),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: mainFontColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Container(
-              margin: const EdgeInsets.only(top: 25, left: 25, right: 25, bottom: 10),
+              margin: const EdgeInsets.only(top: 10, left: 25, right: 25, bottom: 10),
               decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
                 BoxShadow(
                   color: grey.withAlpha((0.03 * 255).round()),
@@ -280,68 +344,136 @@ class _DailyPageState extends State<DailyPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Column(
-                          children: [
-                            _isLoading
-                                ? SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  )
-                                : Text(
-                                    (userTotalData != null && userTotalData!.overallTotal.toString().isNotEmpty)
-                                        ? "TZS ${NumberFormat("#,##0", "en_US").format(userTotalData!.overallTotal)}/="
-                                        : "0.00",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: mainFontColor,
-                                    ),
-                                  ),
-                            SizedBox(height: 5),
-                            Text(
-                              "Jumla Yote",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w100,
-                                color: black,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    CollectionsTablePage(collections: collections != null ? collections!.data : []),
                               ),
-                            ),
-                          ],
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              _isLoading
+                                  ? SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  : Text(
+                                      (userTotalData != null && userTotalData!.overallTotal.toString().isNotEmpty)
+                                          ? "${NumberFormat("#,##0", "en_US").format(userTotalData!.overallTotal)}/="
+                                          : "0.00",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: mainFontColor,
+                                      ),
+                                    ),
+                              SizedBox(height: 5),
+                              Text(
+                                "Jumla Yote",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w100,
+                                  color: black,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         Container(
                           width: 0.5,
                           height: 40,
                           color: black.withAlpha((0.3 * 255).round()),
                         ),
-                        Column(
-                          children: [
-                            _isLoading
-                                ? SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  )
-                                : Text(
-                                    (userTotalData != null && userTotalData!.overallTotal.toString().isNotEmpty)
-                                        ? "TZS ${NumberFormat("#,##0", "en_US").format(userTotalData!.currentYearTotal)}/="
-                                        : "0.00",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: mainFontColor,
-                                    ),
-                                  ),
-                            SizedBox(height: 5),
-                            Text(
-                              "Jumla Kuu",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w100,
-                                color: black,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    CollectionsTablePage(collections: collections != null ? collections!.data : []),
                               ),
-                            ),
-                          ],
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              _isLoading
+                                  ? SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  : Text(
+                                      (userTotalData != null && userTotalData!.overallTotal.toString().isNotEmpty)
+                                          ? "${NumberFormat("#,##0", "en_US").format(userTotalData!.currentYearTotal)}/="
+                                          : "0.00",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: mainFontColor,
+                                      ),
+                                    ),
+                              SizedBox(height: 5),
+                              Text(
+                                "Michango ya Mwaka",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w100,
+                                  color: black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 0.5,
+                          height: 40,
+                          color: black.withAlpha((0.3 * 255).round()),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => OtherCollectionsTablePage(
+                                    otherCollections:
+                                        otherCollectionResponse != null ? otherCollectionResponse!.data : []),
+                              ),
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              _isLoading
+                                  ? SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  : Text(
+                                      (userTotalData != null && userTotalData!.otherTotal.toString().isNotEmpty)
+                                          ? "${NumberFormat("#,##0", "en_US").format(userTotalData!.otherTotal)}/="
+                                          : "0.00",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: mainFontColor,
+                                      ),
+                                    ),
+                              SizedBox(height: 5),
+                              Text(
+                                "Michango Mingine",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w100,
+                                  color: black,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     )
@@ -384,14 +516,6 @@ class _DailyPageState extends State<DailyPage> {
                       )
                     ],
                   ),
-                  // Text(
-                  //   DateFormat('MMM d, yyyy').format(DateTime.now()),
-                  //   style: const TextStyle(
-                  //     fontWeight: FontWeight.w600,
-                  //     fontSize: 13,
-                  //     color: mainFontColor,
-                  //   ),
-                  // ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: mainFontColor,
@@ -399,10 +523,10 @@ class _DailyPageState extends State<DailyPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
                       elevation: 2,
                     ),
-                    icon: const Icon(Icons.visibility, size: 20),
+                    icon: const Icon(Icons.visibility, size: 15),
                     label: const Text(
                       "Tazama Yote",
                       style: TextStyle(

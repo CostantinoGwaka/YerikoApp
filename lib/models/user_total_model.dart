@@ -5,6 +5,7 @@ class UserTotalsResponse {
   final String churchYear;
   final int currentYearTotal;
   final int overallTotal;
+  final int otherTotal;
 
   UserTotalsResponse({
     required this.status,
@@ -13,17 +14,18 @@ class UserTotalsResponse {
     required this.churchYear,
     required this.currentYearTotal,
     required this.overallTotal,
+    required this.otherTotal,
   });
 
   factory UserTotalsResponse.fromJson(Map<String, dynamic> json) {
     return UserTotalsResponse(
-      status: json['status'],
-      message: json['message'],
-      userId: json['userId'],
-      churchYear: json['churchYear'],
-      currentYearTotal: json['currentYearTotal'],
-      overallTotal: json['overallTotal'],
-    );
+        status: json['status'],
+        message: json['message'],
+        userId: json['userId'],
+        churchYear: json['churchYear'],
+        currentYearTotal: json['currentYearTotal'],
+        overallTotal: json['overallTotal'],
+        otherTotal: json['otherTotal']);
   }
 
   Map<String, dynamic> toJson() {
@@ -34,6 +36,7 @@ class UserTotalsResponse {
       'churchYear': churchYear,
       'currentYearTotal': currentYearTotal,
       'overallTotal': overallTotal,
+      'otherTotal': otherTotal
     };
   }
 }

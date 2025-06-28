@@ -19,7 +19,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _phone = TextEditingController();
-  TextEditingController _password = TextEditingController();
+  final TextEditingController _password = TextEditingController();
   bool isPasswordVisible = false;
   bool _isLoading = false;
 
@@ -117,27 +117,27 @@ class _LoginPageState extends State<LoginPage> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            // Column(
-            //   children: [
-            //     const SizedBox(height: 2),
-            //     Text(
-            //       "YERIKO APP",
-            //       style: TextStyle(
-            //         fontSize: 32,
-            //         fontWeight: FontWeight.bold,
-            //         letterSpacing: 2,
-            //         color: buttoncolor,
-            //         shadows: [
-            //           Shadow(
-            //             color: Colors.black26,
-            //             blurRadius: 8,
-            //             offset: Offset(0, 3),
-            //           ),
-            //         ],
-            //       ),
-            //     ),
-            //   ],
-            // ),
+            Column(
+              children: [
+                const SizedBox(height: 2),
+                Text(
+                  "YERIKO APP",
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                    color: buttoncolor,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black26,
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(
               height: 50,
             ),
@@ -236,7 +236,6 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(
               height: 20,
             ),
-
             GestureDetector(
               onTap: _isLoading
                   ? null

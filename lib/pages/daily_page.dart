@@ -1,10 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:yeriko_app/main.dart';
+import 'package:yeriko_app/models/user_collection_model.dart';
 import 'package:yeriko_app/models/user_total_model.dart';
 import 'package:yeriko_app/pages/login_page.dart';
 import 'package:yeriko_app/shared/localstorage/index.dart';
@@ -23,11 +24,15 @@ class DailyPage extends StatefulWidget {
 class _DailyPageState extends State<DailyPage> {
   bool _isLoading = false;
   UserTotalsResponse? userTotalData;
+  // UserCollectionResponse userCollectionData;
 
   @override
   void initState() {
     super.initState();
-    getTotalSummary("1", "2025");
+    if (userData != null && currentYear != null) {
+      getTotalSummary(userData!.userDetails.id, currentYear!.response.churchYear);
+      // getUserCollections(userData!.userDetails.id, currentYear!.response.churchYear);
+    }
   }
 
   Future<dynamic> logout(BuildContext context) async {
@@ -94,18 +99,22 @@ class _DailyPageState extends State<DailyPage> {
     }
   }
 
-  Future<dynamic> getTotalSummary(String userId, String year) async {
+  Future<dynamic> getTotalSummary(int userId, String year) async {
     try {
       setState(() {
         _isLoading = true;
       });
 
-      if (userId == "" || year == "") {
+      if (userId.toString().isEmpty || year == "" || year.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Please make sure you have provide username and password")),
+          SnackBar(content: Text("Tafadhali hakikisha umeweka User ID na mwaka")),
         );
+        setState(() {
+          _isLoading = false;
+        });
+        return;
       } else {
-        String myApi = "$baseUrl/monthly/total/2/2020";
+        String myApi = "$baseUrl/monthly/total/$userId/$year";
         final response = await http.get(
           Uri.parse(myApi),
           headers: await authHeader,
@@ -145,6 +154,77 @@ class _DailyPageState extends State<DailyPage> {
     }
   }
 
+  Future<UserCollectionResponse> getUserCollections(int userId, String year) async {
+    print("User ID: $userId, Year: $year");
+    try {
+      if (userId.toString().isEmpty || year == "") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Please make sure you have provide username and password")),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+        return UserCollectionResponse(
+          statusCode: 400,
+          message: "Please make sure you have provide username and password",
+          response: [],
+        );
+      } else {
+        String myApi = "$baseUrl/monthly/getMonthly/$userId";
+        final response = await http.get(
+          Uri.parse(myApi),
+          headers: await authHeader,
+        );
+
+        var jsonResponse = json.decode(response.body);
+
+        if (response.statusCode == 200 && jsonResponse != null) {
+          setState(() {
+            _isLoading = false;
+          });
+
+          return UserCollectionResponse.fromJson(jsonResponse);
+        } else if (response.statusCode == 404) {
+          //end here
+          setState(() {
+            _isLoading = false;
+          });
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(jsonResponse['message'])),
+          );
+          return UserCollectionResponse(
+            statusCode: 404,
+            message: jsonResponse['message'],
+            response: [],
+          );
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+          return UserCollectionResponse(
+            statusCode: 404,
+            message: jsonResponse['message'],
+            response: [],
+          );
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+      );
+      return UserCollectionResponse(
+        statusCode: 404,
+        message: "Tafadhali hakikisha umeunganishwa na intaneti: $e",
+        response: [],
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -169,7 +249,28 @@ class _DailyPageState extends State<DailyPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Icon(Icons.bar_chart),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Mwaka wa Kanisa",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            currentYear != null ? currentYear!.response.churchYear : "Hakuna Mwaka wa Kanisa",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: mainFontColor,
+                            ),
+                          ),
+                        ],
+                      ),
                       PopupMenuButton<String>(
                         icon: Icon(Icons.more_vert),
                         onSelected: (value) {
@@ -229,7 +330,7 @@ class _DailyPageState extends State<DailyPage> {
                               height: 10,
                             ),
                             Text(
-                              "+255 ${userData!.userDetails.phone}",
+                              "+${userData!.userDetails.phone}",
                               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: black),
                             ),
                           ],
@@ -253,14 +354,14 @@ class _DailyPageState extends State<DailyPage> {
                                 )
                               : Text(
                                   (userTotalData != null && userTotalData!.response.isNotEmpty)
-                                      ? userTotalData!.response
-                                          .firstWhere(
-                                            (e) => e.name == "totalMonthly",
-                                            // orElse: () => UserTotalItem(name: "totalMonthly", total: 0),
-                                          )
-                                          .total
-                                          .toString()
-                                      : "0",
+                                      ? "${NumberFormat("#,##0", "en_US").format(
+                                          userTotalData!.response
+                                              .firstWhere(
+                                                (e) => e.name == "totalMonthly",
+                                              )
+                                              .total,
+                                        )}/="
+                                      : "0.00",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -293,14 +394,14 @@ class _DailyPageState extends State<DailyPage> {
                                 )
                               : Text(
                                   (userTotalData != null && userTotalData!.response.isNotEmpty)
-                                      ? userTotalData!.response
-                                          .firstWhere(
-                                            (e) => e.name == "totalMonthlyByCurrent",
-                                            // orElse: () => UserTotalItem(name: "totalMonthly", total: 0),
-                                          )
-                                          .total
-                                          .toString()
-                                      : "0",
+                                      ? "${NumberFormat("#,##0", "en_US").format(
+                                          userTotalData!.response
+                                              .firstWhere(
+                                                (e) => e.name == "totalMonthlyByCurrent",
+                                              )
+                                              .total,
+                                        )}/="
+                                      : "0.00",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -336,7 +437,7 @@ class _DailyPageState extends State<DailyPage> {
                   children: [
                     Row(
                       children: [
-                        const Text("Overview",
+                        const Text("Michango",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -359,266 +460,185 @@ class _DailyPageState extends State<DailyPage> {
                     )
                   ],
                 ),
-                // Text("Overview",
-                //     style: TextStyle(
-                //       fontWeight: FontWeight.bold,
-                //       fontSize: 20,
-                //       color: mainFontColor,
-                //     )),
-                const Text("Jan 16, 2023",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                      color: mainFontColor,
-                    )),
+                Text(
+                  DateFormat('MMM d, yyyy').format(DateTime.now()),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: mainFontColor,
+                  ),
+                ),
               ],
             ),
           ),
           const SizedBox(
             height: 5,
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(
-                          top: 20,
-                          left: 25,
-                          right: 25,
-                        ),
-                        decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: Column(
+          //     children: [
+          //       Row(
+          //         children: [
+          //           Expanded(
+          //             child: Container(
+          //               margin: const EdgeInsets.only(
+          //                 top: 20,
+          //                 left: 25,
+          //                 right: 25,
+          //               ),
+          //               decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
+          //                 BoxShadow(
+          //                   color: grey.withAlpha((0.03 * 255).round()),
+          //                   spreadRadius: 10,
+          //                   blurRadius: 3,
+          //                   // changes position of shadow
+          //                 ),
+          //               ]),
+          //               child: Padding(
+          //                 padding: const EdgeInsets.only(top: 10, bottom: 10, right: 20, left: 20),
+          //                 child: Row(
+          //                   children: [
+          //                     Container(
+          //                       width: 50,
+          //                       height: 50,
+          //                       decoration: BoxDecoration(
+          //                         color: arrowbgColor,
+          //                         borderRadius: BorderRadius.circular(15),
+          //                         // shape: BoxShape.circle
+          //                       ),
+          //                       child: const Center(child: Icon(Icons.arrow_upward_rounded)),
+          //                     ),
+          //                     const SizedBox(
+          //                       width: 15,
+          //                     ),
+          //                     Expanded(
+          //                       child: SizedBox(
+          //                         width: (size.width - 90) * 0.7,
+          //                         child: Column(
+          //                             mainAxisAlignment: MainAxisAlignment.center,
+          //                             crossAxisAlignment: CrossAxisAlignment.start,
+          //                             children: [
+          //                               const Text(
+          //                                 "Sent",
+          //                                 style: TextStyle(fontSize: 15, color: black, fontWeight: FontWeight.bold),
+          //                               ),
+          //                               const SizedBox(
+          //                                 height: 5,
+          //                               ),
+          //                               Text(
+          //                                 "Sending Payment to Clients",
+          //                                 style: TextStyle(
+          //                                     fontSize: 12,
+          //                                     color: black.withAlpha((0.5 * 255).round()),
+          //                                     fontWeight: FontWeight.w400),
+          //                               ),
+          //                             ]),
+          //                       ),
+          //                     ),
+          //                     Expanded(
+          //                       child: const Row(
+          //                         mainAxisAlignment: MainAxisAlignment.end,
+          //                         children: [
+          //                           Text(
+          //                             "\$150",
+          //                             style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
+          //                           )
+          //                         ],
+          //                       ),
+          //                     )
+          //                   ],
+          //                 ),
+          //               ),
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //       const SizedBox(
+          //         height: 5,
+          //       ),
+          //     ],
+          //   ),
+          // )
+          FutureBuilder(
+            future: getUserCollections(userData!.userDetails.id, currentYear!.response.churchYear), // Your async method
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return const Center(child: Text("Failed to load collection data."));
+              } else if (!snapshot.hasData || snapshot.data!.response.isEmpty) {
+                return const Center(child: Text("No collection data found."));
+              }
+
+              final collections = snapshot.data!.response;
+
+              return ListView.builder(
+                itemCount: collections.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  final item = collections[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
                           BoxShadow(
-                            color: grey.withAlpha((0.03 * 255).round()),
-                            spreadRadius: 10,
-                            blurRadius: 3,
-                            // changes position of shadow
+                            color: grey.withOpacity(0.05),
+                            spreadRadius: 5,
+                            blurRadius: 10,
                           ),
-                        ]),
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 10, right: 20, left: 20),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: arrowbgColor,
-                                  borderRadius: BorderRadius.circular(15),
-                                  // shape: BoxShape.circle
-                                ),
-                                child: const Center(child: Icon(Icons.arrow_upward_rounded)),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: arrowbgColor,
+                                borderRadius: BorderRadius.circular(15),
                               ),
-                              const SizedBox(
-                                width: 15,
+                              child: const Icon(Icons.monetization_on_rounded, color: Colors.white),
+                            ),
+                            const SizedBox(width: 15),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.monthly,
+                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "${item.registeredBy} (${item.user.userFullName})",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: black.withOpacity(0.6),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Expanded(
-                                child: SizedBox(
-                                  width: (size.width - 90) * 0.7,
-                                  child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          "Sent",
-                                          style: TextStyle(fontSize: 15, color: black, fontWeight: FontWeight.bold),
-                                        ),
-                                        const SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text(
-                                          "Sending Payment to Clients",
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: black.withAlpha((0.5 * 255).round()),
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ]),
-                                ),
-                              ),
-                              Expanded(
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      "\$150",
-                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
+                            ),
+                            Text(
+                              "TZS ${item.amount.toString()}",
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(
-                          top: 10,
-                          left: 25,
-                          right: 25,
-                        ),
-                        decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
-                          BoxShadow(
-                            color: grey.withAlpha((0.03 * 255).round()),
-                            spreadRadius: 10,
-                            blurRadius: 3,
-                            // changes position of shadow
-                          ),
-                        ]),
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 10, right: 20, left: 20),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: arrowbgColor,
-                                  borderRadius: BorderRadius.circular(15),
-                                  // shape: BoxShape.circle
-                                ),
-                                child: const Center(child: Icon(Icons.arrow_downward_rounded)),
-                              ),
-                              const SizedBox(
-                                width: 15,
-                              ),
-                              Expanded(
-                                child: SizedBox(
-                                  width: (size.width - 90) * 0.7,
-                                  child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          "Receive",
-                                          style: TextStyle(fontSize: 15, color: black, fontWeight: FontWeight.bold),
-                                        ),
-                                        const SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text(
-                                          "Receiving Payment from company",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: black.withValues(alpha: 0.5),
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
-                                      ]),
-                                ),
-                              ),
-                              Expanded(
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      "\$250",
-                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(
-                          top: 10,
-                          left: 25,
-                          right: 25,
-                        ),
-                        decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
-                          BoxShadow(
-                            color: grey.withValues(alpha: 0.03),
-                            spreadRadius: 10,
-                            blurRadius: 3,
-                            // changes position of shadow
-                          ),
-                        ]),
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 10, right: 20, left: 20),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: arrowbgColor,
-                                  borderRadius: BorderRadius.circular(15),
-                                  // shape: BoxShape.circle
-                                ),
-                                child: const Center(child: Icon(CupertinoIcons.money_dollar)),
-                              ),
-                              const SizedBox(
-                                width: 15,
-                              ),
-                              Expanded(
-                                child: SizedBox(
-                                  width: (size.width - 90) * 0.7,
-                                  child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          "Loan",
-                                          style: TextStyle(fontSize: 15, color: black, fontWeight: FontWeight.bold),
-                                        ),
-                                        const SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text(
-                                          "Loan for the Car",
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: black.withValues(alpha: 0.5),
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ]),
-                                ),
-                              ),
-                              Expanded(
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      "\$400",
-                                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: black),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )
+                  );
+                },
+              );
+            },
+          ),
         ],
       ),
     ));

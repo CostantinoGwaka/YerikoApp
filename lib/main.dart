@@ -1,15 +1,40 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:yeriko_app/models/auth_model.dart';
+import 'package:yeriko_app/models/current_fy_model.dart';
 import 'package:yeriko_app/pages/home_page.dart';
 import 'package:yeriko_app/pages/login_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:yeriko_app/shared/localstorage/index.dart';
+import 'package:yeriko_app/utils/url.dart';
+import 'package:http/http.dart' as http;
 
 LoginResponseModel? userData;
+CurrentChurchYearResponse? currentYear;
 
-void main() {
+Future<void> getCurrentChurchYearData() async {
+  try {
+    String myApi = "$baseUrl/churchYear/getActiveYear";
+    final response = await http.get(
+      Uri.parse(myApi),
+    );
+
+    var jsonResponse = json.decode(response.body);
+
+    if (response.statusCode == 200 && jsonResponse != null) {
+      currentYear = CurrentChurchYearResponse.fromJson(jsonResponse);
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print("Tafadhali hakikisha umeunganishwa na intaneti: $e");
+    }
+  }
+}
+
+void main() async {
+  await getCurrentChurchYearData();
   runApp(const MyApp());
 }
 

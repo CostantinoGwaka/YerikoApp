@@ -31,6 +31,7 @@ class LocalStorage {
     return prefs.remove(key);
   }
 
+  // ignore: strict_top_level_inference
   static Future<void> logOut(context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();

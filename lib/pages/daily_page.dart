@@ -7,6 +7,7 @@ import 'package:yeriko_app/main.dart';
 import 'package:yeriko_app/models/user_collection_model.dart';
 import 'package:yeriko_app/models/user_total_model.dart';
 import 'package:yeriko_app/pages/login_page.dart';
+import 'package:yeriko_app/pages/supports_pages/view_collection.dart';
 import 'package:yeriko_app/shared/localstorage/index.dart';
 import 'package:yeriko_app/theme/colors.dart';
 import 'package:yeriko_app/utils/url.dart';
@@ -22,6 +23,7 @@ class DailyPage extends StatefulWidget {
 class _DailyPageState extends State<DailyPage> {
   bool _isLoading = false;
   UserTotalsResponse? userTotalData;
+  CollectionResponse? collections;
   // UserCollectionResponse userCollectionData;
 
   @override
@@ -133,7 +135,8 @@ class _DailyPageState extends State<DailyPage> {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
           // setState(() => _isLoading = false);
-          return CollectionResponse.fromJson(jsonResponse);
+          collections = CollectionResponse.fromJson(jsonResponse);
+          return collections;
         }
       } else {
         if (context.mounted) {
@@ -407,7 +410,15 @@ class _DailyPageState extends State<DailyPage> {
                         fontSize: 16,
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              CollectionsTablePage(collections: collections != null ? collections!.data : []),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

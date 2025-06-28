@@ -11,20 +11,21 @@ import 'package:yeriko_app/shared/localstorage/index.dart';
 import 'package:yeriko_app/utils/url.dart';
 import 'package:http/http.dart' as http;
 
-LoginResponseModel? userData;
-CurrentChurchYearResponse? currentYear;
+LoginResponse? userData;
+ActiveChurchYearResponse? currentYear;
 
 Future<void> getCurrentChurchYearData() async {
   try {
-    String myApi = "$baseUrl/churchYear/getActiveYear";
+    String myApi = "$baseUrl/year/get_active_year.php";
     final response = await http.get(
       Uri.parse(myApi),
+      headers: {'Accept': 'application/json'},
     );
 
     var jsonResponse = json.decode(response.body);
 
     if (response.statusCode == 200 && jsonResponse != null) {
-      currentYear = CurrentChurchYearResponse.fromJson(jsonResponse);
+      currentYear = ActiveChurchYearResponse.fromJson(jsonResponse);
     }
   } catch (e) {
     if (kDebugMode) {
@@ -57,7 +58,7 @@ class _MyAppState extends State<MyApp> {
       if (value.isNotEmpty) {
         setState(() {
           Map<String, dynamic> userMap = jsonDecode(value);
-          LoginResponseModel user = LoginResponseModel.fromJson(userMap);
+          LoginResponse user = LoginResponse.fromJson(userMap);
           userData = user;
         });
       } else {
@@ -74,7 +75,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         fontFamily: GoogleFonts.poppins().fontFamily,
       ),
-      home: (userData != null && userData!.accessToken.isNotEmpty) ? HomePage() : LoginPage(),
+      home: (userData != null && userData!.user.phone.isNotEmpty) ? HomePage() : LoginPage(),
     );
   }
 }

@@ -1,29 +1,27 @@
-class CurrentChurchYearResponse {
-  final int statusCode;
+class ActiveChurchYearResponse {
+  final String status;
   final String message;
-  final ChurchYear response;
+  final ChurchYear data;
 
-  CurrentChurchYearResponse({
-    required this.statusCode,
+  ActiveChurchYearResponse({
+    required this.status,
     required this.message,
-    required this.response,
+    required this.data,
   });
 
-  factory CurrentChurchYearResponse.fromJson(Map<String, dynamic> json) {
-    return CurrentChurchYearResponse(
-      statusCode: json['statusCode'],
+  factory ActiveChurchYearResponse.fromJson(Map<String, dynamic> json) {
+    return ActiveChurchYearResponse(
+      status: json['status'],
       message: json['message'],
-      response: ChurchYear.fromJson(json['response']),
+      data: ChurchYear.fromJson(json['data']),
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'statusCode': statusCode,
-      'message': message,
-      'response': response.toJson(),
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'status': status,
+        'message': message,
+        'data': data.toJson(),
+      };
 }
 
 class ChurchYear {
@@ -41,15 +39,13 @@ class ChurchYear {
     return ChurchYear(
       id: json['id'],
       churchYear: json['churchYear'],
-      isActive: json['isActive'],
+      isActive: json['isActive'].toString() == "1", // convert "1"/"0" to true/false
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'churchYear': churchYear,
-      'isActive': isActive,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'churchYear': churchYear,
+        'isActive': isActive ? "1" : "0",
+      };
 }

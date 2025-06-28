@@ -42,14 +42,14 @@ class _LoginPageState extends State<LoginPage> {
           SnackBar(content: Text("Please make sure you have provide username and password")),
         );
       } else {
-        String myApi = "$baseUrl/auth/login";
+        String myApi = "$baseUrl/auth/login.php";
         final response = await http.post(
           Uri.parse(myApi),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            "userName": username,
+          headers: {'Accept': 'application/json'},
+          body: {
+            "uname": "255${username.substring(1)}",
             "password": password,
-          }),
+          },
         );
 
         var jsonResponse = json.decode(response.body);
@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
             _password.clear();
           });
 
-          final loginModel = LoginResponseModel.fromJson(jsonResponse);
+          final loginModel = LoginResponse.fromJson(jsonResponse);
 
           final jsonString = jsonEncode(loginModel.toJson());
           await LocalStorage.setStringItem("user_data", jsonString);

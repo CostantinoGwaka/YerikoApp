@@ -1,51 +1,39 @@
 class UserTotalsResponse {
-  final int statusCode;
+  final String status;
   final String message;
-  final List<TotalItem> response;
+  final int userId;
+  final String churchYear;
+  final int currentYearTotal;
+  final int overallTotal;
 
   UserTotalsResponse({
-    required this.statusCode,
+    required this.status,
     required this.message,
-    required this.response,
+    required this.userId,
+    required this.churchYear,
+    required this.currentYearTotal,
+    required this.overallTotal,
   });
 
   factory UserTotalsResponse.fromJson(Map<String, dynamic> json) {
     return UserTotalsResponse(
-      statusCode: json['statusCode'],
+      status: json['status'],
       message: json['message'],
-      response: (json['response'] as List).map((item) => TotalItem.fromJson(item)).toList(),
+      userId: json['userId'],
+      churchYear: json['churchYear'],
+      currentYearTotal: json['currentYearTotal'],
+      overallTotal: json['overallTotal'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'statusCode': statusCode,
+      'status': status,
       'message': message,
-      'response': response.map((item) => item.toJson()).toList(),
-    };
-  }
-}
-
-class TotalItem {
-  final String name;
-  final int total;
-
-  TotalItem({
-    required this.name,
-    required this.total,
-  });
-
-  factory TotalItem.fromJson(Map<String, dynamic> json) {
-    return TotalItem(
-      name: json['name'],
-      total: json['total'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'total': total,
+      'userId': userId,
+      'churchYear': churchYear,
+      'currentYearTotal': currentYearTotal,
+      'overallTotal': overallTotal,
     };
   }
 }

@@ -1,41 +1,67 @@
-import 'package:yeriko_app/models/user_model.dart';
-
-class LoginResponseModel {
-  final int statusCode;
+class LoginResponse {
+  final String status;
   final String message;
-  final String accessToken;
-  final int loginTime;
-  final int expirationDuration;
-  final UserDetails userDetails;
+  final User user;
 
-  LoginResponseModel({
-    required this.statusCode,
+  LoginResponse({
+    required this.status,
     required this.message,
-    required this.accessToken,
-    required this.loginTime,
-    required this.expirationDuration,
-    required this.userDetails,
+    required this.user,
   });
 
-  factory LoginResponseModel.fromJson(Map<String, dynamic> json) {
-    return LoginResponseModel(
-      statusCode: json['statusCode'],
+  factory LoginResponse.fromJson(Map<String, dynamic> json) {
+    return LoginResponse(
+      status: json['status'],
       message: json['message'],
-      accessToken: json['accessToken'],
-      loginTime: json['loginTime'],
-      expirationDuration: json['expirationDuration'],
-      userDetails: UserDetails.fromJson(json['userDetails']),
+      user: User.fromJson(json['user']),
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'statusCode': statusCode,
-      'message': message,
-      'accessToken': accessToken,
-      'loginTime': loginTime,
-      'expirationDuration': expirationDuration,
-      'userDetails': userDetails.toJson(),
-    };
+  Map<String, dynamic> toJson() => {
+        'status': status,
+        'message': message,
+        'user': user.toJson(),
+      };
+}
+
+class User {
+  final int id;
+  final String phone;
+  final String userFullName;
+  final String yearRegistered;
+  final String createdAt;
+  final String userName;
+  final String role;
+
+  User({
+    required this.id,
+    required this.phone,
+    required this.userFullName,
+    required this.yearRegistered,
+    required this.createdAt,
+    required this.userName,
+    required this.role,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'],
+      phone: json['phone'],
+      userFullName: json['user_full_name'],
+      yearRegistered: json['year_registered'],
+      createdAt: json['createdAt'],
+      userName: json['user_name'],
+      role: json['role'],
+    );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'phone': phone,
+        'user_full_name': userFullName,
+        'year_registered': yearRegistered,
+        'createdAt': createdAt,
+        'user_name': userName,
+        'role': role,
+      };
 }

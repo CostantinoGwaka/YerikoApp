@@ -11,11 +11,12 @@ const String expirationDuration = 'expirationDuration';
 const String currency = 'TZS';
 
 //url
-const String localIp = "127.0.0.1";
+//
+const String localIp = "http://localhost:8888/yeriko_jumuiya/api";
 const String remoteIp = "192.168.0.126";
 const String activeIp = localIp;
 const String port = "8081";
-final String baseUrl = "http://$activeIp:$port/api";
+final String baseUrl = localIp; //"http://$activeIp:$port/api";
 
 String getFirstWord(String inputString) {
   List<String> wordList = inputString.split(" ");
@@ -29,5 +30,5 @@ String getFirstWord(String inputString) {
 
 Future<Map<String, String>> get authHeader async => {
       'Content-Type': 'application/json',
-      HttpHeaders.authorizationHeader: 'Bearer ${userData!.accessToken}',
+      HttpHeaders.authorizationHeader: 'Bearer ${userData!.user.id}',
     };

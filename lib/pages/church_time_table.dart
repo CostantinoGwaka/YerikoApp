@@ -122,7 +122,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [Icon(CupertinoIcons.back), Icon(CupertinoIcons.search)],
+                    children: [Text(""), Icon(CupertinoIcons.search)],
                   ),
                 ],
               ),
@@ -142,7 +142,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                       fontSize: 20,
                       color: mainFontColor,
                     )),
-                if (userData!.user.role == "ADMIN") ...[
+                if (userData != null && userData!.user.role == "ADMIN") ...[
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: mainFontColor,

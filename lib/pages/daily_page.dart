@@ -33,6 +33,7 @@ class _DailyPageState extends State<DailyPage> {
   void initState() {
     super.initState();
     if (userData != null && currentYear != null) {
+      setState(() {});
       getTotalSummary(userData!.user.id!, currentYear!.data.churchYear);
       getUserOtherCollections();
     }
@@ -47,22 +48,28 @@ class _DailyPageState extends State<DailyPage> {
   }
 
   Future<dynamic> logout(BuildContext context) async {
+    // Clear storage first
     await LocalStorage.clearSharedPrefs();
 
-    Navigator.push(
-      // ignore: use_build_context_synchronously
-      context,
-      PageTransition(
-        type: PageTransitionType.fade,
-        child: const LoginPage(),
-      ),
-    );
+    // Use Future.microtask to delay navigation until next frame
+    Future.microtask(() {
+      Navigator.pushAndRemoveUntil(
+        // ignore: use_build_context_synchronously
+        context,
+        PageTransition(
+          type: PageTransitionType.fade,
+          child: const LoginPage(),
+        ),
+        (route) => false, // Remove all previous routes
+      );
+    });
 
-    //end here
-    // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Success! You have Logout successfully")),
-    );
+    // Show snackBar AFTER navigation is complete using post-frame callback
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("✅ Success! You have logged out.")),
+      );
+    });
   }
 
   Future<dynamic> getTotalSummary(int userId, String year) async {

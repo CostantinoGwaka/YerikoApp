@@ -1,4 +1,6 @@
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yeriko_app/main.dart';
 
 class LocalStorage {
   static Future<bool> setStringItem(String key, String value) async {
@@ -40,8 +42,11 @@ class LocalStorage {
     // Phoenix.rebirth(context);
   }
 
+  // ignore: strict_top_level_inference
   static Future<void> clearSharedPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // Deletes all stored data
+    userData = null; // Reset userData to null
+    // Phoenix.rebirth(context);
   }
 }

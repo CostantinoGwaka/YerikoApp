@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:yeriko_app/models/auth_model.dart';
 import 'package:yeriko_app/models/current_fy_model.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -40,7 +41,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterLocalization.instance.ensureInitialized();
   await getCurrentChurchYearData();
-  runApp(const MyApp());
+  runApp(Phoenix(child: const MyApp()));
 }
 
 class MyApp extends StatefulWidget {

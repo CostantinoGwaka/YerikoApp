@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:yeriko_app/main.dart';
 import 'package:yeriko_app/models/auth_model.dart';
 import 'package:yeriko_app/pages/home_page.dart';
 import 'package:yeriko_app/shared/localstorage/index.dart';
@@ -52,6 +53,9 @@ class _LoginPageState extends State<LoginPage> {
           },
         );
 
+        await LocalStorage.removeItem("user_data");
+        await LocalStorage.clearSharedPrefs();
+
         var jsonResponse = json.decode(response.body);
 
         if (response.statusCode == 200 && jsonResponse != null) {
@@ -68,6 +72,18 @@ class _LoginPageState extends State<LoginPage> {
 
           final jsonString = jsonEncode(loginModel.toJson());
           await LocalStorage.setStringItem("user_data", jsonString);
+
+          LocalStorage.getStringItem('user_data').then((value) {
+            if (value.isNotEmpty) {
+              setState(() {
+                Map<String, dynamic> userMap = jsonDecode(value);
+                LoginResponse user = LoginResponse.fromJson(userMap);
+                userData = user;
+              });
+            } else {
+              userData = null;
+            }
+          });
 
           Navigator.push(
             // ignore: use_build_context_synchronously

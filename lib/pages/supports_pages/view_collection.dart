@@ -13,7 +13,7 @@ class CollectionsTablePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Mchakato wa Mchango'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -22,12 +22,12 @@ class CollectionsTablePage extends StatelessWidget {
           : SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: DataTable(
-                headingRowColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) => Colors.blue.shade50,
+                headingRowColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) => Colors.indigo.shade50,
                 ),
-                dataRowColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) =>
-                      states.contains(MaterialState.selected) ? Colors.blue.shade100 : Colors.white,
+                dataRowColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) =>
+                      states.contains(WidgetState.selected) ? Colors.indigo.shade100 : Colors.white,
                 ),
                 headingTextStyle: const TextStyle(
                   fontWeight: FontWeight.bold,

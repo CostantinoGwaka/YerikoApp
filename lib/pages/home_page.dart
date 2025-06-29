@@ -2,6 +2,7 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:yeriko_app/pages/all_collection_users.dart';
 import 'package:yeriko_app/pages/church_time_table.dart';
 import 'package:yeriko_app/pages/daily_page.dart';
 import 'package:yeriko_app/pages/transection_page.dart';
@@ -20,7 +21,7 @@ class _HomePageState extends State<HomePage> {
   List<Widget> pages = [
     const DailyPage(),
     const ChurchTimeTable(),
-    const TransectionPage(),
+    const AllUserCollections(),
     const TransectionPage(),
     const TransectionPage(),
   ];

@@ -168,7 +168,6 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   final item = collections[index];
-                  print(item.user!.userFullName);
                   return GestureDetector(
                     onTap: () => _showChurchTimeTableDetails(context, item),
                     child: Padding(

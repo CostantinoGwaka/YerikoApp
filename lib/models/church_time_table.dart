@@ -46,7 +46,6 @@ class ChurchTimeTable {
   });
 
   factory ChurchTimeTable.fromJson(Map<String, dynamic> json) {
-    print(json['user']);
     return ChurchTimeTable(
       id: json['id'],
       datePrayer: json['datePrayer'],

@@ -64,6 +64,14 @@ class User {
         'userName': userName,
         'role': role,
       };
+
+  // ✅ This is the fix
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is User && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class UserModel {

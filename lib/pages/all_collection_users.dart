@@ -204,7 +204,7 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
                                 ),
                               ]),
                               child: Padding(
-                                padding: const EdgeInsets.all(20),
+                                padding: const EdgeInsets.all(2),
                                 child: Row(
                                   children: [
                                     const SizedBox(width: 2),

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:yeriko_app/main.dart';
+import 'package:yeriko_app/models/auth_model.dart';
 import 'package:yeriko_app/models/user_collection_model.dart';
 import 'package:yeriko_app/theme/colors.dart';
 import 'package:yeriko_app/utils/url.dart';
@@ -16,13 +17,65 @@ class AdminAllUserCollections extends StatefulWidget {
 }
 
 class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
-  CollectionResponse? collections;
+  CollectionResponse? collectionsMonthly;
+  CollectionResponse? collectionsOthers;
   int selectedTabIndex = 0;
+
+  //month
+  String filterOption = 'ALL DATA';
+  User? selectedUser;
+  String? selectedMonth;
+
+  List<String> filterOptions = ['ALL DATA', 'BY USER', 'BY MONTH'];
+  List<User> users = []; // replace with real User objects
+  List<String> months = [
+    'JANUARY',
+    'FEBRUARY',
+    'MARCH',
+    'APRIL',
+    'MAY',
+    'JUNE',
+    'JULY',
+    'AUGUST',
+    'SEPTEMBER',
+    'OCTOBER',
+    'NOVEMBER',
+    'DECEMBER'
+  ];
+
+  List<dynamic> allData = []; // replace with your actual data
+  List<dynamic> displayedData = [];
 
   @override
   void initState() {
     super.initState();
     getUserCollections();
+    fetchUsers();
+  }
+
+  Future<void> fetchUsers() async {
+    final response = await http.get(Uri.parse('$baseUrl/auth/get_all_users.php'));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        users = (data['data'] as List).map((u) => User.fromJson(u)).toList();
+      });
+    } else {
+      // handle error
+    }
+  }
+
+  void loadData() {
+    setState(() {
+      if (filterOption == 'ALL DATA') {
+        displayedData = allData;
+      } else if (filterOption == 'BY USER' && selectedUser != null) {
+        getUserYearCollections();
+      } else if (filterOption == 'BY MONTH' && selectedMonth != null) {
+        displayedData = allData.where((item) => item.monthly == selectedMonth).toList();
+      }
+    });
   }
 
   Future<void> _reloadData() async {
@@ -42,15 +95,102 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         return null;
       }
 
-      final String myApi = "$baseUrl/monthly/get_collection_by_user_id.php?user_id=${userData!.user.id}";
+      final String myApi = "$baseUrl/monthly/get_all_collection_user_by_year.php?yearId=${currentYear!.data.id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
           // setState(() => _isLoading = false);
-          collections = CollectionResponse.fromJson(jsonResponse);
-          return collections;
+          collectionsMonthly = CollectionResponse.fromJson(jsonResponse);
+          return collectionsMonthly;
+        }
+      } else {
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: ${response.statusCode}")),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        );
+      }
+    }
+
+    // 🔁 Always return something to complete Future
+    return null;
+  }
+
+  Future<CollectionResponse?> getUserMonthCollections() async {
+    try {
+      if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Please provide username and password")),
+          );
+        }
+        // setState(() => _isLoading = false);
+        return null;
+      }
+
+      final String myApi = "$baseUrl/monthly/get_all_collection_by_month.php?month=$selectedMonth";
+      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse != null) {
+          // setState(() => _isLoading = false);
+          collectionsMonthly = CollectionResponse.fromJson(jsonResponse);
+          return collectionsMonthly;
+        }
+      } else {
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: ${response.statusCode}")),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        );
+      }
+    }
+
+    // 🔁 Always return something to complete Future
+    return null;
+  }
+
+  Future<CollectionResponse?> getUserYearCollections() async {
+    try {
+      if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Please provide username and password")),
+          );
+        }
+        // setState(() => _isLoading = false);
+        return null;
+      }
+
+      final String myApi =
+          "$baseUrl/monthly/get_all_collection_by_user_id_year_id.php?user_id=${selectedUser!.id}&year_id=${currentYear!.data.id}";
+
+      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse != null) {
+          collectionsMonthly = CollectionResponse.fromJson(jsonResponse);
+          return collectionsMonthly;
         }
       } else {
         if (context.mounted) {
@@ -207,7 +347,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                         ),
                         child: Center(
                           child: Text(
-                            "Mingineyo--",
+                            "Mingineyo",
                             style: TextStyle(
                               color: selectedTabIndex == 1 ? Colors.white : Colors.black.withAlpha((0.5 * 255).toInt()),
                               fontSize: 13,
@@ -223,124 +363,356 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
             ),
           ),
           // Display loading indicator while fetching data
-          FutureBuilder(
-            future: getUserCollections(),
-            builder: (context, AsyncSnapshot<CollectionResponse?> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return const Center(child: Text("Failed to load collection data."));
-              } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                return const Center(child: Text("No collection data found."));
-              }
-
-              final collections = snapshot.data!.data;
-
-              return ListView.builder(
-                itemCount: collections.length,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  final item = collections[index];
-                  return GestureDetector(
-                    onTap: () => _showCollectionDetails(context, item),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              margin: EdgeInsets.only(
-                                top: (size.width - 40) / 30,
-                                left: (size.width - 40) / 20,
-                                right: (size.width - 40) / 20,
-                                bottom: (size.width - 40) / 30,
+          Visibility(
+            visible: selectedTabIndex == 0,
+            child: SizedBox(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: (size.width - 40) / 30),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        Padding(
+                          padding: EdgeInsets.only(top: (size.height - 40) / 60),
+                          child: DropdownButtonFormField<String>(
+                            value: filterOption,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              filled: true,
+                              fillColor: Colors.grey[200], // Light background color
+                              hintText: "Chagua Aina ya Utafutaji",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30), // <-- Rounded edges
+                                borderSide: BorderSide.none, // No visible border
                               ),
-                              decoration:
-                                  BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
-                                BoxShadow(
-                                  color: grey.withValues(alpha: (0.03 * 255)),
-                                  spreadRadius: 10,
-                                  blurRadius: 3,
-                                  // changes position of shadow
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                filterOption = value!;
+                                selectedUser = null;
+                                selectedMonth = null;
+                                loadData();
+                              });
+                            },
+                            items: filterOptions.map((option) {
+                              return DropdownMenuItem(
+                                value: option,
+                                child: Text(option),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        if (filterOption == 'BY USER')
+                          Padding(
+                            padding: EdgeInsets.only(top: (size.height - 40) / 60),
+                            child: DropdownButtonFormField<User>(
+                              value: selectedUser,
+                              isExpanded: true,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                filled: true,
+                                fillColor: Colors.grey[200], // Light background color
+                                hintText: "Chagua Mwanajumuiya",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30), // <-- Rounded edges
+                                  borderSide: BorderSide.none, // No visible border
                                 ),
-                              ]),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Row(
-                                  children: [
-                                    const SizedBox(width: 2),
-                                    Expanded(
-                                      child: SizedBox(
-                                        width: (size.width - 90) * 0.2,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                              ),
+                              items: users.map((user) {
+                                return DropdownMenuItem<User>(
+                                  value: user,
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.person, color: Colors.blueGrey, size: 20),
+                                      const SizedBox(width: 8),
+                                      Text(user.userFullName ?? ''),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (user) {
+                                if (user != null) {
+                                  setState(() {
+                                    selectedUser = user;
+                                  });
+                                  loadData();
+                                }
+                              },
+                            ),
+                          ),
+                        if (filterOption == 'BY MONTH')
+                          Padding(
+                            padding: EdgeInsets.only(top: (size.height - 40) / 60),
+                            child: DropdownButtonFormField<String>(
+                              value: selectedMonth,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                filled: true,
+                                fillColor: Colors.grey[200], // Light background
+                                hintText: "Chagua Mwezi",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30), // <-- Rounded border
+                                  borderSide: BorderSide.none, // Remove border line
+                                ),
+                              ),
+                              hint: const Text("Chagua Mwezi"),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedMonth = value;
+                                  loadData();
+                                });
+                              },
+                              items: months.map((month) {
+                                return DropdownMenuItem(
+                                  value: month,
+                                  child: Text(month),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  FutureBuilder(
+                    future: filterOption == 'ALL DATA'
+                        ? getUserCollections()
+                        : (filterOption == 'BY USER' && selectedUser != null)
+                            ? getUserYearCollections()
+                            : (filterOption == 'BY MONTH' && selectedMonth != null)
+                                ? getUserMonthCollections()
+                                : getUserCollections()
+                    //   displayedData = allData;
+                    // } else if (filterOption == 'BY USER' && selectedUser != null) {
+                    //   getUserYearCollections();
+                    // } else if (filterOption == 'BY MONTH' && selectedMonth != null) {
+                    //   displayedData = allData.where((item) => item.monthly == selectedMonth).toList();
+                    // }
+                    ,
+                    builder: (context, AsyncSnapshot<CollectionResponse?> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return const Center(child: Text("Imeshindikana kupakia data ya michango."));
+                      } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
+                        return const Center(child: Text("Hakuna data ya michango iliyopatikana."));
+                      }
+
+                      final collections = snapshot.data!.data;
+
+                      return ListView.builder(
+                        itemCount: collections.length,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final item = collections[index];
+                          return GestureDetector(
+                            onTap: () => _showCollectionDetails(context, item),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      margin: EdgeInsets.only(
+                                        top: (size.width - 40) / 30,
+                                        left: (size.width - 40) / 20,
+                                        right: (size.width - 40) / 20,
+                                        bottom: (size.width - 40) / 30,
+                                      ),
+                                      decoration: BoxDecoration(
+                                          color: white,
+                                          borderRadius: BorderRadius.circular(25),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: grey.withValues(alpha: (0.03 * 255)),
+                                              spreadRadius: 10,
+                                              blurRadius: 3,
+                                              // changes position of shadow
+                                            ),
+                                          ]),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(2),
+                                        child: Row(
                                           children: [
-                                            Text(
-                                              "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
+                                            const SizedBox(width: 2),
+                                            Expanded(
+                                              child: SizedBox(
+                                                width: (size.width - 90) * 0.2,
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "${item.user.userFullName}",
+                                                      style: const TextStyle(
+                                                        fontSize: 15,
+                                                        color: Colors.black,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
+                                                      style: const TextStyle(
+                                                        fontSize: 15,
+                                                        color: Colors.black,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 5),
+                                                    Text(
+                                                      item.registeredDate,
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 5),
+                                                    Text(
+                                                      item.churchYearEntity.churchYear,
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                            const SizedBox(height: 5),
-                                            Text(
-                                              item.registeredDate,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black.withAlpha((0.5 * 255).toInt()),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 5),
-                                            Text(
-                                              item.churchYearEntity.churchYear,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black.withAlpha((0.5 * 255).toInt()),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 5),
-                                            Text(
-                                              'Imesajiliwa na: ${item.registeredBy}',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black.withValues(alpha: 128),
-                                              ),
+                                            const Icon(
+                                              Icons.arrow_forward_ios_rounded,
+                                              size: 16,
+                                              color: Colors.black,
                                             ),
                                           ],
                                         ),
                                       ),
                                     ),
-                                    const Icon(
-                                      Icons.arrow_forward_ios_rounded,
-                                      size: 16,
-                                      color: Colors.black,
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Visibility(
+            visible: selectedTabIndex == 1,
+            child: SizedBox(
+              child: FutureBuilder(
+                future: getUserCollections(),
+                builder: (context, AsyncSnapshot<CollectionResponse?> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text("Failed to load collection data."));
+                  } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
+                    return const Center(child: Text("No collection data found."));
+                  }
+
+                  final collections = snapshot.data!.data;
+
+                  return ListView.builder(
+                    itemCount: collections.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      final item = collections[index];
+                      return GestureDetector(
+                        onTap: () => _showCollectionDetails(context, item),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  margin: EdgeInsets.only(
+                                    top: (size.width - 40) / 30,
+                                    left: (size.width - 40) / 20,
+                                    right: (size.width - 40) / 20,
+                                    bottom: (size.width - 40) / 30,
+                                  ),
+                                  decoration:
+                                      BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
+                                    BoxShadow(
+                                      color: grey.withValues(alpha: (0.03 * 255)),
+                                      spreadRadius: 10,
+                                      blurRadius: 3,
+                                      // changes position of shadow
+                                    ),
+                                  ]),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(2),
+                                    child: Row(
+                                      children: [
+                                        const SizedBox(width: 2),
+                                        Expanded(
+                                          child: SizedBox(
+                                            width: (size.width - 90) * 0.2,
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "${item.user.userFullName}",
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 5),
+                                                Text(
+                                                  item.registeredDate,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 5),
+                                                Text(
+                                                  item.churchYearEntity.churchYear,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const Icon(
+                                          Icons.arrow_forward_ios_rounded,
+                                          size: 16,
+                                          color: Colors.black,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   );
                 },
-              );
-            },
-          ),
-          // Container(
-          //   padding: const EdgeInsets.all(16),
-          //   margin: const EdgeInsets.all(25),
-          //   decoration: BoxDecoration(color: buttoncolor, borderRadius: BorderRadius.circular(25)),
-          //   child: const Center(
-          //     child: Text(
-          //       "See Details",
-          //       style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-          //     ),
-          //   ),
-          // ),
+              ),
+            ),
+          )
         ],
       ),
     ));

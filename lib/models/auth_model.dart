@@ -65,3 +65,32 @@ class User {
         'role': role,
       };
 }
+
+class UserModel {
+  final int? id;
+  final String? phone;
+  final String? userFullName;
+  final String? yearRegistered;
+  final String? userName;
+  final String? role;
+
+  UserModel({
+    this.id,
+    this.phone,
+    this.userFullName,
+    this.yearRegistered,
+    this.userName,
+    this.role,
+  });
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? ''),
+      phone: json['phone']?.toString(),
+      userFullName: json['user_full_name']?.toString(),
+      yearRegistered: json['year_registered']?.toString(),
+      userName: json['user_name']?.toString(),
+      role: json['role']?.toString(),
+    );
+  }
+}

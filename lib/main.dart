@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:yeriko_app/models/auth_model.dart';
 import 'package:yeriko_app/models/current_fy_model.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:yeriko_app/pages/home_page.dart';
 import 'package:yeriko_app/pages/login_page.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -35,6 +37,8 @@ Future<void> getCurrentChurchYearData() async {
 }
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await FlutterLocalization.instance.ensureInitialized();
   await getCurrentChurchYearData();
   runApp(const MyApp());
 }
@@ -75,6 +79,15 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         fontFamily: GoogleFonts.poppins().fontFamily,
       ),
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('sw', 'TZ'),
+      ], // Optional: Swahili locale
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       home: (userData != null && userData!.user.phone.isNotEmpty) ? HomePage() : LoginPage(),
     );
   }

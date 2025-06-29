@@ -41,13 +41,14 @@ dependencies:
   google_fonts: ^6.2.1
   icon_badge: ^1.0.0
   win32: ^5.14.0
-  intl: ^0.17.0
+  intl: ^0.20.2
   lottie:
   http: ^1.4.0
   provider:
   shared_preferences: ^2.5.3
   page_transition: ^2.0.5
   url_launcher: ^6.3.1
+  flutter_localization: ^0.3.3
 
 
 dev_dependencies:

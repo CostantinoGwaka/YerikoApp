@@ -2,6 +2,7 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:yeriko_app/pages/church_time_table.dart';
 import 'package:yeriko_app/pages/daily_page.dart';
 import 'package:yeriko_app/pages/transection_page.dart';
 import 'package:yeriko_app/theme/colors.dart';
@@ -18,7 +19,7 @@ class _HomePageState extends State<HomePage> {
 
   List<Widget> pages = [
     const DailyPage(),
-    const TransectionPage(),
+    const ChurchTimeTable(),
     const TransectionPage(),
     const TransectionPage(),
     const TransectionPage(),
@@ -69,7 +70,7 @@ class _HomePageState extends State<HomePage> {
   Widget getFooter() {
     List<IconData> iconItems = [
       CupertinoIcons.home,
-      CupertinoIcons.creditcard,
+      CupertinoIcons.location_circle,
       CupertinoIcons.money_dollar,
       CupertinoIcons.person,
     ];

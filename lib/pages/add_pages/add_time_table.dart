@@ -221,31 +221,40 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                 const Divider(),
                 const Text("👤 Taarifa za Mtumiaji", style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                DropdownButtonFormField<User>(
-                  value: selectedUser,
-                  isExpanded: true,
-                  decoration: const InputDecoration(
-                    labelText: "Chagua Mtumiaji",
-                    border: OutlineInputBorder(),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButtonFormField<User>(
+                    value: selectedUser,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: "Chagua Mwenyeji",
+                      border: OutlineInputBorder(),
+                    ),
+                    items: users.map((user) {
+                      return DropdownMenuItem<User>(
+                        value: user,
+                        child: Row(
+                          children: [
+                            const Icon(Icons.person, color: Colors.blueGrey, size: 20),
+                            const SizedBox(width: 8),
+                            Text(user.userFullName!),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (user) {
+                      if (user != null) {
+                        setState(() {
+                          selectedUser = user;
+                          userFullNameController.text = user.userFullName!;
+                          userNameController.text = user.userName!;
+                          userPhoneController.text = user.phone!;
+                          userRoleController.text = user.role!;
+                          yearRegisteredController.text = user.yearRegistered!;
+                        });
+                      }
+                    },
                   ),
-                  items: users.map((user) {
-                    return DropdownMenuItem<User>(
-                      value: user,
-                      child: Text(user.userFullName!),
-                    );
-                  }).toList(),
-                  onChanged: (user) {
-                    if (user != null) {
-                      setState(() {
-                        selectedUser = user;
-                        userFullNameController.text = user.userFullName!;
-                        userNameController.text = user.userName!;
-                        userPhoneController.text = user.phone!;
-                        userRoleController.text = user.role!;
-                        yearRegisteredController.text = user.yearRegistered!;
-                      });
-                    }
-                  },
                 ),
                 const SizedBox(height: 12),
                 const Divider(),
@@ -260,7 +269,7 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       final data = {
-                        "id": widget.initialData!.id,
+                        "id": widget.initialData?.id,
                         "datePrayer": datePrayerController.text,
                         "latId": "N/A", //latIdController.text,
                         "longId": "N/A",

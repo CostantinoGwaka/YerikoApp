@@ -207,7 +207,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                         ),
                         child: Center(
                           child: Text(
-                            "Mingineyo",
+                            "Mingineyo--",
                             style: TextStyle(
                               color: selectedTabIndex == 1 ? Colors.white : Colors.black.withAlpha((0.5 * 255).toInt()),
                               fontSize: 13,

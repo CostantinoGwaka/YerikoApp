@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (username == "" || password == "") {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Please make sure you have provide username and password")),
+          SnackBar(content: Text("Tafadhali hakikisha umeweka namba ya simu na nenosiri")),
         );
       } else {
         String myApi = "$baseUrl/auth/login.php";

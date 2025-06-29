@@ -154,7 +154,7 @@ class _DailyPageState extends State<DailyPage> {
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Check your internet connection: $e")),
+          SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
         );
       }
     }
@@ -197,7 +197,7 @@ class _DailyPageState extends State<DailyPage> {
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Check your internet connection: $e")),
+          SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
         );
       }
     }

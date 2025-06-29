@@ -49,12 +49,45 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Check your internet connection: $e")),
+        SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
 
     // 🔁 Always return something to complete Future
     return null;
+  }
+
+  Future<void> deleteTimeTable(dynamic id) async {
+    try {
+      final String myApi = "$baseUrl/church_timetable/delete_time_table.php?id=$id";
+      final response = await http.delete(
+        Uri.parse(myApi),
+        headers: {'Accept': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // final jsonResponse = json.decode(response.body);
+        // print(jsonResponse);
+        // Example: await deleteTimeTable(item.id);
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context); // Close bottom sheet
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Ratiba imefutwa kikamirifu.')),
+        );
+        _reloadData();
+      } else {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: ${response.statusCode}")),
+        );
+      }
+    } catch (e) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+      );
+    }
   }
 
   @override
@@ -261,7 +294,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     ));
   }
 
-  void _showChurchTimeTableDetails(BuildContext context, item) {
+  void _showChurchTimeTableDetails(BuildContext rootContext, item) {
     final user = item.user;
     final year = item.churchYearEntity;
     var size = MediaQuery.of(context).size;
@@ -308,7 +341,6 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                           icon: const Icon(Icons.edit, color: Colors.blue),
                           tooltip: 'Hariri',
                           onPressed: () {
-                            // TODO: Implement edit functionality
                             Navigator.pop(context); // Close bottom sheet
                             showModalBottomSheet(
                               context: context,
@@ -317,7 +349,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                                 borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                               ),
                               builder: (_) => AddPrayerSchedulePage(
-                                rootContext: context,
+                                rootContext: rootContext,
                                 initialData: item, // Pass current item for editing
                                 onSubmit: (data) {
                                   _reloadData();
@@ -348,13 +380,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                               ),
                             );
                             if (confirm == true) {
-                              // TODO: Implement delete functionality
-                              // Example: await deleteTimeTable(item.id);
-                              Navigator.pop(context); // Close bottom sheet
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Ratiba imefutwa (demo only).')),
-                              );
-                              _reloadData();
+                              deleteTimeTable(item.id);
                             }
                           },
                         ),

@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:yeriko_app/main.dart';
 import 'package:yeriko_app/models/auth_model.dart';
 import 'package:yeriko_app/models/user_collection_model.dart';
+import 'package:yeriko_app/models/user_collection_table_model.dart';
+import 'package:yeriko_app/pages/supports_pages/collection_table_against_month.dart';
 import 'package:yeriko_app/theme/colors.dart';
 import 'package:yeriko_app/utils/url.dart';
 import 'package:http/http.dart' as http;
@@ -19,7 +21,10 @@ class AdminAllUserCollections extends StatefulWidget {
 class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   CollectionResponse? collectionsMonthly;
   CollectionResponse? collectionsOthers;
+  UserMonthlyCollectionResponse? userMonthlyCollectionResponse;
   int selectedTabIndex = 0;
+  bool viewTable = false;
+  bool isLoading = false;
 
   //month
   String filterOption = 'ALL DATA';
@@ -114,6 +119,62 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         }
       }
     } catch (e) {
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        );
+      }
+    }
+
+    // 🔁 Always return something to complete Future
+    return null;
+  }
+
+  Future<UserMonthlyCollectionResponse?> getUserCollectionAgainstTable() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Please provide username and password")),
+          );
+        }
+        setState(() {
+          isLoading = false;
+        });
+        return null;
+      }
+
+      final String myApi = "$baseUrl/monthly/get_all_collection_year_id_table_data.php?year_id=1";
+      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse != null) {
+          setState(() {
+            isLoading = false;
+          });
+          userMonthlyCollectionResponse = UserMonthlyCollectionResponse.fromJson(jsonResponse);
+          return userMonthlyCollectionResponse;
+        }
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: ${response.statusCode}")),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
@@ -364,7 +425,50 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
           ),
           // Display loading indicator while fetching data
           Visibility(
-            visible: selectedTabIndex == 0,
+              visible: viewTable,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: mainFontColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                        elevation: 2,
+                      ),
+                      icon: const Icon(Icons.close, size: 15),
+                      label: const Text(
+                        "Funga michango",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      onPressed: () async {
+                        setState(() {
+                          viewTable = !viewTable;
+                        });
+                        if (viewTable) {
+                          await getUserCollectionAgainstTable();
+                        }
+                      },
+                    ),
+                  ),
+                  isLoading
+                      ? const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      : UserMonthlyCollectionTable(data: userMonthlyCollectionResponse),
+                ],
+              )),
+          Visibility(
+            visible: selectedTabIndex == 0 && !viewTable,
             child: SizedBox(
               child: Column(
                 children: [
@@ -377,21 +481,32 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        "",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20,
-                                          color: mainFontColor,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                ],
+                              ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: mainFontColor,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                                  elevation: 2,
+                                ),
+                                icon: const Icon(Icons.table_chart, size: 15),
+                                label: const Text(
+                                  "Tazama Michango",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  setState(() {
+                                    viewTable = !viewTable;
+                                  });
+                                  if (viewTable) {
+                                    await getUserCollectionAgainstTable();
+                                  }
+                                },
                               ),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
@@ -646,7 +761,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
             ),
           ),
           Visibility(
-            visible: selectedTabIndex == 1,
+            visible: selectedTabIndex == 1 && !viewTable,
             child: SizedBox(
               child: FutureBuilder(
                 future: getUserCollections(),

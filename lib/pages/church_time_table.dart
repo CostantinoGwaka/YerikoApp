@@ -335,57 +335,59 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                       "📋 Maelezo ya Ratiba ya Jumuiya",
                       style: TextStyle(fontSize: (size.width - 40) / 30, fontWeight: FontWeight.bold),
                     ),
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.blue),
-                          tooltip: 'Hariri',
-                          onPressed: () {
-                            Navigator.pop(context); // Close bottom sheet
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                              ),
-                              builder: (_) => AddPrayerSchedulePage(
-                                rootContext: rootContext,
-                                initialData: item, // Pass current item for editing
-                                onSubmit: (data) {
-                                  _reloadData();
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          tooltip: 'Futa',
-                          onPressed: () async {
-                            final confirm = await showDialog<bool>(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                title: const Text('Futa Ratiba'),
-                                content: const Text('Una uhakika unataka kufuta ratiba hii?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.of(ctx).pop(false),
-                                    child: const Text('Hapana'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.of(ctx).pop(true),
-                                    child: const Text('Ndiyo'),
-                                  ),
-                                ],
-                              ),
-                            );
-                            if (confirm == true) {
-                              deleteTimeTable(item.id);
-                            }
-                          },
-                        ),
-                      ],
-                    ),
+                    if (userData!.user.role == "ADMIN") ...[
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            tooltip: 'Hariri',
+                            onPressed: () {
+                              Navigator.pop(context); // Close bottom sheet
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                                ),
+                                builder: (_) => AddPrayerSchedulePage(
+                                  rootContext: rootContext,
+                                  initialData: item, // Pass current item for editing
+                                  onSubmit: (data) {
+                                    _reloadData();
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            tooltip: 'Futa',
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('Futa Ratiba'),
+                                  content: const Text('Una uhakika unataka kufuta ratiba hii?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(false),
+                                      child: const Text('Hapana'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(true),
+                                      child: const Text('Ndiyo'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirm == true) {
+                                deleteTimeTable(item.id);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ]
                   ],
                 ),
                 const Divider(height: 20),

@@ -25,43 +25,43 @@ class LoginResponse {
 }
 
 class User {
-  final int id;
-  final String phone;
-  final String userFullName;
-  final String yearRegistered;
-  final String createdAt;
-  final String userName;
-  final String role;
+  final int? id;
+  final String? phone;
+  final String? userFullName;
+  final String? yearRegistered;
+  final String? createdAt;
+  final String? userName;
+  final String? role;
 
   User({
-    required this.id,
-    required this.phone,
-    required this.userFullName,
-    required this.yearRegistered,
-    required this.createdAt,
-    required this.userName,
-    required this.role,
+    this.id,
+    this.phone,
+    this.userFullName,
+    this.yearRegistered,
+    this.createdAt,
+    this.userName,
+    this.role,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'],
-      phone: json['phone'],
-      userFullName: json['user_full_name'],
-      yearRegistered: json['year_registered'],
-      createdAt: json['createdAt'],
-      userName: json['user_name'],
-      role: json['role'],
+      id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? ''),
+      phone: json['phone']?.toString(),
+      userFullName: json['userFullName']?.toString(),
+      yearRegistered: json['yearRegistered']?.toString(),
+      createdAt: json['createdAt']?.toString(),
+      userName: json['userName']?.toString(),
+      role: json['role']?.toString(),
     );
   }
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'phone': phone,
-        'user_full_name': userFullName,
-        'year_registered': yearRegistered,
+        'userFullName': userFullName,
+        'yearRegistered': yearRegistered,
         'createdAt': createdAt,
-        'user_name': userName,
+        'userName': userName,
         'role': role,
       };
 }
@@ -87,9 +87,9 @@ class UserModel {
     return UserModel(
       id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? ''),
       phone: json['phone']?.toString(),
-      userFullName: json['user_full_name']?.toString(),
-      yearRegistered: json['year_registered']?.toString(),
-      userName: json['user_name']?.toString(),
+      userFullName: json['userFullName']?.toString(),
+      yearRegistered: json['yearRegistered']?.toString(),
+      userName: json['userName']?.toString(),
       role: json['role']?.toString(),
     );
   }

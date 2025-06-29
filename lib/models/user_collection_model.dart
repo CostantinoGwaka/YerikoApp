@@ -1,3 +1,5 @@
+import 'package:yeriko_app/models/auth_model.dart';
+
 class CollectionResponse {
   final String status;
   final String message;
@@ -46,38 +48,6 @@ class CollectionItem {
       registeredDate: json['registered_date'],
       user: User.fromJson(json['user']),
       churchYearEntity: ChurchYear.fromJson(json['churchYearEntity']),
-    );
-  }
-}
-
-class User {
-  final int id;
-  final String phone;
-  final String userFullName;
-  final String yearRegistered;
-  final String createdAt;
-  final String userName;
-  final String role;
-
-  User({
-    required this.id,
-    required this.phone,
-    required this.userFullName,
-    required this.yearRegistered,
-    required this.createdAt,
-    required this.userName,
-    required this.role,
-  });
-
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'],
-      phone: json['phone'],
-      userFullName: json['user_full_name'],
-      yearRegistered: json['year_registered'],
-      createdAt: json['createdAt'] ?? '',
-      userName: json['user_name'],
-      role: json['role'],
     );
   }
 }

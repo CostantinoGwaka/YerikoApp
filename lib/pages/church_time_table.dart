@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:yeriko_app/main.dart';
 import 'package:yeriko_app/models/church_time_table.dart';
 import 'package:yeriko_app/pages/add_pages/add_time_table.dart';
 import 'package:yeriko_app/theme/colors.dart';
@@ -36,7 +37,6 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
-          // setState(() => _isLoading = false);
           collections = ChurchTimeTableResponse.fromJson(jsonResponse);
           return collections;
         }
@@ -109,40 +109,42 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                       fontSize: 20,
                       color: mainFontColor,
                     )),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: mainFontColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                    elevation: 2,
-                  ),
-                  icon: const Icon(Icons.plus_one, size: 15),
-                  label: const Text(
-                    "Ongeza",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                if (userData!.user.role == "ADMIN") ...[
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: mainFontColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
                       ),
-                      builder: (_) => AddPrayerSchedulePage(
-                        rootContext: context,
-                        onSubmit: (data) {
-                          _reloadData();
-                        },
+                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                      elevation: 2,
+                    ),
+                    icon: const Icon(Icons.plus_one, size: 15),
+                    label: const Text(
+                      "Ongeza",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
-                    );
-                  },
-                ),
+                    ),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                        ),
+                        builder: (_) => AddPrayerSchedulePage(
+                          rootContext: context,
+                          onSubmit: (data) {
+                            _reloadData();
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ]
               ],
             ),
           ),
@@ -166,6 +168,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   final item = collections[index];
+                  print(item.user!.userFullName);
                   return GestureDetector(
                     onTap: () => _showChurchTimeTableDetails(context, item),
                     child: Padding(
@@ -190,17 +193,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                                 padding: const EdgeInsets.all(20),
                                 child: Row(
                                   children: [
-                                    const SizedBox(
-                                      width: 50,
-                                      height: 50,
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.access_time,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
+                                    const SizedBox(width: 2),
                                     Expanded(
                                       child: SizedBox(
                                         width: (size.width - 90) * 0.7,
@@ -208,7 +201,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "${item.user!.userFullName} (${item.datePrayer})",
+                                              "${item.user?.userFullName} (${item.datePrayer})",
                                               style: const TextStyle(
                                                 fontSize: 15,
                                                 color: Colors.black,
@@ -272,6 +265,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
   void _showChurchTimeTableDetails(BuildContext context, item) {
     final user = item.user;
     final year = item.churchYearEntity;
+    var size = MediaQuery.of(context).size;
 
     showModalBottomSheet(
       context: context,
@@ -302,12 +296,74 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                     ),
                   ),
                 ),
-                const Text(
-                  "📋 Maelezo ya Ratiba ya Jumuiya",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "📋 Maelezo ya Ratiba ya Jumuiya",
+                      style: TextStyle(fontSize: (size.width - 40) / 30, fontWeight: FontWeight.bold),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          tooltip: 'Hariri',
+                          onPressed: () {
+                            // TODO: Implement edit functionality
+                            Navigator.pop(context); // Close bottom sheet
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                              ),
+                              builder: (_) => AddPrayerSchedulePage(
+                                rootContext: context,
+                                initialData: item, // Pass current item for editing
+                                onSubmit: (data) {
+                                  _reloadData();
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          tooltip: 'Futa',
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text('Futa Ratiba'),
+                                content: const Text('Una uhakika unataka kufuta ratiba hii?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(ctx).pop(false),
+                                    child: const Text('Hapana'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.of(ctx).pop(true),
+                                    child: const Text('Ndiyo'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirm == true) {
+                              // TODO: Implement delete functionality
+                              // Example: await deleteTimeTable(item.id);
+                              Navigator.pop(context); // Close bottom sheet
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Ratiba imefutwa (demo only).')),
+                              );
+                              _reloadData();
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 const Divider(height: 20),
-
                 // 🕊 Ratiba ya Maombi
                 const Text("🕊 Taarifa za Jumuiya", style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),

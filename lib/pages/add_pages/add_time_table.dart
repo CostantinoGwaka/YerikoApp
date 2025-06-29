@@ -4,16 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:yeriko_app/main.dart';
 import 'package:yeriko_app/models/auth_model.dart';
+import 'package:yeriko_app/models/church_time_table.dart';
 import 'package:yeriko_app/utils/url.dart';
 import 'package:http/http.dart' as http;
 
 class AddPrayerSchedulePage extends StatefulWidget {
   final void Function(Map<String, dynamic>)? onSubmit;
+  final ChurchTimeTable? initialData; // 👈 Add this
   final BuildContext rootContext;
 
   const AddPrayerSchedulePage({
     super.key,
     required this.rootContext,
+    this.initialData,
     this.onSubmit,
   });
 
@@ -23,8 +26,18 @@ class AddPrayerSchedulePage extends StatefulWidget {
 
 class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
   final _formKey = GlobalKey<FormState>();
-  List<UserModel> users = [];
-  UserModel? selectedUser;
+  List<User> users = [];
+  User? selectedUser;
+  late TextEditingController datePrayerController = TextEditingController();
+  late TextEditingController latIdController = TextEditingController(text: "N/A");
+  late TextEditingController longIdController = TextEditingController(text: "N/A");
+  late TextEditingController locationController = TextEditingController();
+  late TextEditingController messageController = TextEditingController();
+  late TextEditingController userNameController = TextEditingController();
+  late TextEditingController userFullNameController = TextEditingController();
+  late TextEditingController userPhoneController = TextEditingController();
+  late TextEditingController userRoleController = TextEditingController();
+  late TextEditingController yearRegisteredController = TextEditingController();
   bool _isLoading = false;
 
   Future<void> fetchUsers() async {
@@ -33,7 +46,7 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        users = (data['data'] as List).map((u) => UserModel.fromJson(u)).toList();
+        users = (data['data'] as List).map((u) => User.fromJson(u)).toList();
       });
     } else {
       // handle error
@@ -44,6 +57,28 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
   void initState() {
     super.initState();
     fetchUsers();
+
+    if (widget.initialData != null) {
+      final data = widget.initialData!;
+
+      datePrayerController = TextEditingController(text: data.datePrayer ?? '');
+      latIdController = TextEditingController(text: data.latId ?? 'N/A');
+      longIdController = TextEditingController(text: data.longId ?? 'N/A');
+      locationController = TextEditingController(text: data.location ?? '');
+      messageController = TextEditingController(text: data.message ?? '');
+
+      userFullNameController = TextEditingController(text: data.user?.userFullName ?? '');
+      userNameController = TextEditingController(text: data.user?.userName ?? '');
+      userPhoneController = TextEditingController(text: data.user?.phone ?? '');
+      userRoleController = TextEditingController(text: data.user?.role ?? '');
+      yearRegisteredController = TextEditingController(text: data.user?.yearRegistered ?? '');
+
+      setState(() {
+        selectedUser = data.user;
+      });
+
+      isActive = (data.churchYearEntity?.isActive?.toString() == '1' || data.churchYearEntity?.isActive == true);
+    }
   }
 
   Future<dynamic> saveTimeTable(dynamic data) async {
@@ -132,17 +167,6 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
     }
   }
 
-  final TextEditingController datePrayerController = TextEditingController();
-  final TextEditingController latIdController = TextEditingController(text: "N/A");
-  final TextEditingController longIdController = TextEditingController(text: "N/A");
-  final TextEditingController locationController = TextEditingController();
-  final TextEditingController messageController = TextEditingController();
-  final TextEditingController userNameController = TextEditingController();
-  final TextEditingController userFullNameController = TextEditingController();
-  final TextEditingController userPhoneController = TextEditingController();
-  final TextEditingController userRoleController = TextEditingController();
-  final TextEditingController yearRegisteredController = TextEditingController();
-
   bool isActive = true;
 
   @override
@@ -190,7 +214,7 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                 const Divider(),
                 const Text("👤 Taarifa za Mtumiaji", style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                DropdownButtonFormField<UserModel>(
+                DropdownButtonFormField<User>(
                   value: selectedUser,
                   isExpanded: true,
                   decoration: const InputDecoration(
@@ -198,7 +222,7 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                     border: OutlineInputBorder(),
                   ),
                   items: users.map((user) {
-                    return DropdownMenuItem<UserModel>(
+                    return DropdownMenuItem<User>(
                       value: user,
                       child: Text(user.userFullName!),
                     );
@@ -229,6 +253,7 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       final data = {
+                        "id": widget.initialData!.id,
                         "datePrayer": datePrayerController.text,
                         "latId": "N/A", //latIdController.text,
                         "longId": "N/A",

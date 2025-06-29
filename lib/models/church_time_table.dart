@@ -1,3 +1,5 @@
+import 'package:yeriko_app/models/auth_model.dart';
+
 class ChurchTimeTableResponse {
   final String? status;
   final String? message;
@@ -12,14 +14,14 @@ class ChurchTimeTableResponse {
   factory ChurchTimeTableResponse.fromJson(Map<String, dynamic> json) {
     return ChurchTimeTableResponse(
       status: json['status']?.toString(),
-      message: json['message'],
-      data: (json['data'] as List?)?.map((item) => ChurchTimeTable.fromJson(item)).toList(),
+      message: json['message']?.toString(),
+      data: (json['data'] as List?)?.map((e) => ChurchTimeTable.fromJson(e)).toList(),
     );
   }
 }
 
 class ChurchTimeTable {
-  final int? id;
+  final int id;
   final String? datePrayer;
   final String? latId;
   final String? longId;
@@ -31,7 +33,7 @@ class ChurchTimeTable {
   final ChurchYearEntity? churchYearEntity;
 
   ChurchTimeTable({
-    this.id,
+    required this.id,
     this.datePrayer,
     this.latId,
     this.longId,
@@ -44,6 +46,7 @@ class ChurchTimeTable {
   });
 
   factory ChurchTimeTable.fromJson(Map<String, dynamic> json) {
+    print(json['user']);
     return ChurchTimeTable(
       id: json['id'],
       datePrayer: json['datePrayer'],
@@ -55,38 +58,6 @@ class ChurchTimeTable {
       createdAt: json['createdAt'],
       user: json['user'] != null ? User.fromJson(json['user']) : null,
       churchYearEntity: json['churchYearEntity'] != null ? ChurchYearEntity.fromJson(json['churchYearEntity']) : null,
-    );
-  }
-}
-
-class User {
-  final int? id;
-  final String? userFullName;
-  final String? userName;
-  final String? phone;
-  final String? role;
-  final String? yearRegistered;
-  final String? createdAt;
-
-  User({
-    this.id,
-    this.userFullName,
-    this.userName,
-    this.phone,
-    this.role,
-    this.yearRegistered,
-    this.createdAt,
-  });
-
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'],
-      userFullName: json['userFullName'],
-      userName: json['userName'],
-      phone: json['phone'],
-      role: json['role'],
-      yearRegistered: json['yearRegistered'],
-      createdAt: json['createdAt'],
     );
   }
 }

@@ -33,7 +33,7 @@ class _DailyPageState extends State<DailyPage> {
   void initState() {
     super.initState();
     if (userData != null && currentYear != null) {
-      getTotalSummary(userData!.user.id, currentYear!.data.churchYear);
+      getTotalSummary(userData!.user.id!, currentYear!.data.churchYear);
       getUserOtherCollections();
     }
   }
@@ -41,7 +41,7 @@ class _DailyPageState extends State<DailyPage> {
   Future<void> _reloadData() async {
     await getUserCollections();
     if (userData != null && currentYear != null) {
-      getTotalSummary(userData!.user.id, currentYear!.data.churchYear);
+      getTotalSummary(userData!.user.id!, currentYear!.data.churchYear);
     }
     setState(() {}); // Refresh UI after fetching data
   }
@@ -323,7 +323,7 @@ class _DailyPageState extends State<DailyPage> {
                           child: Column(
                             children: [
                               Text(
-                                userData != null ? userData!.user.userFullName : "",
+                                userData != null ? userData!.user.userFullName! : "",
                                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: mainFontColor),
                               ),
                               SizedBox(

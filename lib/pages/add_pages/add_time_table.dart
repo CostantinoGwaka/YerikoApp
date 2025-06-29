@@ -316,7 +316,7 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
         border: Border.all(color: Colors.blueGrey.shade100),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withAlpha((0.1 * 255).toInt()),
             blurRadius: 6,
             offset: const Offset(0, 3),
           )

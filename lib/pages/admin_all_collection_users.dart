@@ -8,15 +8,16 @@ import 'package:yeriko_app/theme/colors.dart';
 import 'package:yeriko_app/utils/url.dart';
 import 'package:http/http.dart' as http;
 
-class AllUserCollections extends StatefulWidget {
-  const AllUserCollections({super.key});
+class AdminAllUserCollections extends StatefulWidget {
+  const AdminAllUserCollections({super.key});
 
   @override
-  State<AllUserCollections> createState() => _AllUserCollectionsState();
+  State<AdminAllUserCollections> createState() => _AdminAllUserCollectionsState();
 }
 
-class _AllUserCollectionsState extends State<AllUserCollections> {
+class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   CollectionResponse? collections;
+  int selectedTabIndex = 0;
 
   @override
   void initState() {
@@ -151,7 +152,7 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Michango yako yote",
+                Text("Michango",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
@@ -160,7 +161,68 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
               ],
             ),
           ),
-
+          Padding(
+            padding: const EdgeInsets.only(top: 5, bottom: 20, left: 25, right: 25),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedTabIndex = 0;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 25, right: 25, top: 5, bottom: 5),
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                          color: selectedTabIndex == 0 ? buttoncolor : white,
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Mwezi",
+                            style: TextStyle(
+                              color: selectedTabIndex == 0 ? Colors.white : Colors.black.withAlpha((0.5 * 255).toInt()),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedTabIndex = 1;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 25, right: 25, top: 5, bottom: 5),
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: selectedTabIndex == 1 ? buttoncolor : white,
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Mingineyo",
+                            style: TextStyle(
+                              color: selectedTabIndex == 1 ? Colors.white : Colors.black.withAlpha((0.5 * 255).toInt()),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          // Display loading indicator while fetching data
           FutureBuilder(
             future: getUserCollections(),
             builder: (context, AsyncSnapshot<CollectionResponse?> snapshot) {

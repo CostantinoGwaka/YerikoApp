@@ -1,7 +1,8 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:yeriko_app/main.dart';
+import 'package:yeriko_app/pages/admin_all_collection_users.dart';
 import 'package:yeriko_app/pages/all_collection_users.dart';
 import 'package:yeriko_app/pages/church_time_table.dart';
 import 'package:yeriko_app/pages/daily_page.dart';
@@ -21,7 +22,7 @@ class _HomePageState extends State<HomePage> {
   List<Widget> pages = [
     const DailyPage(),
     const ChurchTimeTable(),
-    const AllUserCollections(),
+    (userData != null && userData!.user.role == "ADMIN") ? AdminAllUserCollections() : AllUserCollections(),
     const TransectionPage(),
     const TransectionPage(),
   ];
@@ -43,12 +44,13 @@ class _HomePageState extends State<HomePage> {
           // width: 40,
           child: FloatingActionButton(
             onPressed: () {
-              // Example: launch a phone call using url_launcher
-              launchUrl(Uri.parse('tel:0659515042'));
+              setState(() {
+                pageIndex = 3;
+              });
             },
             backgroundColor: buttoncolor,
             child: Icon(
-              Icons.call,
+              Icons.people,
               color: Colors.white,
               size: 20,
             ),

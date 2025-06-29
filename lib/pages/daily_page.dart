@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:yeriko_app/main.dart';
 import 'package:yeriko_app/models/other_collection_model.dart';
 import 'package:yeriko_app/models/user_collection_model.dart';

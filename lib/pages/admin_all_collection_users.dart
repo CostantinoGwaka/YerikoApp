@@ -372,6 +372,50 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                     padding: EdgeInsets.symmetric(horizontal: (size.width - 40) / 30),
                     child: Column(
                       children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 25, right: 2),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        "",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          color: mainFontColor,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: mainFontColor,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                                  elevation: 2,
+                                ),
+                                icon: const Icon(Icons.plus_one, size: 15),
+                                label: const Text(
+                                  "Ongeza Mchango",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                onPressed: () {},
+                              ),
+                            ],
+                          ),
+                        ),
                         const SizedBox(height: 10),
                         Padding(
                           padding: EdgeInsets.only(top: (size.height - 40) / 60),

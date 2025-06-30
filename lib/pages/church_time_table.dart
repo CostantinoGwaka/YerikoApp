@@ -211,10 +211,10 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                           Expanded(
                             child: Container(
                               margin: EdgeInsets.only(
-                                top: (size.width - 40) / 30,
-                                left: (size.width - 40) / 20,
-                                right: (size.width - 40) / 20,
-                                bottom: (size.width - 40) / 30,
+                                top: (size.width - 40) / 30, // slightly reduced
+                                left: (size.width - 40) / 20, // slightly reduced
+                                right: (size.width - 40) / 20, // slightly reduced
+                                bottom: (size.width - 40) / 30, // slightly reduced
                               ),
                               decoration:
                                   BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
@@ -222,11 +222,10 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                                   color: grey.withValues(alpha: (0.03 * 255)),
                                   spreadRadius: 10,
                                   blurRadius: 3,
-                                  // changes position of shadow
                                 ),
                               ]),
                               child: Padding(
-                                padding: const EdgeInsets.all(20),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14), // less padding
                                 child: Row(
                                   children: [
                                     const SizedBox(width: 2),

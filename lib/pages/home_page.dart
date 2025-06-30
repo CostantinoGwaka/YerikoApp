@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:yeriko_app/main.dart';
 import 'package:yeriko_app/pages/admin_all_collection_users.dart';
 import 'package:yeriko_app/pages/all_collection_users.dart';
+import 'package:yeriko_app/pages/all_user_viewer.dart';
 import 'package:yeriko_app/pages/church_time_table.dart';
 import 'package:yeriko_app/pages/daily_page.dart';
 import 'package:yeriko_app/pages/profile_user.dart';
@@ -23,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     const DailyPage(),
     const ChurchTimeTable(),
     (userData != null && userData!.user.role == "ADMIN") ? AdminAllUserCollections() : AllUserCollections(),
-    ProfilePage(),
+    AllViewerUserWithAdmin(),
     ProfilePage(),
   ];
 

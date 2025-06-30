@@ -45,9 +45,7 @@ class _HomePageState extends State<HomePage> {
           // width: 40,
           child: FloatingActionButton(
             onPressed: () {
-              setState(() {
-                pageIndex = 3;
-              });
+              setTabs(3);
             },
             backgroundColor: buttoncolor,
             child: Icon(
@@ -91,7 +89,11 @@ class _HomePageState extends State<HomePage> {
         rightCornerRadius: 10,
         elevation: 2,
         onTap: (index) {
-          setTabs(index);
+          if (index == 3) {
+            setTabs(4);
+          } else {
+            setTabs(index);
+          }
         });
   }
 

@@ -61,7 +61,8 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   }
 
   Future<void> fetchUsers() async {
-    final response = await http.get(Uri.parse('$baseUrl/auth/get_all_users.php'));
+    final response =
+        await http.get(Uri.parse('$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

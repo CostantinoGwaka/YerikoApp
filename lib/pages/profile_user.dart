@@ -175,6 +175,7 @@ class _ProfilePageState extends State<ProfilePage> {
               if (await canLaunchUrl(launchUri)) {
                 await launchUrl(launchUri);
               } else {
+                // ignore: use_build_context_synchronously
                 showSnackBar(context, "Imeshindikana kupiga simu.");
               }
             },
@@ -230,6 +231,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       if (await canLaunchUrl(url)) {
                         await launchUrl(url);
                       } else {
+                        // ignore: use_build_context_synchronously
                         showSnackBar(context, "Imeshindikana kufungua tovuti.");
                       }
                     },

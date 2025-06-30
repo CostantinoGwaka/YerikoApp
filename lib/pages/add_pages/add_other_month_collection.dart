@@ -2,17 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:yeriko_app/main.dart';
+import 'package:yeriko_app/models/all_other_collection_model.dart';
 import 'package:yeriko_app/models/auth_model.dart';
-import 'package:yeriko_app/models/user_collection_model.dart';
+import 'package:yeriko_app/models/collection_type_model.dart';
 import 'package:yeriko_app/utils/url.dart';
 import 'package:http/http.dart' as http;
 
-class AddMonthCollectionUserAdmin extends StatefulWidget {
+class AddOtherMonthCollectionUserAdmin extends StatefulWidget {
   final void Function(Map<String, dynamic>)? onSubmit;
-  final CollectionItem? initialData; // 👈 Add this
+  final OtherCollection? initialData; // 👈 Add this
   final BuildContext rootContext;
 
-  const AddMonthCollectionUserAdmin({
+  const AddOtherMonthCollectionUserAdmin({
     super.key,
     required this.rootContext,
     this.initialData,
@@ -20,13 +21,15 @@ class AddMonthCollectionUserAdmin extends StatefulWidget {
   });
 
   @override
-  State<AddMonthCollectionUserAdmin> createState() => _AddMonthCollectionUserAdminState();
+  State<AddOtherMonthCollectionUserAdmin> createState() => _AddOtherMonthCollectionUserAdminState();
 }
 
-class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmin> {
+class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollectionUserAdmin> {
   final _formKey = GlobalKey<FormState>();
   List<User> users = [];
+  List<CollectionType> collectionTypeResponse = [];
   User? selectedUser;
+  CollectionType? selectedType;
 
   final TextEditingController amountController = TextEditingController();
   String selectedMonth = "JANUARY";
@@ -46,6 +49,20 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
     }
   }
 
+  Future<void> fetchCollectionTypes() async {
+    final response = await http
+        .get(Uri.parse('$baseUrl/collectiontype/get_all_collection_type.php?jumuiya_id=${userData!.user.jumuiya_id}'));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        collectionTypeResponse = (data['data'] as List).map((u) => CollectionType.fromJson(u)).toList();
+      });
+    } else {
+      // handle error
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -55,20 +72,21 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
   void initState() {
     super.initState();
     fetchUsers();
+    fetchCollectionTypes();
 
     if (widget.initialData != null) {
       final data = widget.initialData!;
 
       amountController.text = data.amount.toString();
       selectedMonth = data.monthly; // Default to January if null
-
+      // selectedType = data.
       setState(() {
         selectedUser = data.user;
       });
     }
   }
 
-  Future<dynamic> saveMonthlyContribution(dynamic data) async {
+  Future<dynamic> saveOtherMonthlyContribution(dynamic data) async {
     try {
       setState(() {
         _isLoading = true;
@@ -81,15 +99,21 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
           data['user']['id'] == null ||
           data['churchYearEntity'] == null ||
           data['churchYearEntity']['id'] == null ||
+          data['collection_type']['id'] == null ||
           data['monthly'] == null ||
           data['monthly'].toString().isEmpty ||
-          data['registeredBy'] == null ||
-          data['registeredBy'].toString().isEmpty) {
+          data['registered_by'] == null ||
+          data['registered_by'].toString().isEmpty) {
+        Navigator.pop(context);
+
+        setState(() {
+          _isLoading = true;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Hakikisha umejaza sehemu zote ipasavyo.")),
         );
       } else {
-        String myApi = "$baseUrl/monthly/add.php";
+        String myApi = "$baseUrl/monthly/add_other_collection.php";
         final response = await http.post(
           Uri.parse(myApi),
           headers: {
@@ -100,7 +124,7 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
 
         var jsonResponse = json.decode(response.body);
 
-        if (response.statusCode == 200 && jsonResponse != null) {
+        if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == '200') {
           setState(() {
             _isLoading = false;
           });
@@ -130,6 +154,9 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
             );
           }
         } else if (response.statusCode == 404) {
+          // ignore: use_build_context_synchronously
+          Navigator.pop(context);
+
           //end here
           setState(() {
             _isLoading = false;
@@ -139,6 +166,9 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
             SnackBar(content: Text(jsonResponse['message'])),
           );
         } else {
+          // ignore: use_build_context_synchronously
+          Navigator.pop(context);
+
           setState(() {
             _isLoading = false;
           });
@@ -149,6 +179,9 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
         }
       }
     } catch (e) {
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+
       setState(() {
         _isLoading = false;
       });
@@ -246,6 +279,34 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
                 },
               ),
               const SizedBox(height: 20),
+              DropdownButtonFormField<CollectionType>(
+                value: selectedType,
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  labelText: "Chagua Aina ya Mchango",
+                  border: OutlineInputBorder(),
+                ),
+                items: collectionTypeResponse.map((type) {
+                  return DropdownMenuItem<CollectionType>(
+                    value: type,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.person, color: Colors.blueGrey, size: 20),
+                        const SizedBox(width: 8),
+                        Text(type.collectionName),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (type) {
+                  if (type != null) {
+                    setState(() {
+                      selectedType = type;
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: 20),
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton.icon(
@@ -263,10 +324,13 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
                           "churchYearEntity": {
                             "id": currentYear!.data.id,
                           },
+                          "collection_type": {
+                            "id": selectedType!.id,
+                          },
                           "monthly": selectedMonth,
-                          "registeredBy": userData!.user.userFullName,
+                          "registered_by": userData!.user.userFullName,
                         };
-                        saveMonthlyContribution(data);
+                        saveOtherMonthlyContribution(data);
                       },
                     ),
             ],

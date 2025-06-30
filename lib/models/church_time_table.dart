@@ -79,4 +79,12 @@ class ChurchYearEntity {
       isActive: json['isActive'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'churchYear': churchYear,
+      'isActive': isActive,
+    };
+  }
 }

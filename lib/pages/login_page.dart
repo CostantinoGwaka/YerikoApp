@@ -58,8 +58,6 @@ class _LoginPageState extends State<LoginPage> {
 
         var jsonResponse = json.decode(response.body);
 
-        print(jsonResponse);
-
         if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == '200') {
           setState(() {
             _isLoading = false;

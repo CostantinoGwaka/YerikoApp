@@ -1,12 +1,11 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:yeriko_app/main.dart';
 import 'package:yeriko_app/models/auth_model.dart';
-import 'package:yeriko_app/models/user_collection_model.dart';
+import 'package:yeriko_app/models/other_collection_model.dart';
 import 'package:yeriko_app/models/user_collection_table_model.dart';
-import 'package:yeriko_app/pages/add_pages/add_month_collection.dart';
+import 'package:yeriko_app/pages/add_pages/add_other_month_collection.dart';
 import 'package:yeriko_app/pages/supports_pages/collection_table_against_month.dart';
 import 'package:yeriko_app/theme/colors.dart';
 import 'package:yeriko_app/utils/url.dart';
@@ -20,8 +19,7 @@ class AdminOtherAllUserCollections extends StatefulWidget {
 }
 
 class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollections> {
-  CollectionResponse? collectionsMonthly;
-  CollectionResponse? collectionsOthers;
+  OtherCollectionResponse? collectionsOthers;
   UserMonthlyCollectionResponse? userMonthlyCollectionResponse;
   int selectedTabIndex = 0;
   bool viewTable = false;
@@ -60,7 +58,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
   }
 
   Future<void> fetchUsers() async {
-    final response = await http.get(Uri.parse('$baseUrl/auth/get_all_users.php'));
+    final response =
+        await http.get(Uri.parse('$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -89,7 +88,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
     setState(() {}); // Refresh UI after fetching data
   }
 
-  Future<CollectionResponse?> getUserCollections() async {
+  Future<OtherCollectionResponse?> getUserCollections() async {
     try {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
@@ -109,8 +108,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
           // setState(() => _isLoading = false);
-          collectionsMonthly = CollectionResponse.fromJson(jsonResponse);
-          return collectionsMonthly;
+          collectionsOthers = OtherCollectionResponse.fromJson(jsonResponse);
+
+          return collectionsOthers;
         }
       } else {
         if (context.mounted) {
@@ -195,7 +195,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
     return null;
   }
 
-  Future<CollectionResponse?> getUserMonthCollections() async {
+  Future<OtherCollectionResponse?> getUserMonthCollections() async {
     try {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
@@ -220,10 +220,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
           // setState(() => _isLoading = false);
-          collectionsMonthly = CollectionResponse.fromJson(jsonResponse);
-          print(collectionsMonthly);
+          collectionsOthers = OtherCollectionResponse.fromJson(jsonResponse);
 
-          return collectionsMonthly;
+          return collectionsOthers;
         }
       } else {
         if (context.mounted) {
@@ -246,7 +245,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
     return null;
   }
 
-  Future<CollectionResponse?> getUserYearCollections() async {
+  Future<OtherCollectionResponse?> getUserYearCollections() async {
     try {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
@@ -266,9 +265,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
-          collectionsMonthly = CollectionResponse.fromJson(jsonResponse);
-          print(collectionsMonthly);
-          return collectionsMonthly;
+          collectionsOthers = OtherCollectionResponse.fromJson(jsonResponse);
+          return collectionsOthers;
         }
       } else {
         if (context.mounted) {
@@ -446,7 +444,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                     shape: const RoundedRectangleBorder(
                                       borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                                     ),
-                                    builder: (_) => AddMonthCollectionUserAdmin(
+                                    builder: (_) => AddOtherMonthCollectionUserAdmin(
                                       rootContext: context,
                                       onSubmit: (data) {
                                         _reloadData();
@@ -569,7 +567,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                             : (filterOption == 'KWA MWEZI' && selectedMonth != null)
                                 ? getUserMonthCollections()
                                 : getUserCollections(),
-                    builder: (context, AsyncSnapshot<CollectionResponse?> snapshot) {
+                    builder: (context, AsyncSnapshot<OtherCollectionResponse?> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
@@ -631,7 +629,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                                       ),
                                                     ),
                                                     Text(
-                                                      "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
+                                                      "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.collectionType.collectionName})",
                                                       style: const TextStyle(
                                                         fontSize: 15,
                                                         color: Colors.black,
@@ -685,7 +683,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
             child: SizedBox(
               child: FutureBuilder(
                 future: getUserCollections(),
-                builder: (context, AsyncSnapshot<CollectionResponse?> snapshot) {
+                builder: (context, AsyncSnapshot<OtherCollectionResponse?> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
@@ -797,7 +795,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
     ));
   }
 
-  void _showCollectionDetails(BuildContext rootContext, CollectionItem item) {
+  void _showCollectionDetails(BuildContext rootContext, OtherCollection item) {
     final user = item.user;
     final year = item.churchYearEntity;
     var size = MediaQuery.of(context).size;
@@ -850,9 +848,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                 shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                                 ),
-                                builder: (_) => AddMonthCollectionUserAdmin(
+                                builder: (_) => AddOtherMonthCollectionUserAdmin(
                                   rootContext: rootContext,
-                                  initialData: item, // Pass current item for editing
                                   onSubmit: (data) {
                                     _reloadData();
                                   },

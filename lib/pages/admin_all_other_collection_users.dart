@@ -133,68 +133,6 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
     return null;
   }
 
-  Future<UserMonthlyCollectionResponse?> getUserCollectionAgainstTable() async {
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please provide username and password")),
-          );
-        }
-        setState(() {
-          isLoading = false;
-        });
-        return null;
-      }
-
-      final String myApi =
-          "$baseUrl/monthly/get_all_collection_year_id_table_data.php?year_id=${currentYear!.data.id}&jumuiya_id=${userData!.user.jumuiya_id}";
-      final response = await http.get(
-        Uri.parse(myApi),
-        headers: {
-          'Accept': 'application/json',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
-        if (jsonResponse != null) {
-          setState(() {
-            isLoading = false;
-          });
-          userMonthlyCollectionResponse = UserMonthlyCollectionResponse.fromJson(jsonResponse);
-          return userMonthlyCollectionResponse;
-        }
-      } else {
-        setState(() {
-          isLoading = false;
-        });
-        if (context.mounted) {
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${response.statusCode}")),
-          );
-        }
-      }
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
-        );
-      }
-    }
-
-    // 🔁 Always return something to complete Future
-    return null;
-  }
-
   Future<OtherCollectionResponse?> getUserMonthCollections() async {
     try {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
@@ -209,6 +147,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
 
       final String myApi =
           "$baseUrl/monthly/get_all_other_collection_by_month.php?month=$selectedMonth&jumuiya_id=${userData!.user.jumuiya_id}";
+
       final response = await http.get(
         Uri.parse(myApi),
         headers: {
@@ -340,36 +279,36 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: mainFontColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                        elevation: 2,
-                      ),
-                      icon: const Icon(Icons.close, size: 15),
-                      label: const Text(
-                        "Funga michango",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                      onPressed: () async {
-                        setState(() {
-                          viewTable = !viewTable;
-                        });
-                        if (viewTable) {
-                          await getUserCollectionAgainstTable();
-                        }
-                      },
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   child: ElevatedButton.icon(
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor: mainFontColor,
+                  //       foregroundColor: Colors.white,
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(18),
+                  //       ),
+                  //       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                  //       elevation: 2,
+                  //     ),
+                  //     icon: const Icon(Icons.close, size: 15),
+                  //     label: const Text(
+                  //       "Funga michango",
+                  //       style: TextStyle(
+                  //         fontWeight: FontWeight.bold,
+                  //         fontSize: 13,
+                  //       ),
+                  //     ),
+                  //     onPressed: () async {
+                  //       setState(() {
+                  //         viewTable = !viewTable;
+                  //       });
+                  //       if (viewTable) {
+                  //         await getUserCollectionAgainstTable();
+                  //       }
+                  //     },
+                  //   ),
+                  // ),
                   isLoading
                       ? const Padding(
                           padding: EdgeInsets.all(16.0),

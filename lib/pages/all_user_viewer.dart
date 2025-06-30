@@ -314,6 +314,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                                   if (await canLaunchUrl(url)) {
                                                     await launchUrl(url);
                                                   } else {
+                                                    // ignore: use_build_context_synchronously
                                                     ScaffoldMessenger.of(context).showSnackBar(
                                                       const SnackBar(content: Text("Imeshindikana kupiga simu.")),
                                                     );

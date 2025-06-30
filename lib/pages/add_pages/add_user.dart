@@ -35,24 +35,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
   bool _isLoading = false;
   final roles = ["USER", "ADMIN"];
 
-  Future<void> fetchUsers() async {
-    final response = await http.get(Uri.parse('$baseUrl/auth/get_all_users.php'));
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      setState(() {
-        users = (data['data'] as List).map((u) => User.fromJson(u)).toList();
-      });
-    } else {
-      // handle error
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    fetchUsers();
-
     if (widget.initialData != null) {
       final data = widget.initialData!;
 
@@ -67,7 +52,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
     }
   }
 
-  Future<dynamic> saveTimeTable(dynamic data) async {
+  Future<dynamic> saveTimeTable(BuildContext context, dynamic data) async {
     try {
       setState(() {
         _isLoading = true;
@@ -83,18 +68,18 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
           SnackBar(content: Text("Hakikisha umejaza sehemu zote ipasavyo.")),
         );
       } else {
-        String myApi = "$baseUrl/church_timetable/add.php";
+        String myApi = "$baseUrl/auth/jisajili.php";
         final response = await http.post(
           Uri.parse(myApi),
           headers: {
             'Accept': 'application/json',
           },
-          body: jsonEncode(data),
+          body: data,
         );
 
         var jsonResponse = json.decode(response.body);
 
-        if (response.statusCode == 200 && jsonResponse != null) {
+        if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == '200') {
           setState(() {
             _isLoading = false;
           });
@@ -127,6 +112,8 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
             );
           }
         } else if (response.statusCode == 404) {
+          // ignore: use_build_context_synchronously
+          Navigator.pop(context);
           //end here
           setState(() {
             _isLoading = false;
@@ -136,6 +123,8 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
             SnackBar(content: Text(jsonResponse['message'])),
           );
         } else {
+          // ignore: use_build_context_synchronously
+          Navigator.pop(context);
           setState(() {
             _isLoading = false;
           });
@@ -146,6 +135,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
         }
       }
     } catch (e) {
+      print("Error: $e");
       setState(() {
         _isLoading = false;
       });
@@ -248,14 +238,12 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                             "fname": capitalizeEachWord(fullNameController.text.trim()),
                             "uname": toUnderscore(fullNameController.text.trim()),
                             "phone": phoneController.text.trim().replaceFirst(RegExp(r'^0'), '255'),
-                            "password": passwordController.text.trim(),
+                            "password": phoneController.text.trim(),
                             "role": selectedRole,
                             "jumuiya_id": userData!.user.jumuiya_id,
                           };
 
-                          print("User Data: $user");
-
-                          // saveUser(userData); // you define this function
+                          saveTimeTable(context, user);
                         }
                       },
                       icon: const Icon(Icons.save),

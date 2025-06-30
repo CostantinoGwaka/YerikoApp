@@ -397,7 +397,7 @@ class _DailyPageState extends State<DailyPage> {
                                           : "0.00",
                                       style: TextStyle(
                                         fontSize: 14,
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: FontWeight.bold,
                                         color: mainFontColor,
                                       ),
                                     ),
@@ -442,7 +442,7 @@ class _DailyPageState extends State<DailyPage> {
                                           : "0.00",
                                       style: TextStyle(
                                         fontSize: 14,
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: FontWeight.w900,
                                         color: mainFontColor,
                                       ),
                                     ),

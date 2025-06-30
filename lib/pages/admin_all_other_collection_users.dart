@@ -392,33 +392,34 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: mainFontColor,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                                  elevation: 2,
-                                ),
-                                icon: const Icon(Icons.table_chart, size: 15),
-                                label: const Text(
-                                  "Tazama Michango",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                onPressed: () async {
-                                  setState(() {
-                                    viewTable = !viewTable;
-                                  });
-                                  if (viewTable) {
-                                    await getUserCollectionAgainstTable();
-                                  }
-                                },
-                              ),
+                              Text(""),
+                              // ElevatedButton.icon(
+                              //   style: ElevatedButton.styleFrom(
+                              //     backgroundColor: mainFontColor,
+                              //     foregroundColor: Colors.white,
+                              //     shape: RoundedRectangleBorder(
+                              //       borderRadius: BorderRadius.circular(18),
+                              //     ),
+                              //     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                              //     elevation: 2,
+                              //   ),
+                              //   icon: const Icon(Icons.table_chart, size: 15),
+                              //   label: const Text(
+                              //     "Tazama Michango",
+                              //     style: TextStyle(
+                              //       fontWeight: FontWeight.bold,
+                              //       fontSize: 13,
+                              //     ),
+                              //   ),
+                              //   onPressed: () async {
+                              //     setState(() {
+                              //       viewTable = !viewTable;
+                              //     });
+                              //     if (viewTable) {
+                              //       await getUserCollectionAgainstTable();
+                              //     }
+                              //   },
+                              // ),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: mainFontColor,
@@ -795,9 +796,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
     ));
   }
 
-  void _showCollectionDetails(BuildContext rootContext, OtherCollection item) {
-    final user = item.user;
-    final year = item.churchYearEntity;
+  void _showCollectionDetails(BuildContext rootContext, OtherCollection dataItem) {
+    final user = dataItem.user;
+    final year = dataItem.churchYearEntity;
     var size = MediaQuery.of(context).size;
 
     showModalBottomSheet(
@@ -850,6 +851,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                 ),
                                 builder: (_) => AddOtherMonthCollectionUserAdmin(
                                   rootContext: rootContext,
+                                  initialData: dataItem,
                                   onSubmit: (data) {
                                     _reloadData();
                                   },
@@ -879,7 +881,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                 ),
                               );
                               if (confirm == true) {
-                                deleteTimeTable(item.id);
+                                deleteTimeTable(dataItem.id);
                               }
                             },
                           ),
@@ -908,13 +910,13 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                     Text("Mwaka:          ${year.churchYear}"),
                     // Text("Uhai:           ${year.isActive ? 'Ndiyo' : 'Hapana'}"),
                     const SizedBox(height: 10),
-                    Text("💰 Kiasi:        TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))}"),
+                    Text("💰 Kiasi:        TZS ${NumberFormat("#,##0", "en_US").format(int.parse(dataItem.amount))}"),
                     const SizedBox(height: 4),
-                    Text("🗓 Mwezi:        ${item.monthly}"),
+                    Text("🗓 Mwezi:        ${dataItem.monthly}"),
                     const SizedBox(height: 4),
-                    Text("📅 Tarehe ya Usajili: ${item.registeredDate}"),
+                    Text("📅 Tarehe ya Usajili: ${dataItem.registeredDate}"),
                     const SizedBox(height: 4),
-                    Text("🖊 Aliyesajili:   ${item.registeredBy}"),
+                    Text("🖊 Aliyesajili:   ${dataItem.registeredBy}"),
                   ],
                 ),
               ],

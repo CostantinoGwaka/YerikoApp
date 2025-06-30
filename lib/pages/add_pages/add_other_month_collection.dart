@@ -2,9 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:yeriko_app/main.dart';
-import 'package:yeriko_app/models/all_other_collection_model.dart';
 import 'package:yeriko_app/models/auth_model.dart';
-import 'package:yeriko_app/models/collection_type_model.dart';
+import 'package:yeriko_app/models/other_collection_model.dart' show OtherCollection, CollectionType;
 import 'package:yeriko_app/utils/url.dart';
 import 'package:http/http.dart' as http;
 
@@ -79,9 +78,12 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
 
       amountController.text = data.amount.toString();
       selectedMonth = data.monthly; // Default to January if null
-      // selectedType = data.
+
+      print(data.collectionType.id);
+      print(data.collectionType.collectionName);
       setState(() {
         selectedUser = data.user;
+        selectedType = data.collectionType;
       });
     }
   }

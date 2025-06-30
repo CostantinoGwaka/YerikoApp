@@ -310,19 +310,21 @@ class _ProfilePageState extends State<ProfilePage> {
                   buildPasswordField('Rudia Nenosiri', confirmPasswordController, confirmVisible,
                       (v) => setState(() => confirmVisible = v)),
                   const SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.save),
-                    label: const Text('Hifadhi Nenosiri'),
-                    onPressed: () {
-                      if (formKey.currentState!.validate()) {
-                        updatePassword(
-                          context,
-                          oldPasswordController.text,
-                          newPasswordController.text,
-                        );
-                      }
-                    },
-                  ),
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton.icon(
+                          icon: const Icon(Icons.save),
+                          label: const Text('Hifadhi Nenosiri'),
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              updatePassword(
+                                context,
+                                oldPasswordController.text,
+                                newPasswordController.text,
+                              );
+                            }
+                          },
+                        ),
                 ],
               ),
             ),

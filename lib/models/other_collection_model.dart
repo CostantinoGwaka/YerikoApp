@@ -60,18 +60,32 @@ class OtherCollection {
 class CollectionType {
   final int id;
   final String collectionName;
+  final String? dateRegistered;
+  final String? jumuiyaId;
 
   CollectionType({
     required this.id,
     required this.collectionName,
+    this.dateRegistered,
+    this.jumuiyaId,
   });
 
   factory CollectionType.fromJson(Map<String, dynamic> json) {
     return CollectionType(
       id: json['id'],
       collectionName: json['collection_name'],
+      dateRegistered: json['date_registered'],
+      jumuiyaId: json['jumuiya_id']?.toString(),
     );
   }
+
+  // ✅ override equality so DropdownButton can compare correctly
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is CollectionType && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class ChurchYearEntity {

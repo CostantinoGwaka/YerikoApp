@@ -151,7 +151,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       expand: false,
-      initialChildSize: 0.85,
+      initialChildSize: 0.5,
       maxChildSize: 0.95,
       minChildSize: 0.5,
       builder: (_, controller) => SingleChildScrollView(

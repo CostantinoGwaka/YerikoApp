@@ -107,7 +107,6 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
           data['registered_by'] == null ||
           data['registered_by'].toString().isEmpty) {
         Navigator.pop(context);
-
         setState(() {
           _isLoading = true;
         });
@@ -200,7 +199,7 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       expand: false,
-      initialChildSize: 0.6,
+      initialChildSize: 0.5,
       maxChildSize: 0.95,
       minChildSize: 0.5,
       builder: (_, controller) => SingleChildScrollView(
@@ -257,7 +256,7 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                 value: selectedUser,
                 isExpanded: true,
                 decoration: const InputDecoration(
-                  labelText: "Chagua Mwenyeji",
+                  labelText: "Chagua Mwanajumuiya",
                   border: OutlineInputBorder(),
                 ),
                 items: users.map((user) {

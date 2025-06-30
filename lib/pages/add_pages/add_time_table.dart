@@ -181,7 +181,7 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       expand: false,
-      initialChildSize: 0.85,
+      initialChildSize: 0.8,
       maxChildSize: 0.95,
       minChildSize: 0.5,
       builder: (_, controller) => SingleChildScrollView(

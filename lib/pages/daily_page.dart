@@ -469,8 +469,9 @@ class _DailyPageState extends State<DailyPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => OtherCollectionsTablePage(
-                                    otherCollections:
-                                        otherCollectionResponse != null ? otherCollectionResponse!.data : []),
+                                  otherCollections:
+                                      otherCollectionResponse != null ? otherCollectionResponse!.data : [],
+                                ),
                               ),
                             );
                           },

@@ -85,6 +85,11 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
           data['monthly'].toString().isEmpty ||
           data['registeredBy'] == null ||
           data['registeredBy'].toString().isEmpty) {
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
+        setState(() {
+          _isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Hakikisha umejaza sehemu zote ipasavyo.")),
         );
@@ -165,7 +170,7 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       expand: false,
-      initialChildSize: 0.6,
+      initialChildSize: 0.5,
       maxChildSize: 0.95,
       minChildSize: 0.5,
       builder: (_, controller) => SingleChildScrollView(
@@ -222,7 +227,7 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
                 value: selectedUser,
                 isExpanded: true,
                 decoration: const InputDecoration(
-                  labelText: "Chagua Mwenyeji",
+                  labelText: "Chagua Mwanajumuiya",
                   border: OutlineInputBorder(),
                 ),
                 items: users.map((user) {

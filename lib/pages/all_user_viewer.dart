@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:yeriko_app/main.dart';
 import 'package:yeriko_app/models/all_users_model.dart';
-import 'package:yeriko_app/pages/add_pages/add_time_table.dart';
 import 'package:yeriko_app/pages/add_pages/add_user.dart';
 import 'package:yeriko_app/theme/colors.dart';
 import 'package:yeriko_app/utils/url.dart';
@@ -202,138 +201,135 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   final item = collections[index];
-                  return GestureDetector(
-                    onTap: () => _showChurchTimeTableDetails(context, item),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              margin: EdgeInsets.only(
-                                top: (size.width - 40) / 40,
-                                left: (size.width - 40) / 20,
-                                right: (size.width - 40) / 20,
-                                bottom: (size.width - 40) / 30,
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.only(
+                              top: (size.width - 40) / 40,
+                              left: (size.width - 40) / 20,
+                              right: (size.width - 40) / 20,
+                              bottom: (size.width - 40) / 30,
+                            ),
+                            decoration:
+                                BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
+                              BoxShadow(
+                                color: grey.withValues(alpha: (0.03 * 255)),
+                                spreadRadius: 10,
+                                blurRadius: 3,
+                                // changes position of shadow
                               ),
-                              decoration:
-                                  BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
-                                BoxShadow(
-                                  color: grey.withValues(alpha: (0.03 * 255)),
-                                  spreadRadius: 10,
-                                  blurRadius: 3,
-                                  // changes position of shadow
-                                ),
-                              ]),
-                              child: Row(
-                                children: [
-                                  const SizedBox(width: 2),
-                                  Expanded(
-                                    child: SizedBox(
-                                      width: (size.width - 90) * 0.2,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Flexible(
-                                                child: Text(
-                                                  item.userFullName ?? "Jina Halipo",
-                                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
+                            ]),
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 2),
+                                Expanded(
+                                  child: SizedBox(
+                                    width: (size.width - 90) * 0.2,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                item.userFullName ?? "Jina Halipo",
+                                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                                decoration: BoxDecoration(
-                                                  color: item.role == "ADMIN" ? Colors.redAccent : Colors.blueAccent,
-                                                  borderRadius: BorderRadius.circular(8),
-                                                ),
-                                                child: Text(
-                                                  item.role ?? "Role Halipo",
-                                                  style: const TextStyle(
-                                                      color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              const Icon(Icons.person_outline, size: 14, color: Colors.grey),
-                                              const SizedBox(width: 4),
-                                              Flexible(
-                                                  child: Text("Jina la mtumiaji: ${item.userName}",
-                                                      style: const TextStyle(fontSize: 12))),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Row(
-                                            children: [
-                                              const Icon(Icons.phone, size: 14, color: Colors.grey),
-                                              const SizedBox(width: 4),
-                                              Flexible(
-                                                  child: Text("Namba ya simu: ${item.phone}",
-                                                      style: const TextStyle(fontSize: 12))),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Row(
-                                            children: [
-                                              const Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey),
-                                              const SizedBox(width: 4),
-                                              Flexible(
-                                                  child: Text("Mwaka wa usajili: ${item.yearRegistered}",
-                                                      style: const TextStyle(fontSize: 12))),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Align(
-                                            alignment: Alignment.centerRight,
-                                            child: ElevatedButton.icon(
-                                              icon: const Icon(Icons.call, color: Colors.white, size: 14),
-                                              label: const Text("Piga Simu", style: TextStyle(fontSize: 12)),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.green,
-                                                foregroundColor: Colors.white,
-                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(6),
-                                                ),
-                                                elevation: 0,
-                                                textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                                                minimumSize: Size(0, 28),
-                                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              ),
-                                              onPressed: () async {
-                                                final phone = (item.phone ?? '').replaceAll(' ', '');
-                                                String formattedPhone = formatPhoneNumber(phone);
-                                                if (phone.isNotEmpty) {
-                                                  final Uri url = Uri.parse('tel:$formattedPhone');
-                                                  if (await canLaunchUrl(url)) {
-                                                    await launchUrl(url);
-                                                  } else {
-                                                    // ignore: use_build_context_synchronously
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      const SnackBar(content: Text("Imeshindikana kupiga simu.")),
-                                                    );
-                                                  }
-                                                }
-                                              },
                                             ),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: item.role == "ADMIN" ? Colors.redAccent : Colors.blueAccent,
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: Text(
+                                                item.role ?? "Role Halipo",
+                                                style: const TextStyle(
+                                                    color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.person_outline, size: 14, color: Colors.grey),
+                                            const SizedBox(width: 4),
+                                            Flexible(
+                                                child: Text("Jina la mtumiaji: ${item.userName}",
+                                                    style: const TextStyle(fontSize: 12))),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.phone, size: 14, color: Colors.grey),
+                                            const SizedBox(width: 4),
+                                            Flexible(
+                                                child: Text("Namba ya simu: ${item.phone}",
+                                                    style: const TextStyle(fontSize: 12))),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey),
+                                            const SizedBox(width: 4),
+                                            Flexible(
+                                                child: Text("Mwaka wa usajili: ${item.yearRegistered}",
+                                                    style: const TextStyle(fontSize: 12))),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: ElevatedButton.icon(
+                                            icon: const Icon(Icons.call, color: Colors.white, size: 14),
+                                            label: const Text("Piga Simu", style: TextStyle(fontSize: 12)),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.green,
+                                              foregroundColor: Colors.white,
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(6),
+                                              ),
+                                              elevation: 0,
+                                              textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                              minimumSize: Size(0, 28),
+                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                            ),
+                                            onPressed: () async {
+                                              final phone = (item.phone ?? '').replaceAll(' ', '');
+                                              String formattedPhone = formatPhoneNumber(phone);
+                                              if (phone.isNotEmpty) {
+                                                final Uri url = Uri.parse('tel:$formattedPhone');
+                                                if (await canLaunchUrl(url)) {
+                                                  await launchUrl(url);
+                                                } else {
+                                                  // ignore: use_build_context_synchronously
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    const SnackBar(content: Text("Imeshindikana kupiga simu.")),
+                                                  );
+                                                }
+                                              }
+                                            },
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  //
-                                ],
-                              ),
+                                ),
+                                //
+                              ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   );
                 },
@@ -345,202 +341,10 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
     ));
   }
 
-  void _showChurchTimeTableDetails(BuildContext rootContext, item) {
-    final user = item.user;
-    final year = item.churchYearEntity;
-    var size = MediaQuery.of(context).size;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
-      ),
-      builder: (BuildContext context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.6,
-          maxChildSize: 0.95,
-          minChildSize: 0.5,
-          builder: (_, controller) => SingleChildScrollView(
-            controller: controller,
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    height: 5,
-                    width: 50,
-                    margin: const EdgeInsets.only(bottom: 15),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "📋 Maelezo ya Ratiba ya Jumuiya",
-                      style: TextStyle(fontSize: (size.width - 40) / 30, fontWeight: FontWeight.bold),
-                    ),
-                    if (userData!.user.role == "ADMIN") ...[
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue),
-                            tooltip: 'Hariri',
-                            onPressed: () {
-                              Navigator.pop(context); // Close bottom sheet
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                                ),
-                                builder: (_) => AddPrayerSchedulePage(
-                                  rootContext: rootContext,
-                                  initialData: item, // Pass current item for editing
-                                  onSubmit: (data) {
-                                    _reloadData();
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            tooltip: 'Futa',
-                            onPressed: () async {
-                              final confirm = await showDialog<bool>(
-                                context: context,
-                                builder: (ctx) => AlertDialog(
-                                  title: const Text('Futa Ratiba'),
-                                  content: const Text('Una uhakika unataka kufuta ratiba hii?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.of(ctx).pop(false),
-                                      child: const Text('Hapana'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () => Navigator.of(ctx).pop(true),
-                                      child: const Text('Ndiyo'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                              if (confirm == true) {
-                                deleteTimeTable(item.id);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ]
-                  ],
-                ),
-                const Divider(height: 20),
-                // 🕊 Ratiba ya Maombi
-                const Text("🕊 Taarifa za Jumuiya", style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                _buildDetailRow("Tarehe ya Maombi", item.datePrayer),
-                _buildDetailRow("Mahali", item.location),
-                _buildDetailRow("Ujumbe", item.message),
-                _buildDetailRow("Latitiude ID", item.latId),
-                _buildDetailRow("Longitude ID", item.longId),
-                _buildDetailRow("Tarehe ya Usajili", item.createdAt),
-                _buildDetailRow("Aliyesajili", item.registeredBy),
-
-                const SizedBox(height: 16),
-
-                // 👤 Mtumiaji
-                const Text("👤 Taarifa za Mwenyeji", style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                _buildDetailRow("Jina Kamili", user?.userFullName),
-                _buildDetailRow("Jina la Mtumiaji", user?.userName),
-                _buildDetailRow("Simu", user?.phone),
-                _buildDetailRow("Nafasi", user?.role),
-                _buildDetailRow("Mwaka wa Usajili", user?.yearRegistered),
-                _buildDetailRow("Alisajiliwa Tarehe", user?.createdAt),
-
-                const SizedBox(height: 16),
-
-                // 📆 Mwaka wa Kanisa
-                const Text("📆 Taarifa za Mwaka wa Kanisa", style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                _buildDetailRow("Mwaka", year?.churchYear),
-                // _buildDetailRow("Uhai", year?.isActive == true ? "Ndiyo" : "Hapana"),
-
-                const SizedBox(height: 24),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.call),
-                      label: const Text("Piga Simu"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () async {
-                        final phone = user.phone?.replaceAll(' ', '') ?? '';
-                        String formattedPhone = formatPhoneNumber(phone);
-                        if (phone.isNotEmpty) {
-                          final Uri url = Uri.parse('tel:$formattedPhone');
-                          // ignore: deprecated_member_use
-                          if (await canLaunchUrl(url)) {
-                            await launchUrl(url);
-                          } else {
-                            // ignore: use_build_context_synchronously
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Imeshindikana kupiga simu.")),
-                            );
-                          }
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   String formatPhoneNumber(String phone) {
     if (phone.startsWith("255") && phone.length > 3) {
       return "0${phone.substring(3)}";
     }
     return phone;
-  }
-
-  Widget _buildDetailRow(String label, String? value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "$label: ",
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          Expanded(
-            child: Text(
-              value ?? "Haipo",
-              style: const TextStyle(fontWeight: FontWeight.w400),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

@@ -100,7 +100,8 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         return null;
       }
 
-      final String myApi = "$baseUrl/monthly/get_all_collection_user_by_year.php?yearId=${currentYear!.data.id}";
+      final String myApi =
+          "$baseUrl/monthly/get_all_collection_user_by_year.php?yearId=${currentYear!.data.id}&jumuiya_id=${userData!.user.jumuiya_id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
@@ -148,7 +149,8 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         return null;
       }
 
-      final String myApi = "$baseUrl/monthly/get_all_collection_year_id_table_data.php?year_id=1";
+      final String myApi =
+          "$baseUrl/monthly/get_all_collection_year_id_table_data.php?year_id=${currentYear!.data.id}&jumuiya_id=${userData!.user.jumuiya_id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
@@ -199,7 +201,8 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         return null;
       }
 
-      final String myApi = "$baseUrl/monthly/get_all_collection_by_month.php?month=$selectedMonth";
+      final String myApi =
+          "$baseUrl/monthly/get_all_collection_by_month.php?month=$selectedMonth&jumuiya_id=${userData!.user.jumuiya_id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {

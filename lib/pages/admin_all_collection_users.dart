@@ -27,11 +27,11 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   bool isLoading = false;
 
   //month
-  String filterOption = 'ALL DATA';
+  String filterOption = 'TAARIFA ZOTE';
   User? selectedUser;
   String? selectedMonth;
 
-  List<String> filterOptions = ['ALL DATA', 'BY USER', 'BY MONTH'];
+  List<String> filterOptions = ['TAARIFA ZOTE', 'TAARIFA KWA MWANAJUMUIYA', 'KWA MWEZI'];
   List<User> users = []; // replace with real User objects
   List<String> months = [
     'JANUARY',
@@ -73,11 +73,11 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
 
   void loadData() {
     setState(() {
-      if (filterOption == 'ALL DATA') {
+      if (filterOption == 'TAARIFA ZOTE') {
         displayedData = allData;
-      } else if (filterOption == 'BY USER' && selectedUser != null) {
+      } else if (filterOption == 'TAARIFA KWA MWANAJUMUIYA' && selectedUser != null) {
         getUserYearCollections();
-      } else if (filterOption == 'BY MONTH' && selectedMonth != null) {
+      } else if (filterOption == 'KWA MWEZI' && selectedMonth != null) {
         displayedData = allData.where((item) => item.monthly == selectedMonth).toList();
       }
     });
@@ -477,7 +477,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 25, right: 2),
+                          padding: const EdgeInsets.only(left: 2, right: 2),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -562,7 +562,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                             }).toList(),
                           ),
                         ),
-                        if (filterOption == 'BY USER')
+                        if (filterOption == 'TAARIFA KWA MWANAJUMUIYA')
                           Padding(
                             padding: EdgeInsets.only(top: (size.height - 40) / 60),
                             child: DropdownButtonFormField<User>(
@@ -600,7 +600,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                               },
                             ),
                           ),
-                        if (filterOption == 'BY MONTH')
+                        if (filterOption == 'KWA MWEZI')
                           Padding(
                             padding: EdgeInsets.only(top: (size.height - 40) / 60),
                             child: DropdownButtonFormField<String>(
@@ -635,17 +635,17 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                   ),
                   const SizedBox(height: 10),
                   FutureBuilder(
-                    future: filterOption == 'ALL DATA'
+                    future: filterOption == 'TAARIFA ZOTE'
                         ? getUserCollections()
-                        : (filterOption == 'BY USER' && selectedUser != null)
+                        : (filterOption == 'TAARIFA KWA MWANAJUMUIYA' && selectedUser != null)
                             ? getUserYearCollections()
-                            : (filterOption == 'BY MONTH' && selectedMonth != null)
+                            : (filterOption == 'KWA MWEZI' && selectedMonth != null)
                                 ? getUserMonthCollections()
                                 : getUserCollections()
                     //   displayedData = allData;
-                    // } else if (filterOption == 'BY USER' && selectedUser != null) {
+                    // } else if (filterOption == 'TAARIFA KWA MWANAJUMUIYA' && selectedUser != null) {
                     //   getUserYearCollections();
-                    // } else if (filterOption == 'BY MONTH' && selectedMonth != null) {
+                    // } else if (filterOption == 'KWA MWEZI' && selectedMonth != null) {
                     //   displayedData = allData.where((item) => item.monthly == selectedMonth).toList();
                     // }
                     ,

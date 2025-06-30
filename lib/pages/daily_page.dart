@@ -223,7 +223,7 @@ class _DailyPageState extends State<DailyPage> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 8.0, right: 20.0, bottom: 2),
+              padding: EdgeInsets.only(left: 8.0, right: (size.width - 40) / 30, bottom: 2),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -240,7 +240,8 @@ class _DailyPageState extends State<DailyPage> {
               ),
             ),
             Container(
-              margin: const EdgeInsets.only(top: 10, left: 25, right: 25, bottom: 10),
+              margin: EdgeInsets.only(
+                  top: 10, left: (size.width - 40) / 30, right: (size.width - 40) / 30, bottom: (size.width - 40) / 30),
               decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
                 BoxShadow(
                   color: grey.withAlpha((0.03 * 255).round()),
@@ -513,7 +514,7 @@ class _DailyPageState extends State<DailyPage> {
               height: 10,
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 25, right: 25),
+              padding: const EdgeInsets.only(left: 20, right: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -594,13 +595,14 @@ class _DailyPageState extends State<DailyPage> {
                 return ListView.builder(
                   itemCount: collections.length > 4 ? 4 : collections.length,
                   shrinkWrap: true,
+                  padding: EdgeInsets.zero,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     final item = collections[index];
                     return GestureDetector(
                       onTap: () => _showCollectionDetails(context, item),
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 5.0),
+                        padding: const EdgeInsets.only(bottom: 5.0),
                         child: Column(
                           children: [
                             Row(

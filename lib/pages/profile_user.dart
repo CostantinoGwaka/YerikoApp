@@ -116,27 +116,17 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Akaunti'),
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.edit),
-        //     onPressed: () {
-        //       // Navigate to edit page or open dialog
-        //     },
-        //   )
-        // ],
+        centerTitle: true,
       ),
       body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           const SizedBox(height: 20),
           Center(
             child: CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: MediaQuery.of(context).size.height / 20,
-              child: CircleAvatar(
-                radius: MediaQuery.of(context).size.height / 8,
-                backgroundColor: Colors.white,
-                backgroundImage: const AssetImage("assets/avatar.png"),
-              ),
+              radius: 48,
+              backgroundColor: Colors.grey[200],
+              backgroundImage: const AssetImage("assets/avatar.png"),
             ),
           ),
           const SizedBox(height: 12),
@@ -146,214 +136,53 @@ class _ProfilePageState extends State<ProfilePage> {
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
-          Center(child: Text("+${userData!.user.phone}", style: const TextStyle(color: Colors.grey))),
-          const SizedBox(height: 30),
+          Center(
+            child: Text(
+              "+${userData!.user.phone}",
+              style: const TextStyle(color: Colors.grey),
+            ),
+          ),
+          const SizedBox(height: 20),
           const Divider(),
-
-          /// Menu Options
+          const Padding(
+            padding: EdgeInsets.only(bottom: 10, top: 5),
+            child: Text("⚙️ Mipangilio", style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
           ProfileMenuItem(
             icon: Icons.person,
-            text: 'Edit Profile',
+            text: 'Hariri Taarifa',
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("✅ Bado Ipo Katika Ujenzi.")),
-              );
+              showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
             },
           ),
           ProfileMenuItem(
             icon: Icons.language,
-            text: 'Change Language',
+            text: 'Badili Lugha',
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("✅ Bado Ipo Katika Ujenzi.")),
-              );
+              showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
             },
           ),
           ProfileMenuItem(
             icon: Icons.lock,
             text: 'Badilisha Nenosiri',
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                builder: (context) {
-                  final _formKey = GlobalKey<FormState>();
-                  final TextEditingController oldPasswordController = TextEditingController();
-                  final TextEditingController newPasswordController = TextEditingController();
-                  final TextEditingController confirmPasswordController = TextEditingController();
-
-                  return Padding(
-                    padding: EdgeInsets.only(
-                      left: 20,
-                      right: 20,
-                      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                      top: 20,
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            'Change Password',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 20),
-                          StatefulBuilder(
-                            builder: (context, setState) {
-                              return Column(
-                                children: [
-                                  TextFormField(
-                                    controller: oldPasswordController,
-                                    obscureText: !oldPasswordVisible,
-                                    decoration: InputDecoration(
-                                      labelText: 'Nenosiri la Zamani',
-                                      border: const OutlineInputBorder(),
-                                      suffixIcon: IconButton(
-                                        icon: Icon(
-                                          oldPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            oldPasswordVisible = !oldPasswordVisible;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Tafadhali ingiza nenosiri lako la zamani';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 12),
-                                  TextFormField(
-                                    controller: newPasswordController,
-                                    obscureText: !newPasswordVisible,
-                                    decoration: InputDecoration(
-                                      labelText: 'New Password',
-                                      border: const OutlineInputBorder(),
-                                      suffixIcon: IconButton(
-                                        icon: Icon(
-                                          newPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            newPasswordVisible = !newPasswordVisible;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Tafadhali ingiza nenosiri jipya';
-                                      }
-                                      if (value.length < 6) {
-                                        return 'Nenosiri lazima liwe na angalau herufi 6';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 12),
-                                  TextFormField(
-                                    controller: confirmPasswordController,
-                                    obscureText: !confirmPasswordVisible,
-                                    decoration: InputDecoration(
-                                      labelText: 'Confirm New Password',
-                                      border: const OutlineInputBorder(),
-                                      suffixIcon: IconButton(
-                                        icon: Icon(
-                                          confirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            confirmPasswordVisible = !confirmPasswordVisible;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    validator: (value) {
-                                      if (value != newPasswordController.text) {
-                                        return 'Passwords do not match';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          _isLoading
-                              ? const Center(child: CircularProgressIndicator())
-                              : SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      if (_formKey.currentState!.validate()) {
-                                        updatePassword(
-                                            rootContext, oldPasswordController.text, newPasswordController.text);
-                                      }
-                                    },
-                                    child: const Text('Update Password'),
-                                  ),
-                                ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
+            onTap: () => _showPasswordChangeSheet(context),
           ),
           ProfileMenuItem(
             icon: Icons.phone,
             text: 'Msaada na Usaidizi',
             onTap: () async {
-              // Call support number
-              const phoneNumber = '0659515041'; // Change to your support number
-              final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
+              final Uri launchUri = Uri(scheme: 'tel', path: '0659515041');
               if (await canLaunchUrl(launchUri)) {
                 await launchUrl(launchUri);
               } else {
-                // ignore: use_build_context_synchronously
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Imeshindikana kupiga simu.')),
-                );
+                showSnackBar(context, "Imeshindikana kupiga simu.");
               }
             },
           ),
-          ProfileMenuItem(
-            icon: Icons.logout,
-            text: 'Toka',
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Toka'),
-                    content: const Text('Una uhakika unataka kutoka?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          logout(context);
-                        },
-                        child: const Text('Toka'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
+          const Divider(),
+          const Padding(
+            padding: EdgeInsets.only(bottom: 10, top: 5),
+            child: Text("ℹ️ Maelezo ya Programu", style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           ProfileMenuItem(
             icon: Icons.info,
@@ -366,30 +195,162 @@ class _ProfilePageState extends State<ProfilePage> {
                 applicationIcon: const Icon(Icons.app_registration),
                 children: [
                   const Text('Jumuiya Yangu App ni mfumo wa usimamizi wa Jumuiya.'),
-                  const SizedBox(height: 10),
-                  const Text('Developed by Yeriko Team'),
-                  const SizedBox(height: 10),
+                  const Text('Imeundwa na iSoftTz'),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Text('Wasiliana nasi:'),
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: () async {
+                          final Uri emailUri = Uri(
+                            scheme: 'mailto',
+                            path: 'info@isofttz.com',
+                          );
+                          if (await canLaunchUrl(emailUri)) {
+                            await launchUrl(emailUri);
+                          } else {
+                            // ignore: use_build_context_synchronously
+                            showSnackBar(context, "Imeshindikana kufungua barua pepe.");
+                          }
+                        },
+                        child: const Text(
+                          'info@isofttz.com',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   TextButton(
                     onPressed: () async {
                       final Uri url = Uri.parse('https://www.instagram.com/isofttz_/?hl=en');
                       if (await canLaunchUrl(url)) {
                         await launchUrl(url);
                       } else {
-                        // ignore: use_build_context_synchronously
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Imeshindikana kufungua tovuti.')),
-                        );
+                        showSnackBar(context, "Imeshindikana kufungua tovuti.");
                       }
                     },
-                    child: const Text('Visit our website'),
+                    child: const Text('Tembelea Tovuti Yetu'),
                   ),
                 ],
+              );
+            },
+          ),
+          ProfileMenuItem(
+            icon: Icons.logout,
+            text: 'Toka',
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Text('Toka'),
+                  content: const Text('Una uhakika unataka kutoka?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Ghairi'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        logout(context);
+                      },
+                      child: const Text('Toka'),
+                    ),
+                  ],
+                ),
               );
             },
           ),
         ],
       ),
     );
+  }
+
+  void _showPasswordChangeSheet(BuildContext context) {
+    final formKey = GlobalKey<FormState>();
+    final oldPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+    bool oldVisible = false, newVisible = false, confirmVisible = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            top: 20,
+            left: 20,
+            right: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Form(
+            key: formKey,
+            child: StatefulBuilder(
+              builder: (context, setState) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Badilisha Nenosiri', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 20),
+                  buildPasswordField(
+                      'Nenosiri la Zamani', oldPasswordController, oldVisible, (v) => setState(() => oldVisible = v)),
+                  const SizedBox(height: 12),
+                  buildPasswordField(
+                      'Nenosiri Jipya', newPasswordController, newVisible, (v) => setState(() => newVisible = v)),
+                  const SizedBox(height: 12),
+                  buildPasswordField('Rudia Nenosiri', confirmPasswordController, confirmVisible,
+                      (v) => setState(() => confirmVisible = v)),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.save),
+                    label: const Text('Hifadhi Nenosiri'),
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        updatePassword(
+                          context,
+                          oldPasswordController.text,
+                          newPasswordController.text,
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildPasswordField(String label, TextEditingController controller, bool isVisible, Function(bool) toggle) {
+    return TextFormField(
+      controller: controller,
+      obscureText: !isVisible,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+        suffixIcon: IconButton(
+          icon: Icon(isVisible ? Icons.visibility : Icons.visibility_off),
+          onPressed: () => toggle(!isVisible),
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) return 'Jaza $label';
+        return null;
+      },
+    );
+  }
+
+  void showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
@@ -410,7 +371,6 @@ class ProfileMenuItem extends StatelessWidget {
     return ListTile(
       leading: Icon(icon, color: Colors.blue),
       title: Text(text),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
     );
   }

@@ -28,14 +28,15 @@ class UserMonthlyCollectionTable extends StatelessWidget {
       child: (data != null && data!.data.isNotEmpty)
           ? DataTable(
               columns: [
-                const DataColumn(label: Text('Mwanajumuiya')),
+                const DataColumn(label: Text(' Mwanajumuiya')),
                 ...months.map((m) => DataColumn(label: Text(m.substring(0, 3)))),
               ],
               rows: data!.data.map((user) {
                 final List<String> collectedMonths = List<String>.from(user.monthsCollected);
+                int userIndex = data!.data.indexOf(user) + 1;
                 return DataRow(
                   cells: [
-                    DataCell(Text(user.userFullName)),
+                    DataCell(Text('$userIndex. ${user.userFullName}')),
                     ...months.map((month) {
                       final hasCollection = collectedMonths.contains(month);
                       return DataCell(

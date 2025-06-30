@@ -71,6 +71,7 @@ class _LoginPageState extends State<LoginPage> {
           final loginModel = LoginResponse.fromJson(jsonResponse);
 
           final jsonString = jsonEncode(loginModel.toJson());
+          print(jsonString);
           await LocalStorage.setStringItem("user_data", jsonString);
 
           LocalStorage.getStringItem('user_data').then((value) {
@@ -137,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 const SizedBox(height: 2),
                 Text(
-                  "YERIKO APP",
+                  "--",
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,

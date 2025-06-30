@@ -32,7 +32,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
 
   Future<ChurchTimeTableResponse?> getTimeTableCollections() async {
     try {
-      final String myApi = "$baseUrl/church_timetable/get_all.php";
+      final String myApi = "$baseUrl/church_timetable/get_all.php?jumuiya_id=${userData!.user.jumuiya_id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {

@@ -32,6 +32,8 @@ class User {
   final String? createdAt;
   final String? userName;
   final String? role;
+  // ignore: non_constant_identifier_names
+  final dynamic jumuiya_id; // Optional field, not used in the current context
 
   User({
     this.id,
@@ -41,6 +43,8 @@ class User {
     this.createdAt,
     this.userName,
     this.role,
+    // ignore: non_constant_identifier_names
+    this.jumuiya_id, // Optional field, not used in the current contex
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -52,6 +56,7 @@ class User {
       createdAt: json['createdAt']?.toString(),
       userName: json['userName']?.toString(),
       role: json['role']?.toString(),
+      jumuiya_id: json['jumuiya_id']?.toString(), // Optional field, not used in the current context
     );
   }
 
@@ -63,6 +68,7 @@ class User {
         'createdAt': createdAt,
         'userName': userName,
         'role': role,
+        'jumuiya_id': jumuiya_id, // Optional field, not used in the current context
       };
 
   // ✅ This is the fix
@@ -72,33 +78,4 @@ class User {
 
   @override
   int get hashCode => id.hashCode;
-}
-
-class UserModel {
-  final int? id;
-  final String? phone;
-  final String? userFullName;
-  final String? yearRegistered;
-  final String? userName;
-  final String? role;
-
-  UserModel({
-    this.id,
-    this.phone,
-    this.userFullName,
-    this.yearRegistered,
-    this.userName,
-    this.role,
-  });
-
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? ''),
-      phone: json['phone']?.toString(),
-      userFullName: json['userFullName']?.toString(),
-      yearRegistered: json['yearRegistered']?.toString(),
-      userName: json['userName']?.toString(),
-      role: json['role']?.toString(),
-    );
-  }
 }

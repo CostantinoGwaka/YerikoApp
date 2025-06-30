@@ -209,7 +209,7 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                     ),
                   ),
                 ),
-                const Text("➕ Ongeza Ratiba ya Maombi", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text("➕ Ongeza Ratiba ya Ibada", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _buildDatePickerField("📅 Tarehe ya Maombi", datePrayerController),
                 _buildTextField("📍 Mahali", locationController),
@@ -271,6 +271,7 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                       final data = {
                         "id": widget.initialData?.id,
                         "datePrayer": datePrayerController.text,
+                        "jumuiya_id": userData!.user.jumuiya_id, // Ensure this is set correctly
                         "latId": "N/A", //latIdController.text,
                         "longId": "N/A",
                         "location": locationController.text.toUpperCase(),

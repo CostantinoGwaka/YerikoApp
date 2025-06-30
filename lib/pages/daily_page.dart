@@ -201,6 +201,7 @@ class _DailyPageState extends State<DailyPage> {
         }
       }
     } catch (e) {
+      print(e);
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(

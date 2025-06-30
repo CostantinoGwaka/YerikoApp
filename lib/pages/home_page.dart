@@ -6,7 +6,7 @@ import 'package:yeriko_app/pages/admin_all_collection_users.dart';
 import 'package:yeriko_app/pages/all_collection_users.dart';
 import 'package:yeriko_app/pages/church_time_table.dart';
 import 'package:yeriko_app/pages/daily_page.dart';
-import 'package:yeriko_app/pages/transection_page.dart';
+import 'package:yeriko_app/pages/profile_user.dart';
 import 'package:yeriko_app/theme/colors.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,8 +23,8 @@ class _HomePageState extends State<HomePage> {
     const DailyPage(),
     const ChurchTimeTable(),
     (userData != null && userData!.user.role == "ADMIN") ? AdminAllUserCollections() : AllUserCollections(),
-    const TransectionPage(),
-    const TransectionPage(),
+    ProfilePage(),
+    ProfilePage(),
   ];
 
   @override

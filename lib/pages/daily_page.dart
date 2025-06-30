@@ -201,7 +201,6 @@ class _DailyPageState extends State<DailyPage> {
         }
       }
     } catch (e) {
-      print(e);
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
@@ -283,7 +282,28 @@ class _DailyPageState extends State<DailyPage> {
                           icon: Icon(Icons.more_vert),
                           onSelected: (value) {
                             if (value == 'logout') {
-                              logout(context);
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Toka'),
+                                    content: const Text('Una uhakika unataka kutoka?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(context).pop(),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          logout(context);
+                                        },
+                                        child: const Text('Toka'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             }
                           },
                           itemBuilder: (BuildContext context) => [

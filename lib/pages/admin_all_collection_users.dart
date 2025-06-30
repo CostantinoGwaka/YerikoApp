@@ -6,6 +6,7 @@ import 'package:yeriko_app/main.dart';
 import 'package:yeriko_app/models/auth_model.dart';
 import 'package:yeriko_app/models/user_collection_model.dart';
 import 'package:yeriko_app/models/user_collection_table_model.dart';
+import 'package:yeriko_app/pages/add_pages/add_month_collection.dart';
 import 'package:yeriko_app/pages/supports_pages/collection_table_against_month.dart';
 import 'package:yeriko_app/theme/colors.dart';
 import 'package:yeriko_app/utils/url.dart';
@@ -529,7 +530,21 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                                     fontSize: 13,
                                   ),
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                                    ),
+                                    builder: (_) => AddMonthCollectionUserAdmin(
+                                      rootContext: context,
+                                      onSubmit: (data) {
+                                        _reloadData();
+                                      },
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),

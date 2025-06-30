@@ -633,8 +633,29 @@ class _DailyPageState extends State<DailyPage> {
                                               color: arrowbgColor,
                                               borderRadius: BorderRadius.circular(15),
                                             ),
-                                            child: const Center(
-                                              child: Icon(Icons.arrow_upward_rounded, color: Colors.white),
+                                            child: Center(
+                                              child: Builder(
+                                                builder: (context) {
+                                                  // Find previous item amount if available
+                                                  int currentAmount = int.tryParse(item.amount) ?? 0;
+                                                  int? prevAmount;
+                                                  if (index > 0) {
+                                                    prevAmount = int.tryParse(collections[index - 1].amount);
+                                                  }
+                                                  // If no previous, show up arrow by default
+                                                  if (prevAmount == null) {
+                                                    return const Icon(Icons.arrow_upward_rounded, color: Colors.white);
+                                                  }
+                                                  if (currentAmount > prevAmount) {
+                                                    return const Icon(Icons.arrow_upward_rounded, color: Colors.white);
+                                                  } else if (currentAmount < prevAmount) {
+                                                    return const Icon(Icons.arrow_downward_rounded,
+                                                        color: Colors.white);
+                                                  } else {
+                                                    return const Icon(Icons.remove, color: Colors.white);
+                                                  }
+                                                },
+                                              ),
                                             ),
                                           ),
                                           const SizedBox(width: 15),
@@ -642,33 +663,60 @@ class _DailyPageState extends State<DailyPage> {
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Text(
-                                                  item.monthly,
-                                                  style: const TextStyle(
-                                                    fontSize: 15,
-                                                    color: black,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                Row(
+                                                  children: [
+                                                    const Text(
+                                                      "🗓 ",
+                                                      style: TextStyle(fontSize: 15),
+                                                    ),
+                                                    Text(
+                                                      item.monthly,
+                                                      style: const TextStyle(
+                                                        fontSize: 15,
+                                                        color: black,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                                 const SizedBox(height: 5),
-                                                Text(
-                                                  "${item.registeredDate} (${item.registeredBy})",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: black.withAlpha((0.5 * 255).round()),
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
+                                                Row(
+                                                  children: [
+                                                    const Text(
+                                                      "🖊 ",
+                                                      style: TextStyle(fontSize: 12),
+                                                    ),
+                                                    Flexible(
+                                                      child: Text(
+                                                        "${item.registeredDate} (${item.registeredBy})",
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: black.withAlpha((0.5 * 255).round()),
+                                                          fontWeight: FontWeight.w400,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
                                           ),
-                                          Text(
-                                            "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))}",
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: black,
-                                            ),
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                "💰 ",
+                                                style: TextStyle(fontSize: 15),
+                                              ),
+                                              Text(
+                                                "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))}",
+                                                style: const TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: black,
+                                                ),
+                                              ),
+                                            ],
                                           )
                                         ],
                                       ),

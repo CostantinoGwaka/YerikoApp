@@ -214,37 +214,60 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                            Row(
+                                              children: [
+                                                const Text("💰", style: TextStyle(fontSize: 15)),
+                                                Text(
+                                                  "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             const SizedBox(height: 5),
-                                            Text(
-                                              item.registeredDate,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black.withAlpha((0.5 * 255).toInt()),
-                                              ),
+                                            Row(
+                                              children: [
+                                                const Text("🗓 ", style: TextStyle(fontSize: 12)),
+                                                Text(
+                                                  item.registeredDate,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             const SizedBox(height: 5),
-                                            Text(
-                                              item.churchYearEntity.churchYear,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black.withAlpha((0.5 * 255).toInt()),
-                                              ),
+                                            Row(
+                                              children: [
+                                                const Text("📆 ", style: TextStyle(fontSize: 12)),
+                                                Text(
+                                                  item.churchYearEntity.churchYear,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             const SizedBox(height: 5),
-                                            Text(
-                                              'Imesajiliwa na: ${item.registeredBy}',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black.withValues(alpha: 128),
-                                              ),
+                                            Row(
+                                              children: [
+                                                const Text("🖊 ", style: TextStyle(fontSize: 12)),
+                                                Expanded(
+                                                  child: Text(
+                                                    'Imesajiliwa na: ${item.registeredBy}',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.black.withValues(alpha: 128),
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),

@@ -235,29 +235,53 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              "${item.user?.userFullName} (${item.datePrayer})",
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                            Row(
+                                              children: [
+                                                const Icon(Icons.person, size: 18, color: Colors.black54),
+                                                const SizedBox(width: 5),
+                                                Expanded(
+                                                  child: Text(
+                                                    "${item.user?.userFullName} (${item.datePrayer})",
+                                                    style: const TextStyle(
+                                                      fontSize: 15,
+                                                      color: Colors.black,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             const SizedBox(height: 5),
-                                            Text(
-                                              item.location ?? 'No location',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black.withAlpha((0.5 * 255).toInt()),
-                                              ),
+                                            Row(
+                                              children: [
+                                                const Icon(Icons.location_on, size: 16, color: Colors.redAccent),
+                                                const SizedBox(width: 5),
+                                                Expanded(
+                                                  child: Text(
+                                                    item.location ?? 'No location',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             const SizedBox(height: 5),
-                                            Text(
-                                              'Imesajiliwa na: ${item.registeredBy ?? 'N/A'}',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black.withValues(alpha: 128),
-                                              ),
+                                            Row(
+                                              children: [
+                                                const Icon(Icons.verified_user, size: 16, color: Colors.blueGrey),
+                                                const SizedBox(width: 5),
+                                                Expanded(
+                                                  child: Text(
+                                                    'Imesajiliwa na: ${item.registeredBy ?? 'N/A'}',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.black.withValues(alpha: 128),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),

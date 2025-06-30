@@ -19,19 +19,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
+  final int collectionPageIndex = 2;
+  bool isFloatingClicked = false;
 
-  List<Widget> pages = [
-    const DailyPage(),
-    const ChurchTimeTable(),
-    (userData != null && userData!.user.role == "ADMIN") ? AdminAllUserCollections() : AllUserCollections(),
-    AllViewerUserWithAdmin(),
-    ProfilePage(),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  List<Widget> get pages => [
+        const DailyPage(), // index 0
+        const ChurchTimeTable(), // index 1
+        (userData != null && userData!.user.role == "ADMIN")
+            ? AdminAllUserCollections()
+            : AllUserCollections(), // index 2
+        AllViewerUserWithAdmin(), // index 3
+        const ProfilePage(), // index 4
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -40,21 +39,19 @@ class _HomePageState extends State<HomePage> {
       body: getBody(),
       bottomNavigationBar: getFooter(),
       floatingActionButton: SafeArea(
-        child: SizedBox(
-          // height: 30,
-          // width: 40,
-          child: FloatingActionButton(
-            onPressed: () {
-              setTabs(3);
-            },
-            backgroundColor: buttoncolor,
-            child: Icon(
-              Icons.people,
-              color: Colors.white,
-              size: 20,
-            ),
-            // shape:
-            //     BeveledRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        child: FloatingActionButton(
+          onPressed: () {
+            setTabs(3); // ✅ Go to the correct page
+            setState(() {
+              pageIndex = 3;
+              isFloatingClicked = true;
+            });
+          },
+          backgroundColor: buttoncolor,
+          child: const Icon(
+            Icons.people,
+            color: Colors.white,
+            size: 20,
           ),
         ),
       ),
@@ -76,29 +73,48 @@ class _HomePageState extends State<HomePage> {
       CupertinoIcons.money_dollar,
       CupertinoIcons.person,
     ];
-    return AnimatedBottomNavigationBar(
-        backgroundColor: primary,
-        icons: iconItems,
-        splashColor: secondary,
-        inactiveColor: black.withValues(alpha: 0.5),
-        gapLocation: GapLocation.center,
-        activeIndex: pageIndex,
-        notchSmoothness: NotchSmoothness.softEdge,
-        leftCornerRadius: 10,
-        iconSize: 25,
-        rightCornerRadius: 10,
-        elevation: 2,
-        onTap: (index) {
-          if (index == 3) {
-            setTabs(4);
-          } else {
-            setTabs(index);
-          }
+
+    return AnimatedBottomNavigationBar.builder(
+      backgroundColor: primary,
+      itemCount: iconItems.length,
+      tabBuilder: (int index, bool isActive) {
+        return Container(
+          decoration: isActive && !isFloatingClicked
+              ? const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black,
+                )
+              : null,
+          padding: const EdgeInsets.all(8),
+          child: Icon(
+            iconItems[index],
+            size: 25,
+            color: isActive && !isFloatingClicked ? Colors.white : black.withAlpha((0.5 * 255).toInt()),
+          ),
+        );
+      },
+      splashColor: secondary,
+      gapLocation: GapLocation.center,
+      activeIndex: pageIndex == 4 && !isFloatingClicked ? 3 : pageIndex,
+      notchSmoothness: NotchSmoothness.softEdge,
+      leftCornerRadius: 10,
+      rightCornerRadius: 10,
+      elevation: 2,
+      onTap: (index) {
+        // Adjust for extra center FAB
+        if (index == 3 && isFloatingClicked) {
+          setTabs(4);
+        } else {
+          setTabs(index);
+        }
+        setState(() {
+          isFloatingClicked = false;
         });
+      },
+    );
   }
 
-  // ignore: strict_top_level_inference
-  void setTabs(index) {
+  void setTabs(int index) {
     setState(() {
       pageIndex = index;
     });

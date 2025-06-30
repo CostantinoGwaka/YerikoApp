@@ -258,33 +258,47 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                         const SizedBox(height: 4),
                                         Row(
                                           children: [
-                                            const Icon(Icons.person_outline, size: 14, color: Colors.grey),
+                                            const Text("👤", style: TextStyle(fontSize: 14)),
                                             const SizedBox(width: 4),
                                             Flexible(
-                                                child: Text("Jina la mtumiaji: ${item.userName}",
-                                                    style: const TextStyle(fontSize: 12))),
+                                              child: Text("Jina la mtumiaji: ${item.userName}",
+                                                  style: const TextStyle(fontSize: 12)),
+                                            ),
                                           ],
                                         ),
                                         const SizedBox(height: 2),
                                         Row(
                                           children: [
-                                            const Icon(Icons.phone, size: 14, color: Colors.grey),
+                                            const Text("📞", style: TextStyle(fontSize: 14)),
                                             const SizedBox(width: 4),
                                             Flexible(
-                                                child: Text("Namba ya simu: ${item.phone}",
-                                                    style: const TextStyle(fontSize: 12))),
+                                              child: Text("Namba ya simu: ${item.phone}",
+                                                  style: const TextStyle(fontSize: 12)),
+                                            ),
                                           ],
                                         ),
                                         const SizedBox(height: 2),
                                         Row(
                                           children: [
-                                            const Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey),
+                                            const Text("📅", style: TextStyle(fontSize: 14)),
                                             const SizedBox(width: 4),
                                             Flexible(
-                                                child: Text("Mwaka wa usajili: ${item.yearRegistered}",
-                                                    style: const TextStyle(fontSize: 12))),
+                                              child: Text("Mwaka wa usajili: ${item.yearRegistered}",
+                                                  style: const TextStyle(fontSize: 12)),
+                                            ),
                                           ],
                                         ),
+                                        const SizedBox(height: 2),
+                                        // Row(
+                                        //   children: [
+                                        //     const Text("💰", style: TextStyle(fontSize: 14)),
+                                        //     const SizedBox(width: 4),
+                                        //     Flexible(
+                                        //       child: Text("Kiasi: ${item.createdAt ?? 'Haipo'}",
+                                        //           style: const TextStyle(fontSize: 12)),
+                                        //     ),
+                                        //   ],
+                                        // ),
                                         const SizedBox(height: 4),
                                         Align(
                                           alignment: Alignment.centerRight,

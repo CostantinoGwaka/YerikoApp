@@ -561,7 +561,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      "${item.user.userFullName}",
+                                                      "👤 ${item.user.userFullName}",
                                                       style: const TextStyle(
                                                         fontSize: 15,
                                                         color: Colors.black,
@@ -569,7 +569,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                                       ),
                                                     ),
                                                     Text(
-                                                      "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.collectionType.collectionName})",
+                                                      "💰 TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.collectionType.collectionName})",
                                                       style: const TextStyle(
                                                         fontSize: 15,
                                                         color: Colors.black,
@@ -578,7 +578,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                                     ),
                                                     const SizedBox(height: 5),
                                                     Text(
-                                                      item.registeredDate,
+                                                      "📅 ${item.registeredDate}",
                                                       style: TextStyle(
                                                         fontSize: 12,
                                                         color: Colors.black.withAlpha((0.5 * 255).toInt()),
@@ -586,7 +586,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                                     ),
                                                     const SizedBox(height: 5),
                                                     Text(
-                                                      item.churchYearEntity.churchYear,
+                                                      "🗓 ${item.churchYearEntity.churchYear}",
                                                       style: TextStyle(
                                                         fontSize: 12,
                                                         color: Colors.black.withAlpha((0.5 * 255).toInt()),
@@ -675,7 +675,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  "${item.user.userFullName}",
+                                                  "👤 ${item.user.userFullName}",
                                                   style: const TextStyle(
                                                     fontSize: 15,
                                                     color: Colors.black,
@@ -683,7 +683,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                                   ),
                                                 ),
                                                 Text(
-                                                  "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
+                                                  "💰 TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
                                                   style: const TextStyle(
                                                     fontSize: 15,
                                                     color: Colors.black,
@@ -692,7 +692,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                                 ),
                                                 const SizedBox(height: 5),
                                                 Text(
-                                                  item.registeredDate,
+                                                  "📅 ${item.registeredDate}",
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color: Colors.black.withAlpha((0.5 * 255).toInt()),
@@ -700,7 +700,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                                 ),
                                                 const SizedBox(height: 5),
                                                 Text(
-                                                  item.churchYearEntity.churchYear,
+                                                  "🗓 ${item.churchYearEntity.churchYear}",
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color: Colors.black.withAlpha((0.5 * 255).toInt()),

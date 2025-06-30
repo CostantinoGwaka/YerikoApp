@@ -58,7 +58,9 @@ class _LoginPageState extends State<LoginPage> {
 
         var jsonResponse = json.decode(response.body);
 
-        if (response.statusCode == 200 && jsonResponse != null) {
+        print(jsonResponse);
+
+        if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == '200') {
           setState(() {
             _isLoading = false;
           });
@@ -96,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Umefanikiwa! Umeingia kwenye mfumo kwa mafanikio")),
           );
-        } else if (response.statusCode == 404) {
+        } else if (jsonResponse['status'] == '300' || jsonResponse['status'] == '403') {
           //end here
           setState(() {
             _isLoading = false;

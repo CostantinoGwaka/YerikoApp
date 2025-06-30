@@ -6,6 +6,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:yeriko_app/models/auth_model.dart';
 import 'package:yeriko_app/models/current_fy_model.dart';
+// ignore: depend_on_referenced_packages
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:yeriko_app/pages/home_page.dart';
 import 'package:yeriko_app/pages/login_page.dart';

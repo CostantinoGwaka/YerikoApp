@@ -135,7 +135,6 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
         }
       }
     } catch (e) {
-      print("Error: $e");
       setState(() {
         _isLoading = false;
       });

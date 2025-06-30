@@ -71,7 +71,6 @@ class _LoginPageState extends State<LoginPage> {
           final loginModel = LoginResponse.fromJson(jsonResponse);
 
           final jsonString = jsonEncode(loginModel.toJson());
-          print(jsonString);
           await LocalStorage.setStringItem("user_data", jsonString);
 
           LocalStorage.getStringItem('user_data').then((value) {

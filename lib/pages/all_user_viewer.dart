@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:yeriko_app/main.dart';
 import 'package:yeriko_app/models/all_users_model.dart';
 import 'package:yeriko_app/pages/add_pages/add_time_table.dart';
+import 'package:yeriko_app/pages/add_pages/add_user.dart';
 import 'package:yeriko_app/theme/colors.dart';
 import 'package:yeriko_app/utils/url.dart';
 import 'package:http/http.dart' as http;
@@ -169,7 +170,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                         ),
-                        builder: (_) => AddPrayerSchedulePage(
+                        builder: (_) => AddUserPageAdmin(
                           rootContext: context,
                           onSubmit: (data) {
                             _reloadData();

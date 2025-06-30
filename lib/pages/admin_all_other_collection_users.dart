@@ -7,20 +7,19 @@ import 'package:yeriko_app/models/auth_model.dart';
 import 'package:yeriko_app/models/user_collection_model.dart';
 import 'package:yeriko_app/models/user_collection_table_model.dart';
 import 'package:yeriko_app/pages/add_pages/add_month_collection.dart';
-import 'package:yeriko_app/pages/admin_all_other_collection_users.dart';
 import 'package:yeriko_app/pages/supports_pages/collection_table_against_month.dart';
 import 'package:yeriko_app/theme/colors.dart';
 import 'package:yeriko_app/utils/url.dart';
 import 'package:http/http.dart' as http;
 
-class AdminAllUserCollections extends StatefulWidget {
-  const AdminAllUserCollections({super.key});
+class AdminOtherAllUserCollections extends StatefulWidget {
+  const AdminOtherAllUserCollections({super.key});
 
   @override
-  State<AdminAllUserCollections> createState() => _AdminAllUserCollectionsState();
+  State<AdminOtherAllUserCollections> createState() => _AdminOtherAllUserCollectionsState();
 }
 
-class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
+class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollections> {
   CollectionResponse? collectionsMonthly;
   CollectionResponse? collectionsOthers;
   UserMonthlyCollectionResponse? userMonthlyCollectionResponse;
@@ -204,7 +203,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       }
 
       final String myApi =
-          "$baseUrl/monthly/get_all_collection_by_month.php?month=$selectedMonth&jumuiya_id=${userData!.user.jumuiya_id}";
+          "$baseUrl/monthly/get_all_other_collection_by_month.php?month=$selectedMonth&jumuiya_id=${userData!.user.jumuiya_id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
@@ -248,7 +247,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       }
 
       final String myApi =
-          "$baseUrl/monthly/get_all_collection_by_user_id_year_id.php?user_id=${selectedUser!.id}&year_id=${currentYear!.data.id}";
+          "$baseUrl/monthly/get_all_other_collection_by_user_id_year_id.php?user_id=${selectedUser!.id}&year_id=${currentYear!.data.id}";
 
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
@@ -314,10 +313,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: primary,
-      body: RefreshIndicator(onRefresh: _reloadData, child: getBody()),
-    );
+    return RefreshIndicator(onRefresh: _reloadData, child: getBody());
   }
 
   Widget getBody() {
@@ -327,108 +323,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         child: SingleChildScrollView(
       child: Column(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: primary,
-              boxShadow: [
-                BoxShadow(
-                  color: grey.withAlpha((0.01 * 255).toInt()),
-                  spreadRadius: 10,
-                  blurRadius: 3,
-                ),
-              ],
-            ),
-            child: const Padding(
-              padding: EdgeInsets.only(top: 20, bottom: 25, right: 20, left: 20),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [Text(""), Icon(CupertinoIcons.search)],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 25, right: 25, bottom: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Michango",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: mainFontColor,
-                    )),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 5, bottom: 20, left: 25, right: 25),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedTabIndex = 0;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.only(left: 25, right: 25, top: 5, bottom: 5),
-                        margin: const EdgeInsets.symmetric(horizontal: 5),
-                        decoration: BoxDecoration(
-                          color: selectedTabIndex == 0 ? buttoncolor : white,
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Mwezi",
-                            style: TextStyle(
-                              color: selectedTabIndex == 0 ? Colors.white : Colors.black.withAlpha((0.5 * 255).toInt()),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedTabIndex = 1;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.only(left: 25, right: 25, top: 5, bottom: 5),
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                          color: selectedTabIndex == 1 ? buttoncolor : white,
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Mingineyo",
-                            style: TextStyle(
-                              color: selectedTabIndex == 1 ? Colors.white : Colors.black.withAlpha((0.5 * 255).toInt()),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-          // Display loading indicator while fetching data
+          // Display loading indicator while fetching data'
           Visibility(
               visible: viewTable,
               child: Column(
@@ -473,7 +368,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                 ],
               )),
           Visibility(
-            visible: selectedTabIndex == 0 && !viewTable,
+            visible: !viewTable,
             child: SizedBox(
               child: Column(
                 children: [
@@ -775,7 +670,113 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
           Visibility(
             visible: selectedTabIndex == 1 && !viewTable,
             child: SizedBox(
-              child: AdminOtherAllUserCollections(),
+              child: FutureBuilder(
+                future: getUserCollections(),
+                builder: (context, AsyncSnapshot<CollectionResponse?> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text("Failed to load collection data."));
+                  } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
+                    return const Center(child: Text("No collection data found."));
+                  }
+
+                  final collections = snapshot.data!.data;
+
+                  return ListView.builder(
+                    itemCount: collections.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      final item = collections[index];
+                      return GestureDetector(
+                        onTap: () => _showCollectionDetails(context, item),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  margin: EdgeInsets.only(
+                                    top: (size.width - 40) / 30,
+                                    left: (size.width - 40) / 20,
+                                    right: (size.width - 40) / 20,
+                                    bottom: (size.width - 40) / 30,
+                                  ),
+                                  decoration:
+                                      BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
+                                    BoxShadow(
+                                      color: grey.withValues(alpha: (0.03 * 255)),
+                                      spreadRadius: 10,
+                                      blurRadius: 3,
+                                      // changes position of shadow
+                                    ),
+                                  ]),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(2),
+                                    child: Row(
+                                      children: [
+                                        const SizedBox(width: 2),
+                                        Expanded(
+                                          child: SizedBox(
+                                            width: (size.width - 90) * 0.2,
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "${item.user.userFullName}",
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 5),
+                                                Text(
+                                                  item.registeredDate,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 5),
+                                                Text(
+                                                  item.churchYearEntity.churchYear,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const Icon(
+                                          Icons.arrow_forward_ios_rounded,
+                                          size: 16,
+                                          color: Colors.black,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           )
         ],

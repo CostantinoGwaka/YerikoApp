@@ -1,10 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:yeriko_app/main.dart';
 import 'package:yeriko_app/models/auth_model.dart';
-import 'package:yeriko_app/models/church_time_table.dart';
 import 'package:yeriko_app/models/user_collection_model.dart';
 import 'package:yeriko_app/utils/url.dart';
 import 'package:http/http.dart' as http;
@@ -59,6 +57,9 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
 
     if (widget.initialData != null) {
       final data = widget.initialData!;
+
+      amountController.text = data.amount.toString();
+      selectedMonth = data.monthly; // Default to January if null
 
       setState(() {
         selectedUser = data.user;
@@ -251,6 +252,10 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
                       label: const Text("Hifadhi Mchango"),
                       onPressed: () {
                         final data = {
+                          // ignore: prefer_null_aware_operators
+                          "id": widget.initialData != null
+                              ? widget.initialData!.id
+                              : null, // Ensure this is set correctly
                           "amount": amountController.text,
                           "jumuiya_id": userData!.user.jumuiya_id, // Ensure this is set correctly
                           "user": {"id": selectedUser?.id ?? 0},

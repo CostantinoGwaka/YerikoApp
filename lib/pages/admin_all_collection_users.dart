@@ -659,14 +659,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                             ? getUserYearCollections()
                             : (filterOption == 'KWA MWEZI' && selectedMonth != null)
                                 ? getUserMonthCollections()
-                                : getUserCollections()
-                    //   displayedData = allData;
-                    // } else if (filterOption == 'TAARIFA KWA MWANAJUMUIYA' && selectedUser != null) {
-                    //   getUserYearCollections();
-                    // } else if (filterOption == 'KWA MWEZI' && selectedMonth != null) {
-                    //   displayedData = allData.where((item) => item.monthly == selectedMonth).toList();
-                    // }
-                    ,
+                                : getUserCollections(),
                     builder: (context, AsyncSnapshot<CollectionResponse?> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -895,9 +888,10 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
     ));
   }
 
-  void _showCollectionDetails(BuildContext context, CollectionItem item) {
+  void _showCollectionDetails(BuildContext rootContext, CollectionItem item) {
     final user = item.user;
     final year = item.churchYearEntity;
+    var size = MediaQuery.of(context).size;
 
     showModalBottomSheet(
       context: context,
@@ -926,9 +920,67 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                     ),
                   ),
                 ),
-                const Text(
-                  "Maelezo ya Mchango",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "📋 Maelezo ya Mchango",
+                      style: TextStyle(fontSize: (size.width - 40) / 30, fontWeight: FontWeight.bold),
+                    ),
+                    if (userData!.user.role == "ADMIN") ...[
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            tooltip: 'Hariri',
+                            onPressed: () {
+                              Navigator.pop(context); // Close bottom sheet
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                                ),
+                                builder: (_) => AddMonthCollectionUserAdmin(
+                                  rootContext: rootContext,
+                                  initialData: item, // Pass current item for editing
+                                  onSubmit: (data) {
+                                    _reloadData();
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            tooltip: 'Futa',
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('Futa Ratiba'),
+                                  content: const Text('Una uhakika unataka kufuta ratiba hii?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(false),
+                                      child: const Text('Hapana'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(true),
+                                      child: const Text('Ndiyo'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirm == true) {
+                                deleteTimeTable(item.id);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ]
+                  ],
                 ),
                 const Divider(),
                 Column(

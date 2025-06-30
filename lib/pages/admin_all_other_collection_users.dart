@@ -102,7 +102,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       }
 
       final String myApi =
-          "$baseUrl/monthly/get_all_collection_user_by_year.php?yearId=${currentYear!.data.id}&jumuiya_id=${userData!.user.jumuiya_id}";
+          "$baseUrl/monthly/get_all_other_collection_user_by_year.php?yearId=${currentYear!.data.id}&jumuiya_id=${userData!.user.jumuiya_id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
@@ -152,7 +152,12 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
 
       final String myApi =
           "$baseUrl/monthly/get_all_collection_year_id_table_data.php?year_id=${currentYear!.data.id}&jumuiya_id=${userData!.user.jumuiya_id}";
-      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+      final response = await http.get(
+        Uri.parse(myApi),
+        headers: {
+          'Accept': 'application/json',
+        },
+      );
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -204,13 +209,20 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
 
       final String myApi =
           "$baseUrl/monthly/get_all_other_collection_by_month.php?month=$selectedMonth&jumuiya_id=${userData!.user.jumuiya_id}";
-      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+      final response = await http.get(
+        Uri.parse(myApi),
+        headers: {
+          'Accept': 'application/json',
+        },
+      );
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
           // setState(() => _isLoading = false);
           collectionsMonthly = CollectionResponse.fromJson(jsonResponse);
+          print(collectionsMonthly);
+
           return collectionsMonthly;
         }
       } else {
@@ -255,6 +267,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
           collectionsMonthly = CollectionResponse.fromJson(jsonResponse);
+          print(collectionsMonthly);
           return collectionsMonthly;
         }
       } else {

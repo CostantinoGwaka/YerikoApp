@@ -143,12 +143,12 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
           if (widget.initialData != null) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("Umefanikiwa! Kuhuisha mchango kwenye mfumo kwa mafanikio")),
+              SnackBar(content: Text("✅ Umefanikiwa! Kuhuisha mchango kwenye mfumo kwa mafanikio")),
             );
           } else {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("Umefanikiwa! Kusajili mchango mfumo kwa mafanikio")),
+              SnackBar(content: Text("✅ Umefanikiwa! Kusajili mchango mfumo kwa mafanikio")),
             );
           }
         } else if (response.statusCode == 404) {
@@ -172,7 +172,7 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
           });
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-            SnackBar(content: Text("Imegoma kusajili kwenye mfumo wetu")),
+            SnackBar(content: Text("❎ Imegoma kusajili kwenye mfumo wetu")),
           );
         }
       }
@@ -185,7 +185,7 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-        SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(content: Text("⚠️  Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }

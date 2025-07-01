@@ -80,7 +80,7 @@ class _DailyPageState extends State<DailyPage> {
 
       if (userId.toString().isEmpty || year == "" || year.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Tafadhali hakikisha umeweka User ID na mwaka")),
+          SnackBar(content: Text("⚠️  Tafadhali hakikisha umeweka User ID na mwaka")),
         );
         setState(() {
           _isLoading = false;
@@ -122,7 +122,7 @@ class _DailyPageState extends State<DailyPage> {
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(content: Text("⚠️  Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }
@@ -161,7 +161,7 @@ class _DailyPageState extends State<DailyPage> {
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+          SnackBar(content: Text("⚠️  Tafadhali hakikisha umeunganishwa na intaneti: $e")),
         );
       }
     }
@@ -204,7 +204,7 @@ class _DailyPageState extends State<DailyPage> {
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+          SnackBar(content: Text("⚠️  Tafadhali hakikisha umeunganishwa na intaneti: $e")),
         );
       }
     }

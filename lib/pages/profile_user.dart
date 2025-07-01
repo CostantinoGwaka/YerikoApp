@@ -71,7 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (oldpassword == "" || newpassword == "") {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Tafadhali hakikisha umeweka namba ya simu na nenosiri")),
+          SnackBar(content: Text("⚠️  Tafadhali hakikisha umeweka namba ya simu na nenosiri")),
         );
       } else {
         String myApi = "$baseUrl/auth/update_password.php";
@@ -100,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(rootContext).showSnackBar(
-            SnackBar(content: Text("Umefanikiwa! Kubadili nenosiri lako kwenye mfumo kwa mafanikio")),
+            SnackBar(content: Text("✅ Umefanikiwa! Kubadili nenosiri lako kwenye mfumo kwa mafanikio")),
           );
         } else {
           setState(() {
@@ -110,7 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Navigator.pop(rootContext);
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(rootContext).showSnackBar(
-            SnackBar(content: Text(jsonResponse['message'] ?? "Imegoma kubadili nenosiri kwenye mfumo wetu")),
+            SnackBar(content: Text(jsonResponse['message'] ?? "❎ Imegoma kubadili nenosiri kwenye mfumo wetu")),
           );
         }
       }
@@ -122,7 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
       Navigator.pop(rootContext);
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(content: Text("⚠️  Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }
@@ -225,104 +225,105 @@ class _ProfilePageState extends State<ProfilePage> {
               );
             },
           ),
-          ProfileMenuItem(
-            icon: Icons.category,
-            text: 'Aina ya Michango',
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                builder: (context) {
-                  // Dummy list of categories, replace with your data source
-                  // final List<String> categories = [
-                  //   "Michango ya Harusi",
-                  //   "Michango ya Maendeleo",
-                  //   "Michango ya Matibabu",
-                  // ];
-                  return Padding(
-                    padding: EdgeInsets.only(
-                      top: 20,
-                      left: 20,
-                      right: 20,
-                      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Aina ya Michango',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 16),
-                        ...collectionTypeResponse.map((cat) => ListTile(
-                              leading: const Icon(Icons.label_outline),
-                              title: Text(cat.collectionName),
-                            )),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.add),
-                          label: const Text('Ongeza Aina Mpya'),
-                          onPressed: () {
-                            Navigator.pop(context); // Dismiss current bottom sheet
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                              ),
-                              builder: (context) {
-                                final TextEditingController controller = TextEditingController();
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                    top: 20,
-                                    left: 20,
-                                    right: 20,
-                                    bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Text(
-                                        'Ongeza Aina Mpya ya Mchango',
-                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      TextField(
-                                        controller: controller,
-                                        decoration: const InputDecoration(
-                                          labelText: 'Jina la Aina',
-                                          border: OutlineInputBorder(),
+          if (userData != null && userData!.user.role == "ADMIN") ...[
+            ProfileMenuItem(
+              icon: Icons.category,
+              text: 'Aina ya Michango',
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  builder: (context) {
+                    // Dummy list of categories, replace with your data source
+                    // final List<String> categories = [
+                    //   "Michango ya Harusi",
+                    //   "Michango ya Maendeleo",
+                    //   "Michango ya Matibabu",
+                    // ];
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        top: 20,
+                        left: 20,
+                        right: 20,
+                        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Aina ya Michango',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 16),
+                          ...collectionTypeResponse.map((cat) => ListTile(
+                                leading: const Icon(Icons.label_outline),
+                                title: Text(cat.collectionName),
+                              )),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            label: const Text('Ongeza Aina Mpya'),
+                            onPressed: () {
+                              Navigator.pop(context); // Dismiss current bottom sheet
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                ),
+                                builder: (context) {
+                                  final TextEditingController controller = TextEditingController();
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 20,
+                                      left: 20,
+                                      right: 20,
+                                      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Text(
+                                          'Ongeza Aina Mpya ya Mchango',
+                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                         ),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      ElevatedButton(
-                                        child: const Text('Hifadhi'),
-                                        onPressed: () {
-                                          // TODO: Save new category logic here
-                                          Navigator.pop(context);
-                                          showSnackBar(
-                                            context,
-                                            "✅ Aina mpya imeongezwa: ${controller.text}",
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-          ),
+                                        const SizedBox(height: 16),
+                                        TextField(
+                                          controller: controller,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Jina la Aina',
+                                            border: OutlineInputBorder(),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        ElevatedButton(
+                                          child: const Text('Hifadhi'),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            showSnackBar(
+                                              context,
+                                              "✅ Aina mpya imeongezwa: ${controller.text}",
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ],
           ProfileMenuItem(
             icon: Icons.lock,
             text: 'Badilisha Nenosiri',

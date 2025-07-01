@@ -33,7 +33,7 @@ Future<void> getCurrentChurchYearData() async {
     }
   } catch (e) {
     if (kDebugMode) {
-      print("Tafadhali hakikisha umeunganishwa na intaneti: $e");
+      print("⚠️  Tafadhali hakikisha umeunganishwa na intaneti: $e");
     }
   }
 }

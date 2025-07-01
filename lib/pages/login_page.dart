@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (username == "" || password == "") {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Tafadhali hakikisha umeweka namba ya simu na nenosiri")),
+          SnackBar(content: Text("⚠️  Tafadhali hakikisha umeweka namba ya simu na nenosiri")),
         );
       } else {
         String myApi = "$baseUrl/auth/login.php";
@@ -94,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
           //end here
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Umefanikiwa! Umeingia kwenye mfumo kwa mafanikio")),
+            SnackBar(content: Text("✅ Umefanikiwa! Umeingia kwenye mfumo kwa mafanikio")),
           );
         } else if (jsonResponse['status'] == '300' || jsonResponse['status'] == '403') {
           //end here
@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(content: Text("⚠️  Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }

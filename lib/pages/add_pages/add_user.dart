@@ -103,12 +103,12 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
           if (widget.initialData != null) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("Umefanikiwa! Kuhuisha ratiba mfumo kwa mafanikio")),
+              SnackBar(content: Text("✅ Umefanikiwa! Kuhuisha ratiba mfumo kwa mafanikio")),
             );
           } else {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("Umefanikiwa! Kusajili ratiba mfumo kwa mafanikio")),
+              SnackBar(content: Text("✅ Umefanikiwa! Kusajili ratiba mfumo kwa mafanikio")),
             );
           }
         } else if (response.statusCode == 404) {
@@ -130,7 +130,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
           });
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-            SnackBar(content: Text("Imegoma kusajili kwenye mfumo wetu")),
+            SnackBar(content: Text("❎ Imegoma kusajili kwenye mfumo wetu")),
           );
         }
       }
@@ -140,7 +140,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-        SnackBar(content: Text("Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(content: Text("⚠️  Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }

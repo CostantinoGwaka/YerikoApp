@@ -369,7 +369,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 5, bottom: 20, left: 25, right: 25),
+            padding: const EdgeInsets.only(top: 5, bottom: 20, left: 10, right: 20),
             child: Column(
               children: [
                 Row(
@@ -668,7 +668,12 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                       } else if (snapshot.hasError) {
                         return const Center(child: Text("Imeshindikana kupakia data ya michango."));
                       } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                        return const Center(child: Text("Hakuna data ya michango iliyopatikana."));
+                        if (selectedUser != null) {
+                          return Center(
+                              child: Text("Hakuna data ya michango iliyopatikana ya ${selectedUser!.userFullName}."));
+                        } else {
+                          return const Center(child: Text("Hakuna data ya michango iliyopatikana."));
+                        }
                       }
 
                       final collections = snapshot.data!.data;

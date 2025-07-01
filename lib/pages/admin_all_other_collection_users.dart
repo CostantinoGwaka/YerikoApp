@@ -513,7 +513,12 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                       } else if (snapshot.hasError) {
                         return const Center(child: Text("Imeshindikana kupakia data ya michango."));
                       } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                        return const Center(child: Text("Hakuna data ya michango iliyopatikana."));
+                        if (selectedUser != null) {
+                          return Center(
+                              child: Text("Hakuna data ya michango iliyopatikana ya ${selectedUser!.userFullName}."));
+                        } else {
+                          return const Center(child: Text("Hakuna data ya michango iliyopatikana."));
+                        }
                       }
 
                       final collections = snapshot.data!.data;

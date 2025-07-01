@@ -58,7 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
     // Show snackBar AFTER navigation is complete using post-frame callback
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("✅ Success! You have logged out.")),
+        const SnackBar(content: Text("✅ Umefanikiwa! Umetoka kwenye mfumo.")),
       );
     });
   }

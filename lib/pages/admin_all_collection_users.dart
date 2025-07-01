@@ -359,12 +359,14 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Michango",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: mainFontColor,
-                    )),
+                Text(
+                  "Michango",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: (size.width - 40) / 22,
+                    color: mainFontColor,
+                  ),
+                ),
               ],
             ),
           ),
@@ -444,7 +446,10 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: (size.width - 40) / 22,
+                          vertical: (size.width - 40) / 50,
+                        ),
                         elevation: 2,
                       ),
                       icon: const Icon(Icons.close, size: 15),
@@ -494,7 +499,10 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(18),
                                   ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: (size.width - 40) / 22,
+                                    vertical: (size.width - 40) / 50,
+                                  ),
                                   elevation: 2,
                                 ),
                                 icon: const Icon(Icons.table_chart, size: 15),
@@ -521,7 +529,10 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(18),
                                   ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: (size.width - 40) / 22,
+                                    vertical: (size.width - 40) / 50,
+                                  ),
                                   elevation: 2,
                                 ),
                                 icon: const Icon(Icons.plus_one, size: 15),

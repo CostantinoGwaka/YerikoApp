@@ -71,7 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (oldpassword == "" || newpassword == "") {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️  Tafadhali hakikisha umeweka namba ya simu na nenosiri")),
+          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeweka namba ya simu na nenosiri")),
         );
       } else {
         String myApi = "$baseUrl/auth/update_password.php";
@@ -122,7 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
       Navigator.pop(rootContext);
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️  Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }

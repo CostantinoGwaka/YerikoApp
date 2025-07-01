@@ -78,9 +78,6 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
 
       amountController.text = data.amount.toString();
       selectedMonth = data.monthly; // Default to January if null
-
-      print(data.collectionType.id);
-      print(data.collectionType.collectionName);
       setState(() {
         selectedUser = data.user;
         selectedType = data.collectionType;

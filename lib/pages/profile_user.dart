@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:yeriko_app/main.dart';
+import 'package:yeriko_app/models/other_collection_model.dart';
 import 'package:yeriko_app/pages/login_page.dart';
 import 'package:yeriko_app/shared/localstorage/index.dart';
 import 'package:yeriko_app/utils/url.dart';
@@ -21,6 +22,21 @@ class _ProfilePageState extends State<ProfilePage> {
   bool newPasswordVisible = false;
   bool confirmPasswordVisible = false;
   bool _isLoading = false;
+  List<CollectionType> collectionTypeResponse = [];
+
+  Future<void> fetchCollectionTypes() async {
+    final response = await http
+        .get(Uri.parse('$baseUrl/collectiontype/get_all_collection_type.php?jumuiya_id=${userData!.user.jumuiya_id}'));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        collectionTypeResponse = (data['data'] as List).map((u) => CollectionType.fromJson(u)).toList();
+      });
+    } else {
+      // handle error
+    }
+  }
 
   Future<dynamic> logout(BuildContext context) async {
     // Clear storage first
@@ -112,6 +128,12 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    fetchCollectionTypes();
+  }
+
+  @override
   Widget build(BuildContext rootContext) {
     return Scaffold(
       appBar: AppBar(
@@ -159,7 +181,146 @@ class _ProfilePageState extends State<ProfilePage> {
             icon: Icons.language,
             text: 'Badili Lugha',
             onTap: () {
-              showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
+              showModalBottomSheet(
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (context) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      top: 20,
+                      left: 20,
+                      right: 20,
+                      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Chagua Lugha',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 16),
+                        ListTile(
+                          leading: const Icon(Icons.flag),
+                          title: const Text('Kiswahili'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            showSnackBar(context, "✅ Lugha imebadilishwa kuwa Kiswahili.");
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.flag_outlined),
+                          title: const Text('English'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            showSnackBar(context, "✅ Language changed to English.");
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          ProfileMenuItem(
+            icon: Icons.category,
+            text: 'Aina ya Michango',
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (context) {
+                  // Dummy list of categories, replace with your data source
+                  // final List<String> categories = [
+                  //   "Michango ya Harusi",
+                  //   "Michango ya Maendeleo",
+                  //   "Michango ya Matibabu",
+                  // ];
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      top: 20,
+                      left: 20,
+                      right: 20,
+                      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Aina ya Michango',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 16),
+                        ...collectionTypeResponse.map((cat) => ListTile(
+                              leading: const Icon(Icons.label_outline),
+                              title: Text(cat.collectionName),
+                            )),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.add),
+                          label: const Text('Ongeza Aina Mpya'),
+                          onPressed: () {
+                            Navigator.pop(context); // Dismiss current bottom sheet
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                              ),
+                              builder: (context) {
+                                final TextEditingController controller = TextEditingController();
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                    top: 20,
+                                    left: 20,
+                                    right: 20,
+                                    bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Text(
+                                        'Ongeza Aina Mpya ya Mchango',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      TextField(
+                                        controller: controller,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Jina la Aina',
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      ElevatedButton(
+                                        child: const Text('Hifadhi'),
+                                        onPressed: () {
+                                          // TODO: Save new category logic here
+                                          Navigator.pop(context);
+                                          showSnackBar(
+                                            context,
+                                            "✅ Aina mpya imeongezwa: ${controller.text}",
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
             },
           ),
           ProfileMenuItem(

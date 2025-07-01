@@ -137,12 +137,14 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Wanajumuiya wote (${collections!.data.length})",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: (size.width - 40) / 22,
-                      color: mainFontColor,
-                    )),
+                Text(
+                  "Wanajumuiya wote (${collections?.data.length ?? 0})",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: (size.width - 40) / 22,
+                    color: mainFontColor,
+                  ),
+                ),
                 if (userData != null && userData!.user.role == "ADMIN") ...[
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(

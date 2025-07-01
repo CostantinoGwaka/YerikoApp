@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
       elevation: 2,
       onTap: (index) {
         // Adjust for extra center FAB
-        if (index == 3 && isFloatingClicked) {
+        if (index == 3) {
           setTabs(4);
         } else {
           setTabs(index);

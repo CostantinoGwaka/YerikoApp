@@ -56,7 +56,7 @@ class CollectionsTablePage extends StatelessWidget {
                           columns: const [
                             DataColumn(
                                 label: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              padding: EdgeInsets.symmetric(vertical: 4.0),
                               child: Text('SN'),
                             )),
                             DataColumn(
@@ -89,7 +89,7 @@ class CollectionsTablePage extends StatelessWidget {
                               return DataRow(
                                 cells: [
                                   DataCell(Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                    padding: const EdgeInsets.symmetric(vertical: 4.0),
                                     child: Text('${index + 1}'),
                                   )),
                                   DataCell(Padding(

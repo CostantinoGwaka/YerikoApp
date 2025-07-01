@@ -56,7 +56,7 @@ class OtherCollectionsTablePage extends StatelessWidget {
                           columns: const [
                             DataColumn(
                                 label: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              padding: EdgeInsets.symmetric(vertical: 4.0),
                               child: Text('SN'),
                             )),
                             DataColumn(

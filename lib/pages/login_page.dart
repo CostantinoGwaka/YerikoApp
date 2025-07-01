@@ -263,33 +263,6 @@ class _LoginPageState extends State<LoginPage> {
                           _isLoading = true;
                         });
                         login(context, _phone.text, _password.text);
-                        // try {
-                        //   // Simulate login process (replace with your actual login logic)
-                        //   await Future.delayed(const Duration(seconds: 2));
-
-                        //   // Navigate to HomePage if login is successful
-                        //   if (mounted) {
-                        //     // Check if widget is still mounted
-                        //     Navigator.pushReplacement(
-                        //       context,
-                        //       MaterialPageRoute(builder: (context) => const HomePage()),
-                        //     );
-                        //   }
-                        // } catch (e) {
-                        //   // Handle login error
-                        //   if (mounted) {
-                        //     ScaffoldMessenger.of(context).showSnackBar(
-                        //       const SnackBar(content: Text("Login failed. Please try again.")),
-                        //     );
-                        //   }
-                        // } finally {
-                        //   // Stop loading
-                        //   if (mounted) {
-                        //     setState(() {
-                        //       _isLoading = false;
-                        //     });
-                        //   }
-                        // }
                       } else {
                         // Show validation error
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -333,14 +306,17 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(
               height: 20,
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(left: 26.0, right: 26.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "",
-                    style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w300),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Text(
+                      "Umesahau nenosiri?",
+                      style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w300),
+                    ),
                   ),
                   Text(
                     "",

@@ -25,6 +25,7 @@ class _ProfilePageState extends State<ProfilePage> {
   List<CollectionType> collectionTypeResponse = [];
 
   Future<void> fetchCollectionTypes() async {
+    collectionTypeResponse = [];
     final response = await http
         .get(Uri.parse('$baseUrl/collectiontype/get_all_collection_type.php?jumuiya_id=${userData!.user.jumuiya_id}'));
 
@@ -33,6 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         collectionTypeResponse = (data['data'] as List).map((u) => CollectionType.fromJson(u)).toList();
       });
+      setState(() {});
     } else {
       // handle error
     }
@@ -61,6 +63,73 @@ class _ProfilePageState extends State<ProfilePage> {
         const SnackBar(content: Text("✅ Umefanikiwa! Umetoka kwenye mfumo.")),
       );
     });
+  }
+
+  Future<dynamic> registerCollectionType(
+      BuildContext rootContext, String collectionName, CollectionType? collection) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      if (collectionName == "") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("⚠️ Tafadhali hakikisha aina ya mchango")),
+        );
+      } else {
+        String myApi = "$baseUrl/collectiontype/add.php";
+        final response = await http.post(
+          Uri.parse(myApi),
+          headers: {'Accept': 'application/json'},
+          body: jsonEncode({
+            "id": collection != null ? collection.id : "",
+            "collection_name": collectionName,
+            "jumuiya_id": userData!.user.jumuiya_id.toString(),
+            "registeredBy": userData!.user.userFullName.toString(),
+          }),
+        );
+
+        var jsonResponse = json.decode(response.body);
+        if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == "200") {
+          setState(() {
+            _isLoading = false;
+          });
+
+          fetchCollectionTypes();
+
+          setState(() {});
+
+          //end here
+          // ignore: use_build_context_synchronously
+          Navigator.pop(rootContext);
+
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(rootContext).showSnackBar(
+            SnackBar(content: Text("✅ Umefanikiwa! kuongeza aina ya mchango lako kwenye mfumo kwa mafanikio")),
+          );
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+          // ignore: use_build_context_synchronously
+          Navigator.pop(rootContext);
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(rootContext).showSnackBar(
+            SnackBar(content: Text(jsonResponse['message'] ?? "❎ Imegoma kubadili nenosiri kwenye mfumo wetu")),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // ignore: use_build_context_synchronously
+      Navigator.pop(rootContext);
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+      );
+    }
   }
 
   Future<dynamic> updatePassword(BuildContext rootContext, String oldpassword, String newpassword) async {
@@ -262,75 +331,75 @@ class _ProfilePageState extends State<ProfilePage> {
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 16),
-                          ...collectionTypeResponse.map(
-                            (cat) => ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.blue.shade100,
-                                child: Text(
-                                  (collectionTypeResponse.indexOf(cat) + 1).toString(),
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              title: Text(cat.collectionName),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.blue),
-                                onPressed: () {
-                                  // Show edit dialog or bottom sheet here
-                                  final TextEditingController controller =
-                                      TextEditingController(text: cat.collectionName);
-                                  showModalBottomSheet(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                    ),
-                                    builder: (context) {
-                                      return Padding(
-                                        padding: EdgeInsets.only(
-                                          top: 20,
-                                          left: 20,
-                                          right: 20,
-                                          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Text(
-                                              'Hariri Aina ya Mchango',
-                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                            ),
-                                            const SizedBox(height: 16),
-                                            TextField(
-                                              controller: controller,
-                                              decoration: const InputDecoration(
-                                                labelText: 'Jina la Aina',
-                                                border: OutlineInputBorder(),
+                          _isLoading
+                              ? const Center(child: CircularProgressIndicator())
+                              : Column(
+                                  children: collectionTypeResponse
+                                      .map(
+                                        (cat) => ListTile(
+                                          leading: CircleAvatar(
+                                            backgroundColor: Colors.blue.shade100,
+                                            child: Text(
+                                              (collectionTypeResponse.indexOf(cat) + 1).toString(),
+                                              style: const TextStyle(
+                                                color: Colors.blue,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                            const SizedBox(height: 16),
-                                            ElevatedButton(
-                                              child: const Text('Hifadhi Mabadiliko'),
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                                showSnackBar(
-                                                  context,
-                                                  "✅ Aina imehaririwa: ${controller.text}",
-                                                );
-                                                // TODO: Call API to update collection type
-                                              },
-                                            ),
-                                          ],
+                                          ),
+                                          title: Text(cat.collectionName),
+                                          trailing: IconButton(
+                                            icon: const Icon(Icons.edit, color: Colors.blue),
+                                            onPressed: () {
+                                              final TextEditingController controller =
+                                                  TextEditingController(text: cat.collectionName);
+                                              showModalBottomSheet(
+                                                context: context,
+                                                isScrollControlled: true,
+                                                shape: const RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                                ),
+                                                builder: (context) {
+                                                  return Padding(
+                                                    padding: EdgeInsets.only(
+                                                      top: 20,
+                                                      left: 20,
+                                                      right: 20,
+                                                      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                                                    ),
+                                                    child: Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        const Text(
+                                                          'Hariri Aina ya Mchango',
+                                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                                        ),
+                                                        const SizedBox(height: 16),
+                                                        TextField(
+                                                          controller: controller,
+                                                          decoration: const InputDecoration(
+                                                            labelText: 'Jina la Aina',
+                                                            border: OutlineInputBorder(),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 16),
+                                                        ElevatedButton(
+                                                          child: const Text('Hifadhi Mabadiliko'),
+                                                          onPressed: () {
+                                                            registerCollectionType(rootContext, controller.text, cat);
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          ),
                                         ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
+                                      )
+                                      .toList(),
+                                ),
                           const SizedBox(height: 16),
                           ElevatedButton.icon(
                             icon: const Icon(Icons.add),
@@ -371,11 +440,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ElevatedButton(
                                           child: const Text('Hifadhi'),
                                           onPressed: () {
-                                            Navigator.pop(context);
-                                            showSnackBar(
-                                              context,
-                                              "✅ Aina mpya imeongezwa: ${controller.text}",
-                                            );
+                                            registerCollectionType(rootContext, controller.text, null);
                                           },
                                         ),
                                       ],

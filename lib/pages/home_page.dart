@@ -1,14 +1,14 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:yeriko_app/main.dart';
-import 'package:yeriko_app/pages/admin_all_collection_users.dart';
-import 'package:yeriko_app/pages/all_collection_users.dart';
-import 'package:yeriko_app/pages/all_user_viewer.dart';
-import 'package:yeriko_app/pages/church_time_table.dart';
-import 'package:yeriko_app/pages/daily_page.dart';
-import 'package:yeriko_app/pages/profile_user.dart';
-import 'package:yeriko_app/theme/colors.dart';
+import 'package:jumuiya_yangu/main.dart';
+import 'package:jumuiya_yangu/pages/admin_all_collection_users.dart';
+import 'package:jumuiya_yangu/pages/all_collection_users.dart';
+import 'package:jumuiya_yangu/pages/all_user_viewer.dart';
+import 'package:jumuiya_yangu/pages/church_time_table.dart';
+import 'package:jumuiya_yangu/pages/daily_page.dart';
+import 'package:jumuiya_yangu/pages/profile_user.dart';
+import 'package:jumuiya_yangu/theme/colors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

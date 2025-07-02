@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:yeriko_app/main.dart';
+import 'package:jumuiya_yangu/main.dart';
 
 const String accessToken = 'accessToken';
 const String userInfo = 'userInfo';

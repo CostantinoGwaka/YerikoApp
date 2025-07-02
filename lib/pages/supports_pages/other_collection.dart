@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:yeriko_app/models/other_collection_model.dart'; // Adjust path accordingly
+import 'package:jumuiya_yangu/models/other_collection_model.dart'; // Adjust path accordingly
 
 class OtherCollectionsTablePage extends StatelessWidget {
   final List<OtherCollection> otherCollections;

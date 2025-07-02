@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:yeriko_app/main.dart';
+import 'package:jumuiya_yangu/main.dart';
 
 class LocalStorage {
   static Future<bool> setStringItem(String key, String value) async {

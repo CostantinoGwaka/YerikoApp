@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yeriko_app/models/user_collection_table_model.dart';
+import 'package:jumuiya_yangu/models/user_collection_table_model.dart';
 
 const List<String> months = [
   "JANUARY",

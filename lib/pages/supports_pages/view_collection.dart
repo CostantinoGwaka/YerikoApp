@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:yeriko_app/models/user_collection_model.dart';
+import 'package:jumuiya_yangu/models/user_collection_model.dart';
 
 class CollectionsTablePage extends StatelessWidget {
   final List<CollectionItem> collections;

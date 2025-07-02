@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:yeriko_app/main.dart';
-import 'package:yeriko_app/models/other_collection_model.dart';
-import 'package:yeriko_app/pages/login_page.dart';
-import 'package:yeriko_app/shared/localstorage/index.dart';
-import 'package:yeriko_app/utils/url.dart';
+import 'package:jumuiya_yangu/main.dart';
+import 'package:jumuiya_yangu/models/other_collection_model.dart';
+import 'package:jumuiya_yangu/pages/login_page.dart';
+import 'package:jumuiya_yangu/shared/localstorage/index.dart';
+import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {

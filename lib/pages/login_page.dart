@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:yeriko_app/main.dart';
-import 'package:yeriko_app/models/auth_model.dart';
-import 'package:yeriko_app/pages/home_page.dart';
-import 'package:yeriko_app/shared/localstorage/index.dart';
-import 'package:yeriko_app/theme/colors.dart';
-import 'package:yeriko_app/utils/url.dart';
+import 'package:jumuiya_yangu/main.dart';
+import 'package:jumuiya_yangu/models/auth_model.dart';
+import 'package:jumuiya_yangu/pages/home_page.dart';
+import 'package:jumuiya_yangu/shared/localstorage/index.dart';
+import 'package:jumuiya_yangu/theme/colors.dart';
+import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {

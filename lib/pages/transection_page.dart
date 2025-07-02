@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:yeriko_app/theme/colors.dart';
+import 'package:jumuiya_yangu/theme/colors.dart';
 
 class TransectionPage extends StatefulWidget {
   const TransectionPage({super.key});

@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:yeriko_app/main.dart';
+import 'package:jumuiya_yangu/main.dart';
 import 'package:http/http.dart' as http;
-import 'package:yeriko_app/utils/url.dart';
+import 'package:jumuiya_yangu/utils/url.dart';
 
 class AddCollectionTypePage extends StatefulWidget {
   final Function(dynamic)? onSubmit;

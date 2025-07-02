@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:yeriko_app/main.dart';
-import 'package:yeriko_app/models/all_users_model.dart';
-import 'package:yeriko_app/pages/add_pages/add_user.dart';
-import 'package:yeriko_app/theme/colors.dart';
-import 'package:yeriko_app/utils/url.dart';
+import 'package:jumuiya_yangu/main.dart';
+import 'package:jumuiya_yangu/models/all_users_model.dart';
+import 'package:jumuiya_yangu/pages/add_pages/add_user.dart';
+import 'package:jumuiya_yangu/theme/colors.dart';
+import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
 
 class AllViewerUserWithAdmin extends StatefulWidget {

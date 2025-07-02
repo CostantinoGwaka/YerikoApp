@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:yeriko_app/main.dart';
-import 'package:yeriko_app/models/auth_model.dart';
-import 'package:yeriko_app/models/church_time_table.dart';
-import 'package:yeriko_app/utils/url.dart';
+import 'package:jumuiya_yangu/main.dart';
+import 'package:jumuiya_yangu/models/auth_model.dart';
+import 'package:jumuiya_yangu/models/church_time_table.dart';
+import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
 
 class AddPrayerSchedulePage extends StatefulWidget {

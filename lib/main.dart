@@ -4,15 +4,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
-import 'package:yeriko_app/models/auth_model.dart';
-import 'package:yeriko_app/models/current_fy_model.dart';
+import 'package:jumuiya_yangu/models/auth_model.dart';
+import 'package:jumuiya_yangu/models/current_fy_model.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:yeriko_app/pages/home_page.dart';
-import 'package:yeriko_app/pages/login_page.dart';
+import 'package:jumuiya_yangu/pages/home_page.dart';
+import 'package:jumuiya_yangu/pages/login_page.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:yeriko_app/shared/localstorage/index.dart';
-import 'package:yeriko_app/utils/url.dart';
+import 'package:jumuiya_yangu/shared/localstorage/index.dart';
+import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
 
 LoginResponse? userData;

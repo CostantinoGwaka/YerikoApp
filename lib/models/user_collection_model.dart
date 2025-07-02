@@ -1,4 +1,4 @@
-import 'package:yeriko_app/models/auth_model.dart';
+import 'package:jumuiya_yangu/models/auth_model.dart';
 
 class CollectionResponse {
   final String status;

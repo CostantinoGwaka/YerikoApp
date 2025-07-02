@@ -312,7 +312,9 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
+                    },
                     child: Text(
                       "Umesahau nenosiri?",
                       style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w300),
@@ -329,5 +331,9 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     ));
+  }
+
+  void showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 }

@@ -203,7 +203,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         const SizedBox(height: 16),
                         ListTile(
-                          leading: const Icon(Icons.flag),
+                          leading: const Text(
+                            "🇹🇿",
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
                           title: const Text('Kiswahili'),
                           onTap: () {
                             Navigator.pop(context);
@@ -211,7 +216,12 @@ class _ProfilePageState extends State<ProfilePage> {
                           },
                         ),
                         ListTile(
-                          leading: const Icon(Icons.flag_outlined),
+                          leading: const Text(
+                            "🇺🇸",
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
                           title: const Text('English'),
                           onTap: () {
                             Navigator.pop(context);
@@ -237,12 +247,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                   ),
                   builder: (context) {
-                    // Dummy list of categories, replace with your data source
-                    // final List<String> categories = [
-                    //   "Michango ya Harusi",
-                    //   "Michango ya Maendeleo",
-                    //   "Michango ya Matibabu",
-                    // ];
                     return Padding(
                       padding: EdgeInsets.only(
                         top: 20,
@@ -258,10 +262,75 @@ class _ProfilePageState extends State<ProfilePage> {
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 16),
-                          ...collectionTypeResponse.map((cat) => ListTile(
-                                leading: const Icon(Icons.label_outline),
-                                title: Text(cat.collectionName),
-                              )),
+                          ...collectionTypeResponse.map(
+                            (cat) => ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.blue.shade100,
+                                child: Text(
+                                  (collectionTypeResponse.indexOf(cat) + 1).toString(),
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              title: Text(cat.collectionName),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                onPressed: () {
+                                  // Show edit dialog or bottom sheet here
+                                  final TextEditingController controller =
+                                      TextEditingController(text: cat.collectionName);
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                    ),
+                                    builder: (context) {
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                          top: 20,
+                                          left: 20,
+                                          right: 20,
+                                          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                                        ),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Text(
+                                              'Hariri Aina ya Mchango',
+                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                            ),
+                                            const SizedBox(height: 16),
+                                            TextField(
+                                              controller: controller,
+                                              decoration: const InputDecoration(
+                                                labelText: 'Jina la Aina',
+                                                border: OutlineInputBorder(),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 16),
+                                            ElevatedButton(
+                                              child: const Text('Hifadhi Mabadiliko'),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                showSnackBar(
+                                                  context,
+                                                  "✅ Aina imehaririwa: ${controller.text}",
+                                                );
+                                                // TODO: Call API to update collection type
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                           const SizedBox(height: 16),
                           ElevatedButton.icon(
                             icon: const Icon(Icons.add),

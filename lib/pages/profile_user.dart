@@ -241,71 +241,71 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: EdgeInsets.only(bottom: 10, top: 5),
             child: Text("⚙️ Mipangilio", style: TextStyle(fontWeight: FontWeight.bold)),
           ),
-          ProfileMenuItem(
-            icon: Icons.person,
-            text: 'Hariri Taarifa',
-            onTap: () {
-              showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
-            },
-          ),
-          ProfileMenuItem(
-            icon: Icons.language,
-            text: 'Badili Lugha',
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                builder: (context) {
-                  return Padding(
-                    padding: EdgeInsets.only(
-                      top: 20,
-                      left: 20,
-                      right: 20,
-                      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Chagua Lugha',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 16),
-                        ListTile(
-                          leading: const Text(
-                            "🇹🇿",
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                          ),
-                          title: const Text('Kiswahili'),
-                          onTap: () {
-                            Navigator.pop(context);
-                            showSnackBar(context, "✅ Lugha imebadilishwa kuwa Kiswahili.");
-                          },
-                        ),
-                        ListTile(
-                          leading: const Text(
-                            "🇺🇸",
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                          ),
-                          title: const Text('English'),
-                          onTap: () {
-                            Navigator.pop(context);
-                            showSnackBar(context, "✅ Language changed to English.");
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-          ),
+          // ProfileMenuItem(
+          //   icon: Icons.person,
+          //   text: 'Hariri Taarifa',
+          //   onTap: () {
+          //     showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
+          //   },
+          // ),
+          // ProfileMenuItem(
+          //   icon: Icons.language,
+          //   text: 'Badili Lugha',
+          //   onTap: () {
+          //     showModalBottomSheet(
+          //       context: context,
+          //       shape: const RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          //       ),
+          //       builder: (context) {
+          //         return Padding(
+          //           padding: EdgeInsets.only(
+          //             top: 20,
+          //             left: 20,
+          //             right: 20,
+          //             bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          //           ),
+          //           child: Column(
+          //             mainAxisSize: MainAxisSize.min,
+          //             children: [
+          //               const Text(
+          //                 'Chagua Lugha',
+          //                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          //               ),
+          //               const SizedBox(height: 16),
+          //               ListTile(
+          //                 leading: const Text(
+          //                   "🇹🇿",
+          //                   style: TextStyle(
+          //                     fontSize: 20,
+          //                   ),
+          //                 ),
+          //                 title: const Text('Kiswahili'),
+          //                 onTap: () {
+          //                   Navigator.pop(context);
+          //                   showSnackBar(context, "✅ Lugha imebadilishwa kuwa Kiswahili.");
+          //                 },
+          //               ),
+          //               ListTile(
+          //                 leading: const Text(
+          //                   "🇺🇸",
+          //                   style: TextStyle(
+          //                     fontSize: 20,
+          //                   ),
+          //                 ),
+          //                 title: const Text('English'),
+          //                 onTap: () {
+          //                   Navigator.pop(context);
+          //                   showSnackBar(context, "✅ Language changed to English.");
+          //                 },
+          //               ),
+          //             ],
+          //           ),
+          //         );
+          //       },
+          //     );
+          //   },
+          // ),
           if (userData != null && userData!.user.role == "ADMIN") ...[
             ProfileMenuItem(
               icon: Icons.category,

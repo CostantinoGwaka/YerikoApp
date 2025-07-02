@@ -13,10 +13,11 @@ const String currency = 'TZS';
 //url
 //
 const String localIp = "http://localhost:8888/yeriko_jumuiya/api";
-const String remoteIp = "192.168.0.126";
-const String activeIp = localIp;
+const String remoteIp = "http://192.168.0.18:8888/yeriko_jumuiya/api";
+const String onlineIp = "https://yeriko.nitusue.com/api";
+const String activeIp = onlineIp;
 const String port = "8081";
-final String baseUrl = localIp; //"http://$activeIp:$port/api";
+final String baseUrl = activeIp; //"http://$activeIp:$port/api";
 
 String getFirstWord(String inputString) {
   List<String> wordList = inputString.split(" ");

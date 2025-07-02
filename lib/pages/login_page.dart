@@ -44,6 +44,7 @@ class _LoginPageState extends State<LoginPage> {
         );
       } else {
         String myApi = "$baseUrl/auth/login.php";
+        print(myApi);
         final response = await http.post(
           Uri.parse(myApi),
           headers: {'Accept': 'application/json'},
@@ -116,6 +117,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
     } catch (e) {
+      print(e);
       setState(() {
         _isLoading = false;
       });

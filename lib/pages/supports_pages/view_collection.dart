@@ -51,7 +51,7 @@ class CollectionsTablePage extends StatelessWidget {
                             fontSize: 15,
                             color: Colors.black87,
                           ),
-                          columnSpacing: 32,
+                          columnSpacing: MediaQuery.of(context).size.width / 20,
                           dividerThickness: 1.0,
                           columns: const [
                             DataColumn(

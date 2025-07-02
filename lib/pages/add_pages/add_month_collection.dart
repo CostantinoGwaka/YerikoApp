@@ -29,7 +29,7 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
   User? selectedUser;
 
   final TextEditingController amountController = TextEditingController();
-  String selectedMonth = "JANUARY";
+  String? selectedMonth;
   bool _isLoading = false;
 
   Future<void> fetchUsers() async {
@@ -113,7 +113,7 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
           setState(() {
             // Clear all relevant controllers
             amountController.clear();
-            selectedMonth = "JANUARY"; // Reset to default month
+            selectedMonth = null; // Reset to default month
             selectedUser = null; // Reset selected user
           });
 

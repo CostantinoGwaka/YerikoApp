@@ -28,10 +28,13 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
   //month
   String filterOption = 'TAARIFA ZOTE';
   User? selectedUser;
+  CollectionType? selectedCollectionType;
   String? selectedMonth;
 
-  List<String> filterOptions = ['TAARIFA ZOTE', 'TAARIFA KWA MWANAJUMUIYA', 'KWA MWEZI'];
+  List<String> filterOptions = ['TAARIFA ZOTE', 'TAARIFA KWA MWANAJUMUIYA', 'KWA MWEZI', 'KWA AINA YA MCHANGO'];
   List<User> users = []; // replace with real User objects
+  List<CollectionType> collectionTypeResponse = [];
+
   List<String> months = [
     'JANUARY',
     'FEBRUARY',
@@ -55,6 +58,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
     super.initState();
     getUserCollections();
     fetchUsers();
+    fetchCollectionTypes();
   }
 
   Future<void> fetchUsers() async {
@@ -71,6 +75,22 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
     }
   }
 
+  Future<void> fetchCollectionTypes() async {
+    collectionTypeResponse = [];
+    final response = await http
+        .get(Uri.parse('$baseUrl/collectiontype/get_all_collection_type.php?jumuiya_id=${userData!.user.jumuiya_id}'));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        collectionTypeResponse = (data['data'] as List).map((u) => CollectionType.fromJson(u)).toList();
+      });
+      setState(() {});
+    } else {
+      // handle error
+    }
+  }
+
   void loadData() {
     setState(() {
       if (filterOption == 'TAARIFA ZOTE') {
@@ -79,6 +99,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
         getUserYearCollections();
       } else if (filterOption == 'KWA MWEZI' && selectedMonth != null) {
         displayedData = allData.where((item) => item.monthly == selectedMonth).toList();
+      } else if (filterOption == 'KWA AINA YA MCHANGO' && selectedMonth != null) {
+        getUserOtherByTypeCollections();
       }
     });
   }
@@ -103,6 +125,57 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       final String myApi =
           "$baseUrl/monthly/get_all_other_collection_user_by_year.php?yearId=${currentYear!.data.id}&jumuiya_id=${userData!.user.jumuiya_id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse != null) {
+          // setState(() => _isLoading = false);
+          collectionsOthers = OtherCollectionResponse.fromJson(jsonResponse);
+
+          return collectionsOthers;
+        }
+      } else {
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: ${response.statusCode}")),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        );
+      }
+    }
+
+    // 🔁 Always return something to complete Future
+    return null;
+  }
+
+  Future<OtherCollectionResponse?> getUserOtherByTypeCollections() async {
+    try {
+      if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Please provide username and password")),
+          );
+        }
+        // setState(() => _isLoading = false);
+        return null;
+      }
+
+      final String myApi =
+          "$baseUrl/monthly/get_all_collection_user_by_collection_type.php?yearId=${currentYear!.data.id}&jumuiya_id=${userData!.user.jumuiya_id}&collection_type_id=${selectedCollectionType!.id}";
+
+      final response = await http.get(
+        Uri.parse(myApi),
+        headers: {
+          'Accept': 'application/json',
+        },
+      );
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -192,7 +265,6 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
             const SnackBar(content: Text("Please provide username and password")),
           );
         }
-        // setState(() => _isLoading = false);
         return null;
       }
 
@@ -237,9 +309,6 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       );
 
       if (response.statusCode == 200) {
-        // final jsonResponse = json.decode(response.body);
-        // print(jsonResponse);
-        // Example: await deleteTimeTable(item.id);
         // ignore: use_build_context_synchronously
         Navigator.pop(context); // Close bottom sheet
         // ignore: use_build_context_synchronously
@@ -279,36 +348,6 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: ElevatedButton.icon(
-                  //     style: ElevatedButton.styleFrom(
-                  //       backgroundColor: mainFontColor,
-                  //       foregroundColor: Colors.white,
-                  //       shape: RoundedRectangleBorder(
-                  //         borderRadius: BorderRadius.circular(18),
-                  //       ),
-                  //       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                  //       elevation: 2,
-                  //     ),
-                  //     icon: const Icon(Icons.close, size: 15),
-                  //     label: const Text(
-                  //       "Funga michango",
-                  //       style: TextStyle(
-                  //         fontWeight: FontWeight.bold,
-                  //         fontSize: 13,
-                  //       ),
-                  //     ),
-                  //     onPressed: () async {
-                  //       setState(() {
-                  //         viewTable = !viewTable;
-                  //       });
-                  //       if (viewTable) {
-                  //         await getUserCollectionAgainstTable();
-                  //       }
-                  //     },
-                  //   ),
-                  // ),
                   isLoading
                       ? const Padding(
                           padding: EdgeInsets.all(16.0),
@@ -332,33 +371,6 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(""),
-                              // ElevatedButton.icon(
-                              //   style: ElevatedButton.styleFrom(
-                              //     backgroundColor: mainFontColor,
-                              //     foregroundColor: Colors.white,
-                              //     shape: RoundedRectangleBorder(
-                              //       borderRadius: BorderRadius.circular(18),
-                              //     ),
-                              //     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                              //     elevation: 2,
-                              //   ),
-                              //   icon: const Icon(Icons.table_chart, size: 15),
-                              //   label: const Text(
-                              //     "Tazama Michango",
-                              //     style: TextStyle(
-                              //       fontWeight: FontWeight.bold,
-                              //       fontSize: 13,
-                              //     ),
-                              //   ),
-                              //   onPressed: () async {
-                              //     setState(() {
-                              //       viewTable = !viewTable;
-                              //     });
-                              //     if (viewTable) {
-                              //       await getUserCollectionAgainstTable();
-                              //     }
-                              //   },
-                              // ),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: mainFontColor,
@@ -498,243 +510,286 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                               }).toList(),
                             ),
                           ),
+                        if (filterOption == 'KWA AINA YA MCHANGO')
+                          Padding(
+                            padding: EdgeInsets.only(top: (size.height - 40) / 60),
+                            child: DropdownButtonFormField<CollectionType>(
+                              value: selectedCollectionType,
+                              isExpanded: true,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                filled: true,
+                                fillColor: Colors.grey[200], // Light background color
+                                hintText: "Chagua Aina ya Mchango",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30), // <-- Rounded edges
+                                  borderSide: BorderSide.none, // No visible border
+                                ),
+                              ),
+                              items: collectionTypeResponse.map((type) {
+                                return DropdownMenuItem<CollectionType>(
+                                  value: type,
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.person, color: Colors.blueGrey, size: 20),
+                                      const SizedBox(width: 8),
+                                      Text(type.collectionName),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (type) {
+                                if (type != null) {
+                                  setState(() {
+                                    selectedCollectionType = type;
+                                  });
+                                  loadData();
+                                }
+                              },
+                            ),
+                          ),
+                        const SizedBox(height: 10),
+                        FutureBuilder(
+                          future: filterOption == 'TAARIFA ZOTE'
+                              ? getUserCollections()
+                              : (filterOption == 'TAARIFA KWA MWANAJUMUIYA' && selectedUser != null)
+                                  ? getUserYearCollections()
+                                  : (filterOption == 'KWA MWEZI' && selectedMonth != null)
+                                      ? getUserMonthCollections()
+                                      : (filterOption == 'KWA AINA YA MCHANGO' && selectedCollectionType != null)
+                                          ? getUserOtherByTypeCollections()
+                                          : getUserCollections(),
+                          builder: (context, AsyncSnapshot<OtherCollectionResponse?> snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return const Center(child: Text("Imeshindikana kupakia data ya michango."));
+                            } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
+                              if (selectedUser != null) {
+                                return Center(
+                                    child: Text(
+                                        "Hakuna data ya michango iliyopatikana ya ${selectedUser!.userFullName}."));
+                              } else {
+                                return const Center(child: Text("Hakuna data ya michango iliyopatikana."));
+                              }
+                            }
+
+                            final collections = snapshot.data!.data;
+
+                            return ListView.builder(
+                              itemCount: collections.length,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                final item = collections[index];
+                                return GestureDetector(
+                                  onTap: () => _showCollectionDetails(context, item),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Container(
+                                            margin: EdgeInsets.only(
+                                              top: (size.width - 40) / 30,
+                                              left: (size.width - 40) / 20,
+                                              right: (size.width - 40) / 20,
+                                              bottom: (size.width - 40) / 30,
+                                            ),
+                                            decoration: BoxDecoration(
+                                                color: white,
+                                                borderRadius: BorderRadius.circular(25),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: grey.withValues(alpha: (0.03 * 255)),
+                                                    spreadRadius: 10,
+                                                    blurRadius: 3,
+                                                    // changes position of shadow
+                                                  ),
+                                                ]),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(2),
+                                              child: Row(
+                                                children: [
+                                                  const SizedBox(width: 2),
+                                                  Expanded(
+                                                    child: SizedBox(
+                                                      width: (size.width - 90) * 0.2,
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            "👤 ${item.user.userFullName}",
+                                                            style: const TextStyle(
+                                                              fontSize: 15,
+                                                              color: Colors.black,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            "💰 TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.collectionType.collectionName})",
+                                                            style: const TextStyle(
+                                                              fontSize: 15,
+                                                              color: Colors.black,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(height: 5),
+                                                          Text(
+                                                            "📅 ${item.registeredDate}",
+                                                            style: TextStyle(
+                                                              fontSize: 12,
+                                                              color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(height: 5),
+                                                          Text(
+                                                            "🗓 ${item.churchYearEntity.churchYear}",
+                                                            style: TextStyle(
+                                                              fontSize: 12,
+                                                              color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const Icon(
+                                                    Icons.arrow_forward_ios_rounded,
+                                                    size: 16,
+                                                    color: Colors.black,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  FutureBuilder(
-                    future: filterOption == 'TAARIFA ZOTE'
-                        ? getUserCollections()
-                        : (filterOption == 'TAARIFA KWA MWANAJUMUIYA' && selectedUser != null)
-                            ? getUserYearCollections()
-                            : (filterOption == 'KWA MWEZI' && selectedMonth != null)
-                                ? getUserMonthCollections()
-                                : getUserCollections(),
-                    builder: (context, AsyncSnapshot<OtherCollectionResponse?> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return const Center(child: Text("Imeshindikana kupakia data ya michango."));
-                      } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                        if (selectedUser != null) {
-                          return Center(
-                              child: Text("Hakuna data ya michango iliyopatikana ya ${selectedUser!.userFullName}."));
-                        } else {
-                          return const Center(child: Text("Hakuna data ya michango iliyopatikana."));
-                        }
-                      }
+                  Visibility(
+                    visible: selectedTabIndex == 1 && !viewTable,
+                    child: SizedBox(
+                      child: FutureBuilder(
+                        future: getUserCollections(),
+                        builder: (context, AsyncSnapshot<OtherCollectionResponse?> snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return const Center(child: Text("Failed to load collection data."));
+                          } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
+                            return const Center(child: Text("No collection data found."));
+                          }
 
-                      final collections = snapshot.data!.data;
+                          final collections = snapshot.data!.data;
 
-                      return ListView.builder(
-                        itemCount: collections.length,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          final item = collections[index];
-                          return GestureDetector(
-                            onTap: () => _showCollectionDetails(context, item),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      margin: EdgeInsets.only(
-                                        top: (size.width - 40) / 30,
-                                        left: (size.width - 40) / 20,
-                                        right: (size.width - 40) / 20,
-                                        bottom: (size.width - 40) / 30,
-                                      ),
-                                      decoration: BoxDecoration(
-                                          color: white,
-                                          borderRadius: BorderRadius.circular(25),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: grey.withValues(alpha: (0.03 * 255)),
-                                              spreadRadius: 10,
-                                              blurRadius: 3,
-                                              // changes position of shadow
-                                            ),
-                                          ]),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(2),
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(width: 2),
-                                            Expanded(
-                                              child: SizedBox(
-                                                width: (size.width - 90) * 0.2,
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      "👤 ${item.user.userFullName}",
-                                                      style: const TextStyle(
-                                                        fontSize: 15,
-                                                        color: Colors.black,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "💰 TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.collectionType.collectionName})",
-                                                      style: const TextStyle(
-                                                        fontSize: 15,
-                                                        color: Colors.black,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 5),
-                                                    Text(
-                                                      "📅 ${item.registeredDate}",
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        color: Colors.black.withAlpha((0.5 * 255).toInt()),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 5),
-                                                    Text(
-                                                      "🗓 ${item.churchYearEntity.churchYear}",
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        color: Colors.black.withAlpha((0.5 * 255).toInt()),
-                                                      ),
-                                                    ),
-                                                  ],
+                          return ListView.builder(
+                            itemCount: collections.length,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              final item = collections[index];
+                              return GestureDetector(
+                                onTap: () => _showCollectionDetails(context, item),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 5),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          margin: EdgeInsets.only(
+                                            top: (size.width - 40) / 30,
+                                            left: (size.width - 40) / 20,
+                                            right: (size.width - 40) / 20,
+                                            bottom: (size.width - 40) / 30,
+                                          ),
+                                          decoration: BoxDecoration(
+                                              color: white,
+                                              borderRadius: BorderRadius.circular(25),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: grey.withValues(alpha: (0.03 * 255)),
+                                                  spreadRadius: 10,
+                                                  blurRadius: 3,
+                                                  // changes position of shadow
                                                 ),
-                                              ),
-                                            ),
-                                            const Icon(
-                                              Icons.arrow_forward_ios_rounded,
-                                              size: 16,
-                                              color: Colors.black,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Visibility(
-            visible: selectedTabIndex == 1 && !viewTable,
-            child: SizedBox(
-              child: FutureBuilder(
-                future: getUserCollections(),
-                builder: (context, AsyncSnapshot<OtherCollectionResponse?> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return const Center(child: Text("Failed to load collection data."));
-                  } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                    return const Center(child: Text("No collection data found."));
-                  }
-
-                  final collections = snapshot.data!.data;
-
-                  return ListView.builder(
-                    itemCount: collections.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      final item = collections[index];
-                      return GestureDetector(
-                        onTap: () => _showCollectionDetails(context, item),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                    top: (size.width - 40) / 30,
-                                    left: (size.width - 40) / 20,
-                                    right: (size.width - 40) / 20,
-                                    bottom: (size.width - 40) / 30,
-                                  ),
-                                  decoration:
-                                      BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
-                                    BoxShadow(
-                                      color: grey.withValues(alpha: (0.03 * 255)),
-                                      spreadRadius: 10,
-                                      blurRadius: 3,
-                                      // changes position of shadow
-                                    ),
-                                  ]),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2),
-                                    child: Row(
-                                      children: [
-                                        const SizedBox(width: 2),
-                                        Expanded(
-                                          child: SizedBox(
-                                            width: (size.width - 90) * 0.2,
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              ]),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(2),
+                                            child: Row(
                                               children: [
-                                                Text(
-                                                  "👤 ${item.user.userFullName}",
-                                                  style: const TextStyle(
-                                                    fontSize: 15,
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.bold,
+                                                const SizedBox(width: 2),
+                                                Expanded(
+                                                  child: SizedBox(
+                                                    width: (size.width - 90) * 0.2,
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text(
+                                                          "👤 ${item.user.userFullName}",
+                                                          style: const TextStyle(
+                                                            fontSize: 15,
+                                                            color: Colors.black,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          "💰 TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
+                                                          style: const TextStyle(
+                                                            fontSize: 15,
+                                                            color: Colors.black,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 5),
+                                                        Text(
+                                                          "📅 ${item.registeredDate}",
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 5),
+                                                        Text(
+                                                          "🗓 ${item.churchYearEntity.churchYear}",
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                                Text(
-                                                  "💰 TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
-                                                  style: const TextStyle(
-                                                    fontSize: 15,
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 5),
-                                                Text(
-                                                  "📅 ${item.registeredDate}",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.black.withAlpha((0.5 * 255).toInt()),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 5),
-                                                Text(
-                                                  "🗓 ${item.churchYearEntity.churchYear}",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.black.withAlpha((0.5 * 255).toInt()),
-                                                  ),
+                                                const Icon(
+                                                  Icons.arrow_forward_ios_rounded,
+                                                  size: 16,
+                                                  color: Colors.black,
                                                 ),
                                               ],
                                             ),
                                           ),
                                         ),
-                                        const Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          size: 16,
-                                          color: Colors.black,
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           )

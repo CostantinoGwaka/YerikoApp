@@ -137,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 const SizedBox(height: 2),
                 Text(
-                  "--",
+                  "Jumuiya Yangu",
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,

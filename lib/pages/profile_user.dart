@@ -102,6 +102,8 @@ class _ProfilePageState extends State<ProfilePage> {
           //end here
           // ignore: use_build_context_synchronously
           Navigator.pop(rootContext);
+          // ignore: use_build_context_synchronously
+          Navigator.pop(rootContext);
 
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(rootContext).showSnackBar(

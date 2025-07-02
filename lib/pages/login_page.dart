@@ -136,6 +136,13 @@ class _LoginPageState extends State<LoginPage> {
             Column(
               children: [
                 const SizedBox(height: 2),
+                // App icon
+                Image.asset(
+                  'assets/appicon.png', // Make sure this path is correct and the image exists
+                  width: 80,
+                  height: 80,
+                ),
+                const SizedBox(height: 16),
                 Text(
                   "Jumuiya Yangu",
                   style: TextStyle(
@@ -155,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
             const SizedBox(
-              height: 50,
+              height: 10,
             ),
             Container(
               width: double.infinity,
@@ -266,7 +273,7 @@ class _LoginPageState extends State<LoginPage> {
                       } else {
                         // Show validation error
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Please enter a valid phone number and password.")),
+                          const SnackBar(content: Text("⚠️ Tafadhali weka namba sahihi ya simu na nenosiri.")),
                         );
                       }
                     },

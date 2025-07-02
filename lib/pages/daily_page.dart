@@ -132,7 +132,7 @@ class _DailyPageState extends State<DailyPage> {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please provide username and password")),
+            const SnackBar(content: Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
         }
         // setState(() => _isLoading = false);
@@ -175,7 +175,7 @@ class _DailyPageState extends State<DailyPage> {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please provide username and password")),
+            const SnackBar(content: Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
         }
         // setState(() => _isLoading = false);

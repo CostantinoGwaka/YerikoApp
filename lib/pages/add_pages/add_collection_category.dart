@@ -28,7 +28,7 @@ class _AddCollectionTypePageState extends State<AddCollectionTypePage> {
     if (!_formKey.currentState!.validate()) return;
 
     final payload = {
-      "collection_name": collectionNameController.text.trim(),
+      "collection_name": collectionNameController.text.trim().toUpperCase(),
       "jumuiya_id": userData!.user.jumuiya_id,
       "registeredBy": userData!.user.userFullName,
     };

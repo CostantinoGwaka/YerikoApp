@@ -52,7 +52,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
     }
   }
 
-  Future<dynamic> saveTimeTable(BuildContext context, dynamic data) async {
+  Future<dynamic> saveUser(BuildContext context, dynamic data) async {
     try {
       setState(() {
         _isLoading = true;
@@ -242,7 +242,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                             "jumuiya_id": userData!.user.jumuiya_id,
                           };
 
-                          saveTimeTable(context, user);
+                          saveUser(context, user);
                         }
                       },
                       icon: const Icon(Icons.save),

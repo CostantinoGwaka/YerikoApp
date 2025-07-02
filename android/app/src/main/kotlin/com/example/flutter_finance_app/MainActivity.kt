@@ -1,4 +1,4 @@
-package com.example.yeriko_app
+package com.isoftzt.jumuiya_yangu
 
 import io.flutter.embedding.android.FlutterActivity
 

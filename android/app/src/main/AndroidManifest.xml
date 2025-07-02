@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.yeriko_app">
+    package="com.isoftzt.jumuiya_yangu">
    <application
-        android:label="yeriko_app"
+        android:label="Jumuiya Yangu"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

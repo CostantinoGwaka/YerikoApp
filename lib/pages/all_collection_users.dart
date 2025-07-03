@@ -167,9 +167,9 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return const Center(child: Text("Failed to load collection data."));
+                return const Center(child: Text("Imeshindikana kupakia data ya michango."));
               } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                return const Center(child: Text("No collection data found."));
+                return const Center(child: Text("Hakuna data ya michango iliyopatikana."));
               }
 
               final collections = snapshot.data!.data;

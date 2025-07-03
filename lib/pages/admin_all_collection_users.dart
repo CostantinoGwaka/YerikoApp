@@ -727,76 +727,79 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                                           children: [
                                             const SizedBox(width: 2),
                                             Expanded(
-                                              child: SizedBox(
-                                                width: (size.width - 90) * 0.2,
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        const Text("👤 ", style: TextStyle(fontSize: 15)),
-                                                        Expanded(
-                                                          child: Text(
-                                                            "${item.user.userFullName}",
-                                                            style: const TextStyle(
-                                                              fontSize: 15,
-                                                              color: Colors.black,
-                                                              fontWeight: FontWeight.bold,
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                                                child: SizedBox(
+                                                  width: (size.width - 90) * 0.2,
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          const Text("👤 ", style: TextStyle(fontSize: 15)),
+                                                          Expanded(
+                                                            child: Text(
+                                                              "${item.user.userFullName}",
+                                                              style: const TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors.black,
+                                                                fontWeight: FontWeight.bold,
+                                                              ),
+                                                              overflow: TextOverflow.ellipsis,
                                                             ),
-                                                            overflow: TextOverflow.ellipsis,
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        const Text("💰 ", style: TextStyle(fontSize: 15)),
-                                                        Expanded(
-                                                          child: Text(
-                                                            "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
-                                                            style: const TextStyle(
-                                                              fontSize: 15,
-                                                              color: Colors.black,
-                                                              fontWeight: FontWeight.bold,
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          const Text("💰 ", style: TextStyle(fontSize: 15)),
+                                                          Expanded(
+                                                            child: Text(
+                                                              "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))} (${item.monthly})",
+                                                              style: const TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors.black,
+                                                                fontWeight: FontWeight.bold,
+                                                              ),
+                                                              overflow: TextOverflow.ellipsis,
                                                             ),
-                                                            overflow: TextOverflow.ellipsis,
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(height: 5),
-                                                    Row(
-                                                      children: [
-                                                        const Text("🗓 ", style: TextStyle(fontSize: 12)),
-                                                        Expanded(
-                                                          child: Text(
-                                                            item.registeredDate,
-                                                            style: TextStyle(
-                                                              fontSize: 12,
-                                                              color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(height: 5),
+                                                      Row(
+                                                        children: [
+                                                          const Text("🗓 ", style: TextStyle(fontSize: 12)),
+                                                          Expanded(
+                                                            child: Text(
+                                                              item.registeredDate,
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                                color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                              ),
+                                                              overflow: TextOverflow.ellipsis,
                                                             ),
-                                                            overflow: TextOverflow.ellipsis,
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(height: 5),
-                                                    Row(
-                                                      children: [
-                                                        const Text("📆 ", style: TextStyle(fontSize: 12)),
-                                                        Expanded(
-                                                          child: Text(
-                                                            item.churchYearEntity.churchYear,
-                                                            style: TextStyle(
-                                                              fontSize: 12,
-                                                              color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(height: 5),
+                                                      Row(
+                                                        children: [
+                                                          const Text("📆 ", style: TextStyle(fontSize: 12)),
+                                                          Expanded(
+                                                            child: Text(
+                                                              item.churchYearEntity.churchYear,
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                                color: Colors.black.withAlpha((0.5 * 255).toInt()),
+                                                              ),
+                                                              overflow: TextOverflow.ellipsis,
                                                             ),
-                                                            overflow: TextOverflow.ellipsis,
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),

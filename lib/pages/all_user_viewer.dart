@@ -221,7 +221,9 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                             decoration:
                                 BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
                               BoxShadow(
-                                color: grey.withValues(alpha: (0.03 * 255)),
+                                color: grey.withValues(
+                                  alpha: (0.03 * 255),
+                                ),
                                 spreadRadius: 10,
                                 blurRadius: 3,
                                 // changes position of shadow
@@ -231,115 +233,107 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                               children: [
                                 const SizedBox(width: 2),
                                 Expanded(
-                                  child: SizedBox(
-                                    width: (size.width - 90) * 0.2,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Flexible(
-                                              child: Text(
-                                                item.userFullName ?? "Jina Halipo",
-                                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                                overflow: TextOverflow.ellipsis,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5), // less padding
+                                    child: SizedBox(
+                                      width: (size.width - 90) * 0.2,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Flexible(
+                                                child: Text(
+                                                  item.userFullName ?? "Jina Halipo",
+                                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
                                               ),
-                                            ),
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: item.role == "ADMIN" ? Colors.redAccent : Colors.blueAccent,
-                                                borderRadius: BorderRadius.circular(8),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: item.role == "ADMIN" ? Colors.redAccent : Colors.blueAccent,
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  item.role ?? "Role Halipo",
+                                                  style: const TextStyle(
+                                                      color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                                                ),
                                               ),
-                                              child: Text(
-                                                item.role ?? "Role Halipo",
-                                                style: const TextStyle(
-                                                    color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            const Text("👤", style: TextStyle(fontSize: 14)),
-                                            const SizedBox(width: 4),
-                                            Flexible(
-                                              child: Text("Jina la mtumiaji: ${item.userName}",
-                                                  style: const TextStyle(fontSize: 12)),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Row(
-                                          children: [
-                                            const Text("📞", style: TextStyle(fontSize: 14)),
-                                            const SizedBox(width: 4),
-                                            Flexible(
-                                              child: Text("Namba ya simu: ${item.phone}",
-                                                  style: const TextStyle(fontSize: 12)),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Row(
-                                          children: [
-                                            const Text("📅", style: TextStyle(fontSize: 14)),
-                                            const SizedBox(width: 4),
-                                            Flexible(
-                                              child: Text("Mwaka wa usajili: ${item.yearRegistered}",
-                                                  style: const TextStyle(fontSize: 12)),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 2),
-                                        // Row(
-                                        //   children: [
-                                        //     const Text("💰", style: TextStyle(fontSize: 14)),
-                                        //     const SizedBox(width: 4),
-                                        //     Flexible(
-                                        //       child: Text("Kiasi: ${item.createdAt ?? 'Haipo'}",
-                                        //           style: const TextStyle(fontSize: 12)),
-                                        //     ),
-                                        //   ],
-                                        // ),
-                                        const SizedBox(height: 4),
-                                        Align(
-                                          alignment: Alignment.centerRight,
-                                          child: ElevatedButton.icon(
-                                            icon: const Icon(Icons.call, color: Colors.white, size: 14),
-                                            label: const Text("Piga Simu", style: TextStyle(fontSize: 12)),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.green,
-                                              foregroundColor: Colors.white,
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(6),
-                                              ),
-                                              elevation: 0,
-                                              textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                                              minimumSize: Size(0, 28),
-                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                            ),
-                                            onPressed: () async {
-                                              final phone = (item.phone ?? '').replaceAll(' ', '');
-                                              String formattedPhone = formatPhoneNumber(phone);
-                                              if (phone.isNotEmpty) {
-                                                final Uri url = Uri.parse('tel:$formattedPhone');
-                                                if (await canLaunchUrl(url)) {
-                                                  await launchUrl(url);
-                                                } else {
-                                                  // ignore: use_build_context_synchronously
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    const SnackBar(content: Text("Imeshindikana kupiga simu.")),
-                                                  );
-                                                }
-                                              }
-                                            },
+                                            ],
                                           ),
-                                        ),
-                                      ],
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              const Text("👤", style: TextStyle(fontSize: 14)),
+                                              const SizedBox(width: 4),
+                                              Flexible(
+                                                child: Text("Jina la mtumiaji: ${item.userName}",
+                                                    style: const TextStyle(fontSize: 12)),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Row(
+                                            children: [
+                                              const Text("📞", style: TextStyle(fontSize: 14)),
+                                              const SizedBox(width: 4),
+                                              Flexible(
+                                                child: Text("Namba ya simu: ${item.phone}",
+                                                    style: const TextStyle(fontSize: 12)),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Row(
+                                            children: [
+                                              const Text("📅", style: TextStyle(fontSize: 14)),
+                                              const SizedBox(width: 4),
+                                              Flexible(
+                                                child: Text("Mwaka wa usajili: ${item.yearRegistered}",
+                                                    style: const TextStyle(fontSize: 12)),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Align(
+                                            alignment: Alignment.centerRight,
+                                            child: ElevatedButton.icon(
+                                              icon: const Icon(Icons.call, color: Colors.white, size: 14),
+                                              label: const Text("Piga Simu", style: TextStyle(fontSize: 12)),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.green,
+                                                foregroundColor: Colors.white,
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(6),
+                                                ),
+                                                elevation: 0,
+                                                textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                                minimumSize: Size(0, 28),
+                                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                              ),
+                                              onPressed: () async {
+                                                final phone = (item.phone ?? '').replaceAll(' ', '');
+                                                String formattedPhone = formatPhoneNumber(phone);
+                                                if (phone.isNotEmpty) {
+                                                  final Uri url = Uri.parse('tel:$formattedPhone');
+                                                  if (await canLaunchUrl(url)) {
+                                                    await launchUrl(url);
+                                                  } else {
+                                                    // ignore: use_build_context_synchronously
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      const SnackBar(content: Text("Imeshindikana kupiga simu.")),
+                                                    );
+                                                  }
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),

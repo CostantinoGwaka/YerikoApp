@@ -207,7 +207,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                 itemBuilder: (context, index) {
                   final item = collections[index];
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14), // less padding
                     child: Row(
                       children: [
                         Expanded(

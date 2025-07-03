@@ -723,7 +723,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                                 ),
                                               ]),
                                           child: Padding(
-                                            padding: const EdgeInsets.all(2),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 16, vertical: 14), // less padding
+
                                             child: Row(
                                               children: [
                                                 const SizedBox(width: 2),

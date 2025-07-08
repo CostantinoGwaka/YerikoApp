@@ -554,9 +554,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 // ignore: deprecated_member_use
                 Share.share(message);
               } catch (e) {
-                if (kDebugMode) {
-                  print("$e");
-                }
+                showSnackBar(context, "Imeshindikana kushirikisha wengine.");
               }
             },
           ),

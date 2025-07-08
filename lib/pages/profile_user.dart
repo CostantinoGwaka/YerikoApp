@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/other_collection_model.dart';
@@ -534,6 +536,29 @@ class _ProfilePageState extends State<ProfilePage> {
           const Padding(
             padding: EdgeInsets.only(bottom: 10, top: 5),
             child: Text("ℹ️ Maelezo ya Programu", style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          ProfileMenuItem(
+            icon: Icons.share,
+            text: 'Shirikisha na Wengine',
+            onTap: () {
+              try {
+                // URL for Android and iOS app downloads
+                const String androidLink = "https://play.google.com/store/apps/details?id=com.isoftzt.jumuiya_yangu";
+                const String iosLink =
+                    "https://apps.apple.com/tz/app/jumuiya-yangu/id6748091565"; // Replace with actual App Store ID
+                const String appName = "Jumuiya Yangu";
+                const String message =
+                    "Habari! Jaribu $appName - mfumo bora wa usimamizi wa Jumuiya yako. Pakua sasa:\n\nAndroid: $androidLink\niOS: $iosLink\n\nUngana nasi kuboresha usimamizi wa Jumuiya yako!";
+
+                // Use the Share plugin to share the message
+                // ignore: deprecated_member_use
+                Share.share(message);
+              } catch (e) {
+                if (kDebugMode) {
+                  print("$e");
+                }
+              }
+            },
           ),
           ProfileMenuItem(
             icon: Icons.info,

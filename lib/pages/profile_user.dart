@@ -95,7 +95,80 @@ class _ProfilePageState extends State<ProfilePage> {
             _isLoading = false;
           });
 
+          setState(() {});
+
+          //end here
+          // ignore: use_build_context_synchronously
+          Navigator.pop(context);
+
           fetchCollectionTypes();
+
+          setState(() {});
+
+          // ignore: use_build_context_synchronously
+          Navigator.pop(context);
+
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(rootContext).showSnackBar(
+            SnackBar(content: Text("✅ Umefanikiwa! kuongeza aina ya mchango lako kwenye mfumo kwa mafanikio")),
+          );
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+          // ignore: use_build_context_synchronously
+          Navigator.pop(rootContext);
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(rootContext).showSnackBar(
+            SnackBar(content: Text(jsonResponse['message'] ?? "❎ Imegoma kubadili nenosiri kwenye mfumo wetu")),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // ignore: use_build_context_synchronously
+      Navigator.pop(rootContext);
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+      );
+    }
+  }
+
+  String toUnderscore(String text) {
+    return text.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '_');
+  }
+
+  Future<dynamic> updateUserName(BuildContext rootContext, String newname) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      if (newname == "") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeweka namba ya jina lako")),
+        );
+      } else {
+        String myApi = "$baseUrl/auth/update_profile_name_only.php";
+        final response = await http.post(
+          Uri.parse(myApi),
+          headers: {'Accept': 'application/json'},
+          body: {
+            "user_id": userData!.user.id.toString(),
+            "userFullName": newname,
+            "userName": toUnderscore(newname),
+          },
+        );
+
+        var jsonResponse = json.decode(response.body);
+
+        if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == "200") {
+          setState(() {
+            _isLoading = false;
+          });
 
           setState(() {});
 
@@ -104,9 +177,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Navigator.pop(rootContext);
 
           // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(rootContext).showSnackBar(
-            SnackBar(content: Text("✅ Umefanikiwa! kuongeza aina ya mchango lako kwenye mfumo kwa mafanikio")),
-          );
+          logout(context);
         } else {
           setState(() {
             _isLoading = false;
@@ -239,74 +310,57 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: EdgeInsets.only(bottom: 10, top: 5),
             child: Text("⚙️ Mipangilio", style: TextStyle(fontWeight: FontWeight.bold)),
           ),
-          // ProfileMenuItem(
-          //   icon: Icons.person,
-          //   text: 'Hariri Taarifa',
-          //   onTap: () {
-          //     showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
-          //   },
-          // ),
-          // ProfileMenuItem(
-          //   icon: Icons.language,
-          //   text: 'Badili Lugha',
-          //   onTap: () {
-          //     showModalBottomSheet(
-          //       context: context,
-          //       shape: const RoundedRectangleBorder(
-          //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          //       ),
-          //       builder: (context) {
-          //         return Padding(
-          //           padding: EdgeInsets.only(
-          //             top: 20,
-          //             left: 20,
-          //             right: 20,
-          //             bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-          //           ),
-          //           child: Column(
-          //             mainAxisSize: MainAxisSize.min,
-          //             children: [
-          //               const Text(
-          //                 'Chagua Lugha',
-          //                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          //               ),
-          //               const SizedBox(height: 16),
-          //               ListTile(
-          //                 leading: const Text(
-          //                   "🇹🇿",
-          //                   style: TextStyle(
-          //                     fontSize: 20,
-          //                   ),
-          //                 ),
-          //                 title: const Text('Kiswahili'),
-          //                 onTap: () {
-          //                   Navigator.pop(context);
-          //                   showSnackBar(context, "✅ Lugha imebadilishwa kuwa Kiswahili.");
-          //                 },
-          //               ),
-          //               ListTile(
-          //                 leading: const Text(
-          //                   "🇺🇸",
-          //                   style: TextStyle(
-          //                     fontSize: 20,
-          //                   ),
-          //                 ),
-          //                 title: const Text('English'),
-          //                 onTap: () {
-          //                   Navigator.pop(context);
-          //                   showSnackBar(context, "✅ Language changed to English.");
-          //                 },
-          //               ),
-          //             ],
-          //           ),
-          //         );
-          //       },
-          //     );
-          //   },
-          // ),
+          ProfileMenuItem(
+            icon: Icons.person,
+            text: 'Hariri Taarifa',
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (context) {
+                  final TextEditingController controller = TextEditingController();
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      top: 20,
+                      left: 20,
+                      right: 20,
+                      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Hariri Jina Lako',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: controller..text = userData!.user.userFullName ?? "User Name",
+                          decoration: const InputDecoration(
+                            labelText: 'Hariri Jina Lako',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          child: const Text('Hifadhi'),
+                          onPressed: () {
+                            updateUserName(rootContext, controller.text);
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
           if (userData != null && userData!.user.role == "ADMIN") ...[
             ProfileMenuItem(
-              icon: Icons.category,
+              icon: Icons.catching_pokemon_rounded,
               text: 'Aina ya Michango',
               onTap: () {
                 showModalBottomSheet(

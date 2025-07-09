@@ -34,28 +34,32 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: primary,
-      body: getBody(),
-      bottomNavigationBar: getFooter(),
-      floatingActionButton: SafeArea(
-        child: FloatingActionButton(
-          onPressed: () {
-            setTabs(3); // ✅ Go to the correct page
-            setState(() {
-              pageIndex = 3;
-              isFloatingClicked = true;
-            });
-          },
-          backgroundColor: buttoncolor,
-          child: const Icon(
-            Icons.people,
-            color: Colors.white,
-            size: 20,
+    // ignore: deprecated_member_use
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        backgroundColor: primary,
+        body: getBody(),
+        bottomNavigationBar: getFooter(),
+        floatingActionButton: SafeArea(
+          child: FloatingActionButton(
+            onPressed: () {
+              setTabs(3); // ✅ Go to the correct page
+              setState(() {
+                pageIndex = 3;
+                isFloatingClicked = true;
+              });
+            },
+            backgroundColor: buttoncolor,
+            child: const Icon(
+              Icons.people,
+              color: Colors.white,
+              size: 20,
+            ),
           ),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 

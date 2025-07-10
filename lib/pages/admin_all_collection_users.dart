@@ -315,9 +315,13 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: primary,
-      body: RefreshIndicator(onRefresh: _reloadData, child: getBody()),
+    // ignore: deprecated_member_use
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        backgroundColor: primary,
+        body: RefreshIndicator(onRefresh: _reloadData, child: getBody()),
+      ),
     );
   }
 

@@ -51,6 +51,8 @@ dependencies:
   flutter_localization: ^0.3.3
   flutter_phoenix: ^1.1.0
   share_plus: ^11.0.0
+  open_store:
+
 
 
 

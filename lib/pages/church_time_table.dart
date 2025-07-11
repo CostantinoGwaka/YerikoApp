@@ -450,8 +450,8 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
 
                 const SizedBox(height: 16),
 
-                // 📆 Mwaka wa Kanisa
-                const Text("📆 Taarifa za Mwaka wa Kanisa", style: TextStyle(fontWeight: FontWeight.bold)),
+                // 📆 Mwaka
+                const Text("📆 Taarifa za Mwaka", style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 _buildDetailRow("Mwaka", year?.churchYear),
                 // _buildDetailRow("Uhai", year?.isActive == true ? "Ndiyo" : "Hapana"),

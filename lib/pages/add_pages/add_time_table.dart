@@ -259,7 +259,7 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                 ),
                 const SizedBox(height: 12),
                 const Divider(),
-                const Text("📆 Mwaka wa Kanisa", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text("📆 Mwaka", style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 _buildChurchYearInfo(
                   churchYear: currentYear!.data.churchYear,
@@ -327,7 +327,7 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("📆 Mwaka wa Kanisa", style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text("📆 Mwaka", style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Row(
             children: [

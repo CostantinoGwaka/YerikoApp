@@ -11,12 +11,16 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:jumuiya_yangu/pages/home_page.dart';
 import 'package:jumuiya_yangu/pages/login_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:jumuiya_yangu/pages/update/maintance_screen.dart';
+import 'package:jumuiya_yangu/pages/update/update_screen.dart';
 import 'package:jumuiya_yangu/shared/localstorage/index.dart';
+import 'package:jumuiya_yangu/utils/global/global_setting.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
 
 LoginResponse? userData;
 ActiveChurchYearResponse? currentYear;
+final GlobalKey<NavigatorState> globalNavigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> getCurrentChurchYearData() async {
   try {
@@ -53,10 +57,40 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final GlobalProvider globalProvider = GlobalProvider();
+
+  Future<void> checkAppSettings() async {
+    // internetGloabalCheck = await InternetConnection().hasInternetAccess;
+    print("App Settings Check Result:2");
+
+    String message = await globalProvider.checkAppSettings();
+
+    if (globalNavigatorKey.currentContext == null) return; // Prevent error
+
+    BuildContext context = globalNavigatorKey.currentContext!;
+
+    print("App Settings Check Result: $message");
+
+    if (message == "UPDATE_NEEDED") {
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const UpdateAvailablePage()),
+        (Route<dynamic> route) => false,
+      );
+    } else if (message == "APP_MAINTENANCE") {
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const AppMaintanacePage()),
+        (Route<dynamic> route) => false,
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getUserLocalData();
+    // checkAppSettings();
   }
 
   void getUserLocalData() async {

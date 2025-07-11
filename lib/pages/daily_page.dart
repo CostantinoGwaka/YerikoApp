@@ -261,7 +261,7 @@ class _DailyPageState extends State<DailyPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Mwaka wa Kanisa",
+                              "Mwaka",
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -270,7 +270,7 @@ class _DailyPageState extends State<DailyPage> {
                             ),
                             SizedBox(height: 2),
                             Text(
-                              currentYear != null ? currentYear!.data.churchYear : "Hakuna Mwaka wa Kanisa",
+                              currentYear != null ? currentYear!.data.churchYear : "Hakuna Mwaka",
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

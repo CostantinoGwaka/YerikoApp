@@ -129,216 +129,217 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget getBody() {
     return SafeArea(
-        child: Center(
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            Column(
-              children: [
-                const SizedBox(height: 2),
-                // App icon
-                Image.asset(
-                  'assets/appicon.png', // Make sure this path is correct and the image exists
-                  width: 80,
-                  height: 80,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "Jumuiya Yangu",
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                    color: buttoncolor,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black26,
-                        blurRadius: 8,
-                        offset: Offset(0, 3),
+      child: Center(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            children: [
+              Column(
+                children: [
+                  const SizedBox(height: 2),
+                  // App icon
+                  Image.asset(
+                    'assets/appicon.png', // Make sure this path is correct and the image exists
+                    width: 80,
+                    height: 80,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Jumuiya Yangu",
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2,
+                      color: buttoncolor,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 25),
+                decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
+                  BoxShadow(
+                    color: grey.withAlpha((0.03 * 255).round()),
+                    spreadRadius: 10,
+                    blurRadius: 3,
+                  ),
+                ]),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20, top: 15, bottom: 5, right: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Namba ya simu",
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13, color: Color(0xff67727d)),
+                      ),
+                      TextField(
+                        controller: _phone,
+                        cursorColor: black,
+                        keyboardType: TextInputType.phone, // Show numeric keyboard
+                        maxLength: 10, // Limit to 10 characters
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly, // Only allow digits
+                          LengthLimitingTextInputFormatter(10), // Enforce 10 digit limit
+                        ],
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                          color: black,
+                        ),
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.phone_android),
+                          prefixIconColor: black,
+                          hintText: "Namba ya simu (tarakimu 10)",
+                          border: InputBorder.none,
+                          counterText: "", // Hide the character counter
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(horizontal: 25),
-              decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
-                BoxShadow(
-                  color: grey.withAlpha((0.03 * 255).round()),
-                  spreadRadius: 10,
-                  blurRadius: 3,
-                ),
-              ]),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20, top: 15, bottom: 5, right: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Namba ya simu",
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13, color: Color(0xff67727d)),
-                    ),
-                    TextField(
-                      controller: _phone,
-                      cursorColor: black,
-                      keyboardType: TextInputType.phone, // Show numeric keyboard
-                      maxLength: 10, // Limit to 10 characters
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly, // Only allow digits
-                        LengthLimitingTextInputFormatter(10), // Enforce 10 digit limit
-                      ],
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                        color: black,
-                      ),
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.phone_android),
-                        prefixIconColor: black,
-                        hintText: "Namba ya simu (tarakimu 10)",
-                        border: InputBorder.none,
-                        counterText: "", // Hide the character counter
-                      ),
-                    ),
-                  ],
-                ),
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(horizontal: 25),
-              decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
-                BoxShadow(
-                  color: grey.withAlpha((0.03 * 255).round()),
-                  spreadRadius: 10,
-                  blurRadius: 3,
-                ),
-              ]),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20, top: 15, bottom: 5, right: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Nenosiri",
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13, color: Color(0xff67727d)),
-                    ),
-                    TextField(
-                      obscureText: !isPasswordVisible, // Toggle based on state
-                      controller: _password,
-                      cursorColor: black,
-                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500, color: black),
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock_outline_rounded),
-                        prefixIconColor: Colors.black,
-                        suffixIcon: IconButton(
-                          icon: Icon(isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined),
-                          color: Colors.black,
-                          onPressed: () {
-                            setState(() {
-                              isPasswordVisible = !isPasswordVisible;
-                            });
-                          },
-                        ),
-                        hintText: "Nenosiri",
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ],
-                ),
+              const SizedBox(
+                height: 20,
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            GestureDetector(
-              onTap: _isLoading
-                  ? null
-                  : () async {
-                      // Disable tap when loading
-                      if (_phone.text.length == 10 && _password.text.isNotEmpty) {
-                        // Start loading
-                        setState(() {
-                          _isLoading = true;
-                        });
-                        login(context, _phone.text, _password.text);
-                      } else {
-                        // Show validation error
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("⚠️ Tafadhali weka namba sahihi ya simu na nenosiri.")),
-                        );
-                      }
-                    },
-              child: Container(
-                padding: const EdgeInsets.all(16),
+              Container(
+                width: double.infinity,
                 margin: const EdgeInsets.symmetric(horizontal: 25),
-                decoration: BoxDecoration(
-                    color: _isLoading
-                        ? buttoncolor.withAlpha((0.7 * 255).toInt())
-                        : buttoncolor, // Dim button when loading
-                    borderRadius: BorderRadius.circular(25)),
-                child: Center(
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
+                  BoxShadow(
+                    color: grey.withAlpha((0.03 * 255).round()),
+                    spreadRadius: 10,
+                    blurRadius: 3,
+                  ),
+                ]),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20, top: 15, bottom: 5, right: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Nenosiri",
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13, color: Color(0xff67727d)),
+                      ),
+                      TextField(
+                        obscureText: !isPasswordVisible, // Toggle based on state
+                        controller: _password,
+                        cursorColor: black,
+                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500, color: black),
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.lock_outline_rounded),
+                          prefixIconColor: Colors.black,
+                          suffixIcon: IconButton(
+                            icon: Icon(isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                            color: Colors.black,
+                            onPressed: () {
+                              setState(() {
+                                isPasswordVisible = !isPasswordVisible;
+                              });
+                            },
                           ),
-                        )
-                      : Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.login, color: Colors.white),
-                            SizedBox(width: 8),
-                            Text(
-                              "Ingia",
-                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-                            ),
-                          ],
+                          hintText: "Nenosiri",
+                          border: InputBorder.none,
                         ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 26.0, right: 26.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
-                    },
-                    child: Text(
-                      "Umesahau nenosiri?",
+              const SizedBox(
+                height: 20,
+              ),
+              GestureDetector(
+                onTap: _isLoading
+                    ? null
+                    : () async {
+                        // Disable tap when loading
+                        if (_phone.text.length == 10 && _password.text.isNotEmpty) {
+                          // Start loading
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          login(context, _phone.text, _password.text);
+                        } else {
+                          // Show validation error
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("⚠️ Tafadhali weka namba sahihi ya simu na nenosiri.")),
+                          );
+                        }
+                      },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.symmetric(horizontal: 25),
+                  decoration: BoxDecoration(
+                      color: _isLoading
+                          ? buttoncolor.withAlpha((0.7 * 255).toInt())
+                          : buttoncolor, // Dim button when loading
+                      borderRadius: BorderRadius.circular(25)),
+                  child: Center(
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.login, color: Colors.white),
+                              SizedBox(width: 8),
+                              Text(
+                                "Ingia",
+                                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 26.0, right: 26.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
+                      },
+                      child: Text(
+                        "Umesahau nenosiri?",
+                        style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w300),
+                      ),
+                    ),
+                    Text(
+                      "",
                       style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w300),
                     ),
-                  ),
-                  Text(
-                    "",
-                    style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w300),
-                  ),
-                ],
-              ),
-            )
-          ],
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 
   void showSnackBar(BuildContext context, String message) {

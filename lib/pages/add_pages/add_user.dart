@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
-import 'package:jumuiya_yangu/models/church_time_table.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
 
 class AddUserPageAdmin extends StatefulWidget {
   final void Function(Map<String, dynamic>)? onSubmit;
-  final ChurchTimeTable? initialData; // 👈 Add this
+  final User? initialData; // 👈 Add this
   final BuildContext rootContext;
 
   const AddUserPageAdmin({
@@ -50,18 +49,17 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
     if (widget.initialData != null) {
       final data = widget.initialData!;
 
-      fullNameController.text = data.user?.userFullName ?? '';
-      userNameController.text = data.user?.userName ?? '';
-      phoneController.text = data.user?.phone ?? '';
-      locationController.text = data.user?.location ?? '';
-      genderController.text = data.user?.gender ?? '';
-      dobController.text = data.user?.dobdate ?? '';
-      martialstatusController.text = data.user?.martialstatus ?? '';
+      fullNameController.text = data.userFullName ?? '';
+      userNameController.text = data.userName ?? '';
+      phoneController.text =
+          (data.phone != null && data.phone!.startsWith('255')) ? '0${data.phone!.substring(3)}' : (data.phone ?? '');
+      locationController.text = data.location ?? '';
+      genderController.text = data.gender ?? '';
+      dobController.text = data.dobdate ?? '';
+      martialstatusController.text = data.martialstatus ?? '';
       passwordController.text = ''; // Password is not prefilled for security
-      jumuiyaIdController.text = data.user?.jumuiya_id ?? '';
-      selectedRole = data.user?.role ?? "USER";
-
-      isActive = (data.churchYearEntity?.isActive?.toString() == '1' || data.churchYearEntity?.isActive == true);
+      jumuiyaIdController.text = data.jumuiya_id ?? '';
+      selectedRole = data.role ?? "USER";
     }
   }
 
@@ -148,6 +146,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
         }
       }
     } catch (e) {
+      print(e);
       setState(() {
         _isLoading = false;
       });
@@ -314,21 +313,32 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                           }
                         }
 
-                        if (_formKey.currentState!.validate()) {
-                          final user = {
-                            "fname": capitalizeEachWord(fullNameController.text.trim()),
-                            "uname": toUnderscore(fullNameController.text.trim()),
-                            "phone": phoneController.text.trim().replaceFirst(RegExp(r'^0'), '255'),
-                            "password": phoneController.text.trim(),
-                            "location": locationController.text.trim(),
-                            "gender": selectedGender,
-                            "dobdate": dobController.text.trim(),
-                            "martialstatus": selectedMartialStatus,
-                            "role": selectedRole,
-                            "jumuiya_id": userData!.user.jumuiya_id,
-                          };
+                        try {
+                          if (_formKey.currentState!.validate()) {
+                            final user = {
+                              "fname": capitalizeEachWord(fullNameController.text.trim()),
+                              "uname": toUnderscore(fullNameController.text.trim()),
+                              "phone": phoneController.text.trim().replaceFirst(RegExp(r'^0'), '255'),
+                              "password": phoneController.text.trim(),
+                              "location": locationController.text.trim(),
+                              "gender": selectedGender,
+                              "dobdate": dobController.text.trim(),
+                              "martialstatus": selectedMartialStatus,
+                              "role": selectedRole,
+                              "jumuiya_id": userData!.user.jumuiya_id,
+                            };
 
-                          saveUser(context, user);
+                            if (widget.initialData != null) {
+                              user['id'] = widget.initialData!.id.toString();
+                            }
+
+                            saveUser(context, user);
+                          }
+                        } catch (e) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Kosa: $e")),
+                          );
                         }
                       },
                       icon: const Icon(Icons.save),
@@ -368,7 +378,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
           DateTime? pickedDate = await showDatePicker(
             context: widget.rootContext,
             initialDate: DateTime.now(),
-            firstDate: DateTime(2020),
+            firstDate: DateTime(1900),
             lastDate: DateTime(2100),
             locale: const Locale('sw', 'TZ'),
           );

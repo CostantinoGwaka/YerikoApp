@@ -346,36 +346,82 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                           const SizedBox(height: 4),
                                           Align(
                                             alignment: Alignment.centerRight,
-                                            child: ElevatedButton.icon(
-                                              icon: const Icon(Icons.call, color: Colors.white, size: 14),
-                                              label: const Text("Piga Simu", style: TextStyle(fontSize: 12)),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.green,
-                                                foregroundColor: Colors.white,
-                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(6),
+                                            child: Row(
+                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                if (userData != null && userData!.user.role == "ADMIN") ...[
+                                                  ElevatedButton.icon(
+                                                    icon: const Icon(Icons.edit, color: Colors.white, size: 14),
+                                                    label: const Text("Hariri", style: TextStyle(fontSize: 12)),
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Colors.blue[900],
+                                                      foregroundColor: Colors.white,
+                                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(6),
+                                                      ),
+                                                      elevation: 0,
+                                                      textStyle:
+                                                          const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                                      minimumSize: Size(0, 28),
+                                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                    ),
+                                                    onPressed: () async {
+                                                      if (userData != null && userData!.user.role == "ADMIN") {
+                                                        showModalBottomSheet(
+                                                          context: context,
+                                                          isScrollControlled: true,
+                                                          shape: const RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.vertical(top: Radius.circular(25)),
+                                                          ),
+                                                          builder: (_) => AddUserPageAdmin(
+                                                            rootContext: context,
+                                                            initialData: item,
+                                                            onSubmit: (data) {
+                                                              _reloadData();
+                                                            },
+                                                          ),
+                                                        );
+                                                      }
+                                                    },
+                                                  ),
+                                                  SizedBox(width: 2),
+                                                ],
+                                                ElevatedButton.icon(
+                                                  icon: const Icon(Icons.call, color: Colors.white, size: 14),
+                                                  label: const Text("Piga Simu", style: TextStyle(fontSize: 12)),
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors.green,
+                                                    foregroundColor: Colors.white,
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(6),
+                                                    ),
+                                                    elevation: 0,
+                                                    textStyle:
+                                                        const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                                    minimumSize: Size(0, 28),
+                                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                  ),
+                                                  onPressed: () async {
+                                                    final phone = (item.phone ?? '').replaceAll(' ', '');
+                                                    String formattedPhone = formatPhoneNumber(phone);
+                                                    if (phone.isNotEmpty) {
+                                                      final Uri url = Uri.parse('tel:$formattedPhone');
+                                                      if (await canLaunchUrl(url)) {
+                                                        await launchUrl(url);
+                                                      } else {
+                                                        // ignore: use_build_context_synchronously
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                          const SnackBar(content: Text("Imeshindikana kupiga simu.")),
+                                                        );
+                                                      }
+                                                    }
+                                                  },
                                                 ),
-                                                elevation: 0,
-                                                textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                                                minimumSize: Size(0, 28),
-                                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              ),
-                                              onPressed: () async {
-                                                final phone = (item.phone ?? '').replaceAll(' ', '');
-                                                String formattedPhone = formatPhoneNumber(phone);
-                                                if (phone.isNotEmpty) {
-                                                  final Uri url = Uri.parse('tel:$formattedPhone');
-                                                  if (await canLaunchUrl(url)) {
-                                                    await launchUrl(url);
-                                                  } else {
-                                                    // ignore: use_build_context_synchronously
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      const SnackBar(content: Text("Imeshindikana kupiga simu.")),
-                                                    );
-                                                  }
-                                                }
-                                              },
+                                              ],
                                             ),
                                           ),
                                         ],

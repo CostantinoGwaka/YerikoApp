@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jumuiya_yangu/utils/global/appSetting.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
@@ -116,7 +117,6 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
     } catch (e) {
-      print(e);
       setState(() {
         _isLoading = false;
       });
@@ -334,6 +334,18 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height / 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    AppSettings.appVersion,
+                    style: TextStyle(
+                      color: Colors.black54,
+                    ),
+                  ),
+                ],
               )
             ],
           ),

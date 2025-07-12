@@ -41,8 +41,6 @@ class _HomePageState extends State<HomePage> {
 
     String message = await globalProvider.checkAppSettings();
 
-    print(message);
-
     if (message == "UPDATE_NEEDED") {
       // ignore: use_build_context_synchronously
       Navigator.of(context).pushAndRemoveUntil(

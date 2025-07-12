@@ -314,8 +314,8 @@ class _DailyPageState extends State<DailyPage> {
                                 children: [
                                   if (_isLoading)
                                     SizedBox(
-                                      width: 20,
-                                      height: 20,
+                                      width: 10,
+                                      height: 10,
                                       child: CircularProgressIndicator(strokeWidth: 2),
                                     )
                                   else ...[

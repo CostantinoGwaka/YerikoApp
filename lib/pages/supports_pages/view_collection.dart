@@ -59,12 +59,12 @@ class CollectionsTablePage extends StatelessWidget {
                             columns: const [
                               DataColumn(
                                   label: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 4.0),
+                                padding: EdgeInsets.symmetric(vertical: 2.0),
                                 child: Text('SN'),
                               )),
                               DataColumn(
                                   label: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                padding: EdgeInsets.symmetric(vertical: 6.0),
                                 child: Text('Kiasi'),
                               )),
                               DataColumn(
@@ -91,18 +91,12 @@ class CollectionsTablePage extends StatelessWidget {
                                 }
                                 return DataRow(
                                   cells: [
-                                    DataCell(Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                      child: Text('${index + 1}'),
-                                    )),
-                                    DataCell(Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text(
-                                        NumberFormat('#,##0', 'en_US').format(int.tryParse(item.amount) ?? 0),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.green,
-                                        ),
+                                    DataCell(Text('${index + 1}')),
+                                    DataCell(Text(
+                                      NumberFormat('#,##0', 'en_US').format(int.tryParse(item.amount) ?? 0),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.green,
                                       ),
                                     )),
                                     DataCell(Padding(

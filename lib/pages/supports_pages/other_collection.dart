@@ -70,7 +70,7 @@ class OtherCollectionsTablePage extends StatelessWidget {
                               DataColumn(
                                   label: Padding(
                                 padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Text('Mwezi'),
+                                child: Text('Mchango'),
                               )),
                               DataColumn(
                                   label: Padding(
@@ -107,7 +107,11 @@ class OtherCollectionsTablePage extends StatelessWidget {
                                     )),
                                     DataCell(Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text(item.monthly),
+                                      child: Text(item.collectionType.collectionName,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.indigo,
+                                          )),
                                     )),
                                     DataCell(Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 8.0),

@@ -8,7 +8,10 @@ import 'package:jumuiya_yangu/pages/all_user_viewer.dart';
 import 'package:jumuiya_yangu/pages/church_time_table.dart';
 import 'package:jumuiya_yangu/pages/daily_page.dart';
 import 'package:jumuiya_yangu/pages/profile_user.dart';
+import 'package:jumuiya_yangu/pages/update/maintance_screen.dart';
+import 'package:jumuiya_yangu/pages/update/update_screen.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
+import 'package:jumuiya_yangu/utils/global/global_setting.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,6 +24,7 @@ class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
   final int collectionPageIndex = 2;
   bool isFloatingClicked = false;
+  final GlobalProvider globalProvider = GlobalProvider();
 
   List<Widget> get pages => [
         const DailyPage(), // index 0
@@ -31,6 +35,34 @@ class _HomePageState extends State<HomePage> {
         AllViewerUserWithAdmin(), // index 3
         const ProfilePage(), // index 4
       ];
+
+  Future<void> checkAppSettings() async {
+    // internetGloabalCheck = await InternetConnection().hasInternetAccess;
+
+    String message = await globalProvider.checkAppSettings();
+
+    print(message);
+
+    if (message == "UPDATE_NEEDED") {
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const UpdateAvailablePage()),
+        (Route<dynamic> route) => false,
+      );
+    } else if (message == "APP_MAINTENANCE") {
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const AppMaintanacePage()),
+        (Route<dynamic> route) => false,
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkAppSettings();
+  }
 
   @override
   Widget build(BuildContext context) {

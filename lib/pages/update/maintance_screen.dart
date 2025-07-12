@@ -68,11 +68,11 @@ class _AppMaintanacePageState extends State<AppMaintanacePage> {
                   height: MediaQuery.of(context).size.height / 20,
                 ),
                 Text(
-                  "NITUSUE is under mainatanance",
+                  "Jumuiya Yangu iko kwenye matengenezo",
                   style: TextStyle(
                     fontSize: MediaQuery.of(context).size.height / 50,
                     fontFamily: "gotham_bold",
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 )
               ],
@@ -104,7 +104,7 @@ class _AppMaintanacePageState extends State<AppMaintanacePage> {
                               fit: BoxFit.contain,
                               width: 40.0,
                               height: 40.0,
-                              image: AssetImage('image/nitusue.png'),
+                              image: AssetImage('assets/appicon.png'),
                             ),
                           ),
                         ),
@@ -125,7 +125,7 @@ class _AppMaintanacePageState extends State<AppMaintanacePage> {
                               SizedBox(
                                 width: 10,
                               ),
-                              Text("Help")
+                              Text("Msaada"),
                             ],
                           )),
                     ];
@@ -208,22 +208,22 @@ class _AppMaintanacePageState extends State<AppMaintanacePage> {
                                           // Contact Options
                                           _buildContactItem(
                                             icon: Icons.email,
-                                            label: "Email",
-                                            value: "nitusue.help@gmail.com",
+                                            label: "Barua pepe",
+                                            value: "jumuiyayangu@gmail.com",
                                             onTap: () => {},
                                           ),
                                           const Divider(),
                                           _buildContactItem(
                                             icon: Icons.phone,
-                                            label: "Phone",
-                                            value: "+255 659 5XX XXX",
+                                            label: "Namba ya Simu",
+                                            value: "+255 659 515 042",
                                             onTap: () => {},
                                           ),
                                           const Divider(),
                                           _buildContactItem(
                                             icon: Icons.web,
-                                            label: "Website",
-                                            value: "www.nitusue-website.com",
+                                            label: "Tovuti",
+                                            value: "www.jumuiyayangu.com",
                                             onTap: () => {},
                                           ),
                                         ],

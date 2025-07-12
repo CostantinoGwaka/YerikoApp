@@ -285,6 +285,35 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
                       onPressed: () {
+                        // Validate the form
+                        // Check if user is at least 18 years old
+                        if (dobController.text.trim().isNotEmpty) {
+                          try {
+                            final inputFormat = DateFormat("dd-MM-yyyy");
+                            final dob = inputFormat.parse(dobController.text.trim());
+                            final today = DateTime.now();
+                            final age = today.year -
+                                dob.year -
+                                ((today.month < dob.month || (today.month == dob.month && today.day < dob.day))
+                                    ? 1
+                                    : 0);
+                            if (age < 18) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Umri wa mtumiaji lazima uwe angalau miaka 18.")),
+                              );
+                              return;
+                            }
+                          } catch (e) {
+                            Navigator.pop(context);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Tarehe ya kuzaliwa si sahihi.")),
+                            );
+                            return;
+                          }
+                        }
+
                         if (_formKey.currentState!.validate()) {
                           final user = {
                             "fname": capitalizeEachWord(fullNameController.text.trim()),

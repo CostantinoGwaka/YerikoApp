@@ -298,6 +298,52 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                             ],
                                           ),
                                           const SizedBox(height: 4),
+                                          if (userData != null && userData!.user.role == "ADMIN") ...[
+                                            Row(
+                                              children: [
+                                                const Text("🏠", style: TextStyle(fontSize: 14)),
+                                                const SizedBox(width: 4),
+                                                Flexible(
+                                                  child: Text("Mahali Anapoishi: ${item.location}",
+                                                      style: const TextStyle(fontSize: 12)),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Row(
+                                              children: [
+                                                const Text("⚧️", style: TextStyle(fontSize: 14)),
+                                                const SizedBox(width: 4),
+                                                Flexible(
+                                                  child: Text("Jinsia ya mwanajumuiya: ${item.gender}",
+                                                      style: const TextStyle(fontSize: 12)),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Row(
+                                              children: [
+                                                const Text("📅", style: TextStyle(fontSize: 14)),
+                                                const SizedBox(width: 4),
+                                                Flexible(
+                                                  child: Text("Tarehe ya kuzaliwa: ${item.dobdate}",
+                                                      style: const TextStyle(fontSize: 12)),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Row(
+                                              children: [
+                                                const Text("💍", style: TextStyle(fontSize: 14)),
+                                                const SizedBox(width: 4),
+                                                Flexible(
+                                                  child: Text("Hali ya ndoa: ${item.martialstatus}",
+                                                      style: const TextStyle(fontSize: 12)),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                          const SizedBox(height: 4),
                                           Align(
                                             alignment: Alignment.centerRight,
                                             child: ElevatedButton.icon(

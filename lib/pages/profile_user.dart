@@ -283,6 +283,7 @@ class _ProfilePageState extends State<ProfilePage> {
         appBar: AppBar(
           title: const Text('Akaunti'),
           centerTitle: true,
+          automaticallyImplyLeading: false, // Removes the back arrow
         ),
         body: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16),

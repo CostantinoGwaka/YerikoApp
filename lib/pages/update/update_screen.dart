@@ -20,7 +20,7 @@ class _UpdateAvailablePageState extends State<UpdateAvailablePage> {
       style: const TextStyle(
         fontWeight: FontWeight.bold,
         fontFamily: "gotham_bold",
-        color: Colors.white,
+        color: Colors.black54,
       ),
     );
   }
@@ -33,7 +33,7 @@ class _UpdateAvailablePageState extends State<UpdateAvailablePage> {
         style: const TextStyle(
           fontWeight: FontWeight.bold,
           fontFamily: "gotham_bold",
-          color: Colors.white,
+          color: Colors.black54,
         ),
       ),
     );
@@ -105,7 +105,7 @@ class _UpdateAvailablePageState extends State<UpdateAvailablePage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontFamily: "gotham_bold",
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                   const SizedBox(
@@ -136,7 +136,7 @@ class _UpdateAvailablePageState extends State<UpdateAvailablePage> {
                           style: TextStyle(
                             fontSize: 15,
                             fontFamily: "gotham_bold",
-                            color: Colors.white,
+                            color: Colors.black54,
                           ),
                         ),
                         const SizedBox(
@@ -207,7 +207,7 @@ class _UpdateAvailablePageState extends State<UpdateAvailablePage> {
                             fit: BoxFit.contain,
                             width: 40.0,
                             height: 40.0,
-                            image: AssetImage('image/nitusue.png'),
+                            image: AssetImage('assets/appicon.png'),
                           ),
                         ),
                       ),
@@ -250,7 +250,7 @@ class _UpdateAvailablePageState extends State<UpdateAvailablePage> {
                             return Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Colors.black,
                                 borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                               ),
                               child: Column(
@@ -299,7 +299,7 @@ class _UpdateAvailablePageState extends State<UpdateAvailablePage> {
                                       children: [
                                         // Title
                                         const Text(
-                                          "Wasiliana Nasi",
+                                          "Get in Touch",
                                           style: TextStyle(
                                             fontSize: 24,
                                             fontWeight: FontWeight.bold,
@@ -311,8 +311,8 @@ class _UpdateAvailablePageState extends State<UpdateAvailablePage> {
                                         // Contact Options
                                         _buildContactItem(
                                           icon: Icons.email,
-                                          label: "Barua Pepe",
-                                          value: "gwaka94@gmail.com",
+                                          label: "Barua pepe",
+                                          value: "jumuiyayangu@gmail.com",
                                           onTap: () => {},
                                         ),
                                         const Divider(),

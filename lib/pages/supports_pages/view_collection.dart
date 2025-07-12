@@ -26,7 +26,7 @@ class CollectionsTablePage extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 child: Container(
                   width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.all(2),
+                  padding: EdgeInsets.all(MediaQuery.of(context).size.width / 90),
                   child: Card(
                     elevation: 4,
                     shape: RoundedRectangleBorder(
@@ -54,7 +54,7 @@ class CollectionsTablePage extends StatelessWidget {
                               fontSize: 15,
                               color: Colors.black87,
                             ),
-                            columnSpacing: MediaQuery.of(context).size.width / 20,
+                            columnSpacing: MediaQuery.of(context).size.width / 30,
                             dividerThickness: 1.0,
                             columns: const [
                               DataColumn(

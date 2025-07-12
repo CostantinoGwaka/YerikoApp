@@ -9,6 +9,8 @@ class OtherCollectionsTablePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async => false,
@@ -26,14 +28,14 @@ class OtherCollectionsTablePage extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 child: Container(
                   width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.all(2),
+                  padding: EdgeInsets.all(MediaQuery.of(context).size.width / 90),
                   child: Card(
                     elevation: 4,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: EdgeInsets.all(MediaQuery.of(context).size.width / 30),
                       child: Column(
                         children: [
                           DataTable(
@@ -54,7 +56,7 @@ class OtherCollectionsTablePage extends StatelessWidget {
                               fontSize: 15,
                               color: Colors.black87,
                             ),
-                            columnSpacing: MediaQuery.of(context).size.width / 20,
+                            columnSpacing: MediaQuery.of(context).size.width / 30,
                             dividerThickness: 1.0,
                             columns: const [
                               DataColumn(

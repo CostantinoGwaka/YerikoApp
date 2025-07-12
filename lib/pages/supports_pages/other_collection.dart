@@ -9,8 +9,6 @@ class OtherCollectionsTablePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async => false,

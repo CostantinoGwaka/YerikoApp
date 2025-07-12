@@ -146,7 +146,6 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
         }
       }
     } catch (e) {
-      print(e);
       setState(() {
         _isLoading = false;
       });

@@ -9,9 +9,6 @@ import 'package:jumuiya_yangu/utils/url.dart';
 class GlobalProvider extends ChangeNotifier {
   Future<String> checkAppSettings() async {
     AppVersion globalResponse = await getMobileSettings();
-
-    print("Global Response: ${globalResponse.toJson()}");
-
     if (globalResponse.lockStatus == 'OFF') {
       if (AppSettings.oldversionCode == "" || AppSettings.newversionCode == "") {
         return "UPDATE_NEEDED";

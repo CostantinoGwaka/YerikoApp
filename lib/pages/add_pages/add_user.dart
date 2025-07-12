@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/church_time_table.dart';
@@ -28,12 +29,20 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
   List<User> users = [];
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController userNameController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
+  final TextEditingController genderController = TextEditingController();
+  final TextEditingController dobController = TextEditingController();
+  final TextEditingController martialstatusController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController jumuiyaIdController = TextEditingController();
   String selectedRole = "USER"; // default
+  String selectedGender = "MWANAUME"; // default
+  String selectedMartialStatus = "AMEOLEWA"; // default
   bool _isLoading = false;
   final roles = ["USER", "ADMIN"];
+  final listGenders = ["MWANAUME", "MWANAMKE"];
+  final listStatus = ["AMEOLEWA", "AMEOA", "HAJAOA", "HAJAOLEWA", "WALIOACHANA", "MJANE", "MGANE"];
 
   @override
   void initState() {
@@ -44,6 +53,10 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
       fullNameController.text = data.user?.userFullName ?? '';
       userNameController.text = data.user?.userName ?? '';
       phoneController.text = data.user?.phone ?? '';
+      locationController.text = data.user?.location ?? '';
+      genderController.text = data.user?.gender ?? '';
+      dobController.text = data.user?.dobdate ?? '';
+      martialstatusController.text = data.user?.martialstatus ?? '';
       passwordController.text = ''; // Password is not prefilled for security
       jumuiyaIdController.text = data.user?.jumuiya_id ?? '';
       selectedRole = data.user?.role ?? "USER";
@@ -186,10 +199,48 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text("🆕 Sajili Mtumiaji", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
                     _buildTextField("👤 Jina Kamili", fullNameController),
-                    // const SizedBox(height: 8),
-                    // _buildTextField("🧑‍💻 Jina la Mtumiaji", userNameController),
+                    const SizedBox(height: 1),
+                    _buildTextField("🏠 Mahali anapoishi", locationController),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<String>(
+                      value: selectedGender,
+                      items: listGenders.map((gender) {
+                        return DropdownMenuItem(
+                          value: gender,
+                          child: Text(gender),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => selectedGender = value);
+                        }
+                      },
+                      decoration: const InputDecoration(
+                        labelText: "⚧️ Jinsia ya mwanajumuiya",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<String>(
+                      value: selectedMartialStatus,
+                      items: listStatus.map((status) {
+                        return DropdownMenuItem(
+                          value: status,
+                          child: Text(status),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => selectedMartialStatus = value);
+                        }
+                      },
+                      decoration: const InputDecoration(
+                        labelText: "💍 Hali ya Ndoa",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: phoneController,
@@ -210,6 +261,8 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                         return null;
                       },
                     ),
+                    const SizedBox(height: 8),
+                    _buildDatePickerField("📅 Tarehe ya kuzaliwa", dobController),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
                       value: selectedRole,
@@ -238,6 +291,10 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                             "uname": toUnderscore(fullNameController.text.trim()),
                             "phone": phoneController.text.trim().replaceFirst(RegExp(r'^0'), '255'),
                             "password": phoneController.text.trim(),
+                            "location": locationController.text.trim(),
+                            "gender": selectedGender,
+                            "dobdate": dobController.text.trim(),
+                            "martialstatus": selectedMartialStatus,
                             "role": selectedRole,
                             "jumuiya_id": userData!.user.jumuiya_id,
                           };
@@ -264,6 +321,35 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
         .split(' ')
         .map((word) => word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}' : '')
         .join(' ');
+  }
+
+  Widget _buildDatePickerField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: TextFormField(
+        controller: controller,
+        readOnly: true,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+          suffixIcon: const Icon(Icons.calendar_today),
+        ),
+        validator: (value) => value == null || value.isEmpty ? "Tafadhali chagua tarehe" : null,
+        onTap: () async {
+          DateTime? pickedDate = await showDatePicker(
+            context: widget.rootContext,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2020),
+            lastDate: DateTime(2100),
+            locale: const Locale('sw', 'TZ'),
+          );
+
+          if (pickedDate != null) {
+            controller.text = DateFormat("dd-MM-yyyy").format(pickedDate);
+          }
+        },
+      ),
+    );
   }
 
   String toUnderscore(String text) {

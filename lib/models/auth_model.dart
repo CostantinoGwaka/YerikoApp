@@ -31,6 +31,10 @@ class User {
   final String? yearRegistered;
   final String? createdAt;
   final String? userName;
+  final String? location; // Optional field, not used in the current context
+  final String? gender;
+  final String? dobdate;
+  final String? martialstatus;
   final String? role;
   // ignore: non_constant_identifier_names
   final dynamic jumuiya_id; // Optional field, not used in the current context
@@ -42,6 +46,10 @@ class User {
     this.yearRegistered,
     this.createdAt,
     this.userName,
+    this.location,
+    this.gender,
+    this.dobdate,
+    this.martialstatus,
     this.role,
     // ignore: non_constant_identifier_names
     this.jumuiya_id, // Optional field, not used in the current contex
@@ -55,6 +63,10 @@ class User {
       yearRegistered: json['yearRegistered']?.toString(),
       createdAt: json['createdAt']?.toString(),
       userName: json['userName']?.toString(),
+      location: json['location']?.toString(), // Optional field, not used in the current context
+      gender: json['gender']?.toString(), // Optional field, not used in the current context
+      dobdate: json['dobdate']?.toString(), // Optional field, not used in the current context
+      martialstatus: json['martialstatus']?.toString(), //
       role: json['role']?.toString(),
       jumuiya_id: json['jumuiya_id']?.toString(), // Optional field, not used in the current context
     );
@@ -67,6 +79,10 @@ class User {
         'yearRegistered': yearRegistered,
         'createdAt': createdAt,
         'userName': userName,
+        'location': location, // Optional field, not used in the current context
+        'gender': gender,
+        'dobdate': dobdate, // Optional field, not used in the current context
+        'martialstatus': martialstatus, // Optional field, not used in the current context
         'role': role,
         'jumuiya_id': jumuiya_id, // Optional field, not used in the current context
       };

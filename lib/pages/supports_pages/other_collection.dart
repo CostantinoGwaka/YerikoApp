@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:jumuiya_yangu/models/other_collection_model.dart'; // Adjust path accordingly
+import 'package:jumuiya_yangu/models/other_collection_model.dart';
+import 'package:jumuiya_yangu/shared/components/modern_widgets.dart';
+import 'package:jumuiya_yangu/theme/colors.dart';
 
 class OtherCollectionsTablePage extends StatelessWidget {
   final List<OtherCollection> otherCollections;
@@ -9,175 +11,243 @@ class OtherCollectionsTablePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ignore: deprecated_member_use
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Michango Mengineyo'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ),
-        body: otherCollections.isEmpty
-            ? const Center(child: Text('Hakuna data ya mchango mwingine.'))
-            : SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.all(MediaQuery.of(context).size.width / 90),
-                  child: Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(MediaQuery.of(context).size.width / 30),
-                      child: Column(
-                        children: [
-                          DataTable(
-                            headingRowColor: WidgetStateProperty.resolveWith<Color?>(
-                              (Set<WidgetState> states) => Colors.indigo.shade100,
+    final totalAmount = otherCollections.fold<int>(
+      0,
+      (sum, item) => sum + (int.tryParse(item.amount) ?? 0),
+    );
+
+    return Scaffold(
+      backgroundColor: surfaceColor,
+      appBar: ModernAppBar(
+        title: "Michango Mengineyo",
+      ),
+      body: otherCollections.isEmpty
+          ? EmptyState(
+              icon: Icons.volunteer_activism_rounded,
+              title: "Hakuna Michango",
+              subtitle: "Hakuna data ya mchango mwingine inayopatikana kwa sasa.",
+            )
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Summary Card
+                  ModernCard(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: successGradient,
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                            dataRowColor: WidgetStateProperty.resolveWith<Color?>(
-                              (Set<WidgetState> states) =>
-                                  states.contains(WidgetState.selected) ? Colors.indigo.shade50 : Colors.white,
-                            ),
-                            headingTextStyle: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.indigo,
-                              fontSize: 17,
-                              letterSpacing: 1.1,
-                            ),
-                            dataTextStyle: const TextStyle(
-                              fontSize: 15,
-                              color: Colors.black87,
-                            ),
-                            columnSpacing: MediaQuery.of(context).size.width / 30,
-                            dividerThickness: 1.0,
-                            columns: const [
-                              DataColumn(
-                                  label: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 4.0),
-                                child: Text('SN'),
-                              )),
-                              DataColumn(
-                                  label: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Text('Kiasi'),
-                              )),
-                              DataColumn(
-                                  label: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Text('Mchango'),
-                              )),
-                              DataColumn(
-                                  label: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Text('Tarehe'),
-                              )),
-                            ],
-                            rows: [
-                              ...otherCollections.asMap().entries.map((entry) {
-                                final index = entry.key;
-                                final item = entry.value;
-                                String formattedDate;
-                                try {
-                                  final date = DateTime.parse(item.registeredDate);
-                                  formattedDate = DateFormat('yyyy-MM-dd').format(date);
-                                } catch (_) {
-                                  formattedDate = item.registeredDate;
-                                }
-                                return DataRow(
-                                  cells: [
-                                    DataCell(Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text('${index + 1}'),
-                                    )),
-                                    DataCell(Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text(
-                                        NumberFormat('#,##0', 'en_US').format(int.tryParse(item.amount) ?? 0),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.green,
-                                        ),
-                                      ),
-                                    )),
-                                    DataCell(Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text(item.collectionType.collectionName,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.indigo,
-                                          )),
-                                    )),
-                                    DataCell(Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text(formattedDate),
-                                    )),
-                                  ],
-                                );
-                              }),
-                              // Total row
-                              DataRow(
-                                color: WidgetStateProperty.resolveWith<Color?>(
-                                  (Set<WidgetState> states) => Colors.indigo.shade50,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(
+                            Icons.volunteer_activism_rounded,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Jumla ya Michango Mengineyo",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: textSecondary,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                cells: [
-                                  const DataCell(
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text(
-                                        'Jumla',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.indigo,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text(
-                                        NumberFormat('#,##0', 'en_US').format(
-                                          otherCollections.fold<int>(
-                                            0,
-                                            (sum, item) => sum + (int.tryParse(item.amount) ?? 0),
-                                          ),
-                                        ),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const DataCell(
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text(''),
-                                    ),
-                                  ),
-                                  const DataCell(
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text(''),
-                                    ),
-                                  ),
-                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "TSh ${NumberFormat('#,##0', 'en_US').format(totalAmount)}",
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: successColor,
+                                ),
+                              ),
+                              Text(
+                                "${otherCollections.length} michango",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: textSecondary,
+                                ),
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
+
+                  const SizedBox(height: 24),
+
+                  Text(
+                    "Historia ya Michango Mengineyo",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: textPrimary,
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Collections List
+                  ModernCard(
+                    padding: EdgeInsets.zero,
+                    child: Column(
+                      children: [
+                        // Header
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: primaryGradient[0].withValues(alpha: 0.1),
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Expanded(
+                                flex: 1,
+                                child: Text(
+                                  "SN",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: textPrimary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              const Expanded(
+                                flex: 2,
+                                child: Text(
+                                  "Kiasi",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: textPrimary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              const Expanded(
+                                flex: 3,
+                                child: Text(
+                                  "Mchango",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: textPrimary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              const Expanded(
+                                flex: 2,
+                                child: Text(
+                                  "Tarehe",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: textPrimary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Data Rows
+                        ...otherCollections.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final item = entry.value;
+                          String formattedDate;
+                          try {
+                            final date = DateTime.parse(item.registeredDate);
+                            formattedDate = DateFormat('dd/MM/yyyy').format(date);
+                          } catch (_) {
+                            formattedDate = item.registeredDate;
+                          }
+
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: borderColor.withValues(alpha: 0.5),
+                                  width: 0.5,
+                                ),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    '${index + 1}',
+                                    style: TextStyle(
+                                      color: textSecondary,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    "TSh ${NumberFormat('#,##0').format(int.tryParse(item.amount) ?? 0)}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: successColor,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: infoColor.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      item.collectionType.collectionName,
+                                      style: const TextStyle(
+                                        color: infoColor,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    formattedDate,
+                                    style: TextStyle(
+                                      color: textSecondary,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-      ),
+            ),
     );
   }
 }

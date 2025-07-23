@@ -381,7 +381,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withAlpha((0.8 * 255).toInt()),
+                          color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: IconButton(

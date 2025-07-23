@@ -213,602 +213,1047 @@ class _DailyPageState extends State<DailyPage> {
     return null;
   }
 
+  // Helper methods for navigation
+  void _navigateToCollections() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CollectionsTablePage(collections: collections != null ? collections!.data : []),
+      ),
+    );
+  }
+
+  void _navigateToOtherCollections() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => OtherCollectionsTablePage(
+          otherCollections: otherCollectionResponse != null ? otherCollectionResponse!.data : [],
+        ),
+      ),
+    );
+  }
+
+  // Helper widget for stat cards
+  Widget _buildStatCard(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String? value,
+    required VoidCallback onTap,
+    required bool isSmall,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          vertical: isSmall ? 12 : 16,
+          horizontal: isSmall ? 8 : 12,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: Colors.white,
+              size: isSmall ? 20 : 24,
+            ),
+            SizedBox(height: 8),
+            if (value == null)
+              SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            else
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: isSmall ? 10 : 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: isSmall ? 8 : 10,
+                fontWeight: FontWeight.w500,
+                color: Colors.white.withOpacity(0.9),
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360;
+    final isMediumScreen = size.width < 600;
+
     return SafeArea(
-        child: RefreshIndicator(
-      onRefresh: _reloadData,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 8.0, right: (size.width - 40) / 30, bottom: 2),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    DateFormat('MMM d, yyyy').format(DateTime.now()),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                      color: mainFontColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(
-                  top: 10, left: (size.width - 40) / 30, right: (size.width - 40) / 30, bottom: (size.width - 40) / 30),
-              decoration: BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
-                BoxShadow(
-                  color: grey.withAlpha((0.03 * 255).round()),
-                  spreadRadius: 10,
-                  blurRadius: 3,
-                  // changes position of shadow
+      child: RefreshIndicator(
+        onRefresh: _reloadData,
+        color: mainFontColor,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with date and greeting
+              Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: size.width * 0.05,
+                  vertical: 16,
                 ),
-              ]),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 20, bottom: 25, right: 20, left: 20),
-                child: Column(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Mwaka",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              currentYear != null ? currentYear!.data.churchYear : "Hakuna Mwaka",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: mainFontColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        PopupMenuButton<String>(
-                          icon: Icon(Icons.more_vert),
-                          onSelected: (value) {
-                            if (value == 'logout') {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Toka'),
-                                    content: const Text('Una uhakika unataka kutoka?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.of(context).pop(),
-                                        child: const Text('Cancel'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          logout(context);
-                                        },
-                                        child: const Text('Toka'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            }
-                          },
-                          itemBuilder: (BuildContext context) => [
-                            PopupMenuItem<String>(
-                              value: 'logout',
-                              child: Row(
-                                children: [
-                                  if (_isLoading)
-                                    SizedBox(
-                                      width: 10,
-                                      height: 10,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    )
-                                  else ...[
-                                    Icon(Icons.logout, color: Colors.black54),
-                                    SizedBox(width: 8),
-                                  ],
-                                  Text('Toka'),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: MediaQuery.of(context).size.height / 20,
-                          child: CircleAvatar(
-                            radius: MediaQuery.of(context).size.height / 8,
-                            backgroundColor: Colors.white,
-                            backgroundImage: const AssetImage("assets/avatar.png"),
+                        Text(
+                          "Hujambo 👋",
+                          style: TextStyle(
+                            fontSize: isSmallScreen ? 20 : 24,
+                            fontWeight: FontWeight.bold,
+                            color: mainFontColor,
                           ),
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        SizedBox(
-                          width: (size.width - 40) * 0.6,
-                          child: Column(
-                            children: [
-                              Text(
-                                userData != null ? userData!.user.userFullName! : "",
-                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: mainFontColor),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                userData != null ? "+${userData!.user.phone}" : "",
-                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: black),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    CollectionsTablePage(collections: collections != null ? collections!.data : []),
-                              ),
-                            );
-                          },
-                          child: Column(
-                            children: [
-                              _isLoading
-                                  ? SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    )
-                                  : Text(
-                                      (userTotalData != null && userTotalData!.overallTotal.toString().isNotEmpty)
-                                          ? "${NumberFormat("#,##0", "en_US").format(userTotalData!.overallTotal)}/="
-                                          : "0.00",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: mainFontColor,
-                                      ),
-                                    ),
-                              SizedBox(height: 5),
-                              Text(
-                                "Jumla Yote",
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w100,
-                                  color: black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          width: 0.5,
-                          height: 40,
-                          color: black.withAlpha((0.3 * 255).round()),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    CollectionsTablePage(collections: collections != null ? collections!.data : []),
-                              ),
-                            );
-                          },
-                          child: Column(
-                            children: [
-                              _isLoading
-                                  ? SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    )
-                                  : Text(
-                                      (userTotalData != null && userTotalData!.overallTotal.toString().isNotEmpty)
-                                          ? "${NumberFormat("#,##0", "en_US").format(userTotalData!.currentYearTotal)}/="
-                                          : "0.00",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,
-                                        color: mainFontColor,
-                                      ),
-                                    ),
-                              SizedBox(height: 5),
-                              Text(
-                                "Michango ya Mwaka",
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w100,
-                                  color: black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          width: 0.5,
-                          height: 40,
-                          color: black.withAlpha((0.3 * 255).round()),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => OtherCollectionsTablePage(
-                                  otherCollections:
-                                      otherCollectionResponse != null ? otherCollectionResponse!.data : [],
-                                ),
-                              ),
-                            );
-                          },
-                          child: Column(
-                            children: [
-                              _isLoading
-                                  ? SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    )
-                                  : Text(
-                                      (userTotalData != null && userTotalData!.otherTotal.toString().isNotEmpty)
-                                          ? "${NumberFormat("#,##0", "en_US").format(userTotalData!.otherTotal)}/="
-                                          : "0.00",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: mainFontColor,
-                                      ),
-                                    ),
-                              SizedBox(height: 5),
-                              Text(
-                                "Michango Mingine",
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w100,
-                                  color: black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          const Text("Michango",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                color: mainFontColor,
-                              )),
-                          // IconBadge(
-                          //   icon: const Icon(Icons.notifications_none),
-                          //   itemCount: 1,
-                          //   badgeColor: Colors.red,
-                          //   itemColor: mainFontColor,
-                          //   hideZero: true,
-                          //   top: -1,
-                          //   onTap: () {
-                          //     if (kDebugMode) {
-                          //       print('test');
-                          //     }
-                          //   },
-                          // ),
-                        ],
-                      )
-                    ],
-                  ),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: mainFontColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                      elevation: 2,
-                    ),
-                    icon: const Icon(Icons.visibility, size: 15),
-                    label: const Text(
-                      "Tazama Yote",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              CollectionsTablePage(collections: collections != null ? collections!.data : []),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            FutureBuilder(
-              future: getUserCollections(),
-              builder: (context, AsyncSnapshot<CollectionResponse?> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text("Imeshindikana kupakia data ya michango."));
-                } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                  return const Center(child: Text("Hakuna data ya michango iliyopatikana."));
-                }
-
-                final collections = snapshot.data!.data;
-
-                return ListView.builder(
-                  itemCount: collections.length > 4 ? 4 : collections.length,
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    final item = collections[index];
-                    return GestureDetector(
-                      onTap: () => _showCollectionDetails(context, item),
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 5.0),
-                        child: Column(
+                        SizedBox(height: 4),
+                        Row(
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    margin: const EdgeInsets.only(left: 25, right: 25),
-                                    decoration: BoxDecoration(
-                                      color: white,
-                                      borderRadius: BorderRadius.circular(25),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: grey.withAlpha((0.03 * 255).round()),
-                                          spreadRadius: 10,
-                                          blurRadius: 3,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 10, bottom: 10, right: 20, left: 20),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 50,
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              color: arrowbgColor,
-                                              borderRadius: BorderRadius.circular(15),
-                                            ),
-                                            child: Center(
-                                              child: Builder(
-                                                builder: (context) {
-                                                  // Find previous item amount if available
-                                                  int currentAmount = int.tryParse(item.amount) ?? 0;
-                                                  int? prevAmount;
-                                                  if (index > 0) {
-                                                    prevAmount = int.tryParse(collections[index - 1].amount);
-                                                  }
-                                                  // If no previous, show up arrow by default
-                                                  if (prevAmount == null) {
-                                                    return const Icon(Icons.arrow_upward_rounded, color: Colors.white);
-                                                  }
-                                                  if (currentAmount > prevAmount) {
-                                                    return const Icon(Icons.arrow_upward_rounded, color: Colors.white);
-                                                  } else if (currentAmount < prevAmount) {
-                                                    return const Icon(Icons.arrow_downward_rounded,
-                                                        color: Colors.white);
-                                                  } else {
-                                                    return const Icon(Icons.remove, color: Colors.white);
-                                                  }
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 15),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    const Text(
-                                                      "🗓 ",
-                                                      style: TextStyle(fontSize: 15),
-                                                    ),
-                                                    Text(
-                                                      item.monthly,
-                                                      style: const TextStyle(
-                                                        fontSize: 15,
-                                                        color: black,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 5),
-                                                Row(
-                                                  children: [
-                                                    const Text(
-                                                      "🖊 ",
-                                                      style: TextStyle(fontSize: 12),
-                                                    ),
-                                                    Flexible(
-                                                      child: Text(
-                                                        "${item.registeredDate} (${item.registeredBy})",
-                                                        overflow: TextOverflow.ellipsis,
-                                                        style: TextStyle(
-                                                          fontSize: 12,
-                                                          color: black.withAlpha((0.5 * 255).round()),
-                                                          fontWeight: FontWeight.w400,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Row(
-                                            children: [
-                                              const Text(
-                                                "💰 ",
-                                                style: TextStyle(fontSize: 15),
-                                              ),
-                                              Text(
-                                                "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))}",
-                                                style: const TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: black,
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                        ],
+                            Icon(
+                              Icons.calendar_today,
+                              size: 14,
+                              color: Colors.grey[600],
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              DateFormat('EEEE, MMM d, yyyy').format(DateTime.now()),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: isSmallScreen ? 12 : 14,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: PopupMenuButton<String>(
+                        icon: Icon(
+                          Icons.more_vert_rounded,
+                          color: mainFontColor,
+                          size: 20,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 8,
+                        onSelected: (value) {
+                          if (value == 'logout') {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  title: Row(
+                                    children: [
+                                      Icon(Icons.logout_rounded, color: Colors.red[400]),
+                                      SizedBox(width: 8),
+                                      Text('Toka'),
+                                    ],
+                                  ),
+                                  content: const Text('Una uhakika unataka kutoka?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(),
+                                      child: Text(
+                                        'Hapana',
+                                        style: TextStyle(color: Colors.grey[600]),
                                       ),
                                     ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red[400],
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        logout(context);
+                                      },
+                                      child: const Text('Ndiyo'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        },
+                        itemBuilder: (BuildContext context) => [
+                          PopupMenuItem<String>(
+                            value: 'logout',
+                            child: Row(
+                              children: [
+                                if (_isLoading)
+                                  SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                else
+                                  Icon(
+                                    Icons.logout_rounded,
+                                    color: Colors.red[400],
+                                    size: 18,
+                                  ),
+                                SizedBox(width: 12),
+                                Text(
+                                  'Toka',
+                                  style: TextStyle(
+                                    color: Colors.red[400],
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 5),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Profile Card
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      mainFontColor,
+                      mainFontColor.withOpacity(0.8),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: mainFontColor.withOpacity(0.3),
+                      spreadRadius: 1,
+                      blurRadius: 15,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(isMediumScreen ? 20 : 24),
+                  child: Column(
+                    children: [
+                      // Year and Status Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.calendar_month_rounded,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  currentYear != null ? currentYear!.data.churchYear : "Hakuna Mwaka",
+                                  style: TextStyle(
+                                    fontSize: isSmallScreen ? 12 : 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              Icons.verified_user_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 24),
+
+                      // Profile Info
+                      Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                                width: 3,
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              radius: isSmallScreen ? 35 : 45,
+                              backgroundColor: Colors.white,
+                              child: CircleAvatar(
+                                radius: isSmallScreen ? 32 : 42,
+                                backgroundColor: Colors.white,
+                                backgroundImage: const AssetImage("assets/avatar.png"),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            userData != null ? userData!.user.userFullName! : "Mtumiaji",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: isSmallScreen ? 18 : 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.phone_rounded,
+                                  color: Colors.white,
+                                  size: 14,
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  userData != null ? "+${userData!.user.phone}" : "",
+                                  style: TextStyle(
+                                    fontSize: isSmallScreen ? 12 : 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 32),
+
+                      // Statistics Cards
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildStatCard(
+                              context,
+                              icon: Icons.account_balance_wallet_rounded,
+                              label: "Jumla Yote",
+                              value: _isLoading
+                                  ? null
+                                  : (userTotalData != null && userTotalData!.overallTotal.toString().isNotEmpty)
+                                      ? "${NumberFormat("#,##0", "en_US").format(userTotalData!.overallTotal)}/="
+                                      : "0.00",
+                              onTap: () => _navigateToCollections(),
+                              isSmall: isSmallScreen,
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: _buildStatCard(
+                              context,
+                              icon: Icons.trending_up_rounded,
+                              label: "Mwaka Huu",
+                              value: _isLoading
+                                  ? null
+                                  : (userTotalData != null && userTotalData!.currentYearTotal.toString().isNotEmpty)
+                                      ? "${NumberFormat("#,##0", "en_US").format(userTotalData!.currentYearTotal)}/="
+                                      : "0.00",
+                              onTap: () => _navigateToCollections(),
+                              isSmall: isSmallScreen,
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: _buildStatCard(
+                              context,
+                              icon: Icons.category_rounded,
+                              label: "Mengine",
+                              value: _isLoading
+                                  ? null
+                                  : (userTotalData != null && userTotalData!.otherTotal.toString().isNotEmpty)
+                                      ? "${NumberFormat("#,##0", "en_US").format(userTotalData!.otherTotal)}/="
+                                      : "0.00",
+                              onTap: () => _navigateToOtherCollections(),
+                              isSmall: isSmallScreen,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 32),
+
+              // Collections Section
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: mainFontColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.savings_rounded,
+                            color: mainFontColor,
+                            size: 20,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          "Michango",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: isSmallScreen ? 18 : 22,
+                            color: mainFontColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: mainFontColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isSmallScreen ? 12 : 16,
+                          vertical: isSmallScreen ? 8 : 10,
+                        ),
+                        elevation: 3,
+                      ),
+                      icon: Icon(
+                        Icons.visibility_rounded,
+                        size: isSmallScreen ? 14 : 16,
+                      ),
+                      label: Text(
+                        "Tazama Yote",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: isSmallScreen ? 12 : 14,
+                        ),
+                      ),
+                      onPressed: () => _navigateToCollections(),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 16),
+
+              // Collections List
+              FutureBuilder(
+                future: getUserCollections(),
+                builder: (context, AsyncSnapshot<CollectionResponse?> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container(
+                      margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                      height: 200,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(mainFontColor),
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              "Inapakia michango...",
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     );
-                  },
-                );
-              },
-            )
-          ],
+                  } else if (snapshot.hasError) {
+                    return Container(
+                      margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.red[50],
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.red[200]!),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.error_outline_rounded,
+                            color: Colors.red[400],
+                            size: 32,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            "Imeshindikana kupakia michango",
+                            style: TextStyle(
+                              color: Colors.red[700],
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
+                    return Container(
+                      margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.inbox_rounded,
+                            color: Colors.grey[400],
+                            size: 48,
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            "Hakuna michango iliyopatikana",
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            "Michango itaonekana hapa baada ya kuongezwa",
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  final collections = snapshot.data!.data;
+                  final displayCount = collections.length > 4 ? 4 : collections.length;
+
+                  return Column(
+                    children: [
+                      ListView.builder(
+                        itemCount: displayCount,
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final item = collections[index];
+                          return _buildCollectionCard(context, item, index, collections, isSmallScreen);
+                        },
+                      ),
+                      if (collections.length > 4)
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: size.width * 0.05, vertical: 16),
+                          child: TextButton.icon(
+                            style: TextButton.styleFrom(
+                              foregroundColor: mainFontColor,
+                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(color: mainFontColor.withOpacity(0.3)),
+                              ),
+                            ),
+                            icon: Icon(Icons.expand_more_rounded),
+                            label: Text(
+                              "Tazama zaidi (${collections.length - 4})",
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            onPressed: () => _navigateToCollections(),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+
+              SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 
-  void _showCollectionDetails(BuildContext context, CollectionItem item) {
-    final user = item.user;
-    final year = item.churchYearEntity;
+  Widget _buildCollectionCard(
+      BuildContext context, CollectionItem item, int index, List<CollectionItem> collections, bool isSmallScreen) {
+    return GestureDetector(
+      onTap: () => _showCollectionDetails(context, item),
+      child: Container(
+        margin: EdgeInsets.only(
+          left: MediaQuery.of(context).size.width * 0.05,
+          right: MediaQuery.of(context).size.width * 0.05,
+          bottom: 12,
+        ),
+        decoration: BoxDecoration(
+          color: white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
+          child: Row(
+            children: [
+              // Trend indicator
+              Container(
+                width: isSmallScreen ? 40 : 48,
+                height: isSmallScreen ? 40 : 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: _getTrendColors(item, index, collections),
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: _getTrendIcon(item, index, collections),
+                ),
+              ),
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+              SizedBox(width: 12),
+
+              // Collection info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Month and amount row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_month_rounded,
+                                size: isSmallScreen ? 14 : 16,
+                                color: mainFontColor,
+                              ),
+                              SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  item.monthly,
+                                  style: TextStyle(
+                                    fontSize: isSmallScreen ? 14 : 16,
+                                    color: mainFontColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: mainFontColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))}",
+                            style: TextStyle(
+                              fontSize: isSmallScreen ? 12 : 14,
+                              fontWeight: FontWeight.bold,
+                              color: mainFontColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 8),
+
+                    // Registration info
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.person_outline_rounded,
+                          size: isSmallScreen ? 12 : 14,
+                          color: Colors.grey[600],
+                        ),
+                        SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            "${item.registeredDate} • ${item.registeredBy}",
+                            style: TextStyle(
+                              fontSize: isSmallScreen ? 10 : 12,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Arrow indicator
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.grey[400],
+                size: 20,
+              ),
+            ],
+          ),
+        ),
       ),
-      builder: (BuildContext context) {
-        return DraggableScrollableSheet(
+    );
+  }
+
+  List<Color> _getTrendColors(CollectionItem item, int index, List<CollectionItem> collections) {
+    int currentAmount = int.tryParse(item.amount) ?? 0;
+    int? prevAmount;
+    if (index > 0) {
+      prevAmount = int.tryParse(collections[index - 1].amount);
+    }
+
+    if (prevAmount == null || currentAmount >= prevAmount) {
+      return [Colors.green[400]!, Colors.green[600]!];
+    } else {
+      return [Colors.orange[400]!, Colors.orange[600]!];
+    }
+  }
+
+  Widget _getTrendIcon(CollectionItem item, int index, List<CollectionItem> collections) {
+    int currentAmount = int.tryParse(item.amount) ?? 0;
+    int? prevAmount;
+    if (index > 0) {
+      prevAmount = int.tryParse(collections[index - 1].amount);
+    }
+
+    if (prevAmount == null) {
+      return Icon(Icons.trending_up_rounded, color: Colors.white, size: 20);
+    } else if (currentAmount > prevAmount) {
+      return Icon(Icons.trending_up_rounded, color: Colors.white, size: 20);
+    } else if (currentAmount < prevAmount) {
+      return Icon(Icons.trending_down_rounded, color: Colors.white, size: 20);
+    } else {
+      return Icon(Icons.trending_flat_rounded, color: Colors.white, size: 20);
+    }
+  }
+}
+
+void _showCollectionDetails(BuildContext context, CollectionItem item) {
+  final user = item.user;
+  final year = item.churchYearEntity;
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (BuildContext context) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+        ),
+        child: DraggableScrollableSheet(
           expand: false,
-          initialChildSize: 0.5, // 80% of screen height
-          maxChildSize: 0.95,
+          initialChildSize: 0.6,
+          maxChildSize: 0.9,
           minChildSize: 0.5,
           builder: (_, controller) => Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Wrap(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Handle bar
                 Center(
                   child: Container(
-                    height: 5,
+                    height: 4,
                     width: 50,
-                    margin: const EdgeInsets.only(bottom: 15),
+                    margin: const EdgeInsets.only(bottom: 20),
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
-                const Text(
-                  "Maelezo ya Mchango",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const Divider(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                // Header
+                Row(
                   children: [
-                    const SizedBox(height: 8),
-                    const Text("👤 Taarifa za Mtumiaji", style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 6),
-                    Text("Jina Kamili:     ${user.userFullName}"),
-                    const SizedBox(height: 4),
-                    Text("Simu:           ${user.phone}"),
-                    const SizedBox(height: 4),
-                    Text("Jina la Mtumiaji: ${user.userName}"),
-                    const SizedBox(height: 4),
-                    Text("Nafasi:         ${user.role}"),
-                    const SizedBox(height: 12),
-                    const Text("📆 Taarifa za Mwaka", style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 6),
-                    Text("Mwaka:          ${year.churchYear}"),
-                    Text("Uhai:           ${year.isActive ? 'Ndiyo' : 'Hapana'}"),
-                    const SizedBox(height: 10),
-                    Text("💰 Kiasi:        TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))}"),
-                    const SizedBox(height: 4),
-                    Text("🗓 Mwezi:        ${item.monthly}"),
-                    const SizedBox(height: 4),
-                    Text("📅 Tarehe ya Usajili: ${item.registeredDate}"),
-                    const SizedBox(height: 4),
-                    Text("🖊 Aliyesajili:   ${item.registeredBy}"),
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: mainFontColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(
+                        Icons.receipt_long_rounded,
+                        color: mainFontColor,
+                        size: 24,
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Text(
+                      "Maelezo ya Mchango",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: mainFontColor,
+                      ),
+                    ),
                   ],
+                ),
+
+                SizedBox(height: 24),
+
+                // Amount highlight
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [mainFontColor.withOpacity(0.1), mainFontColor.withOpacity(0.05)],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        "Kiasi cha Mchango",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(item.amount))}",
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: mainFontColor,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Mwezi: ${item.monthly}",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 24),
+
+                // Details sections
+                Expanded(
+                  child: ListView(
+                    controller: controller,
+                    children: [
+                      _buildDetailSection(
+                        icon: Icons.person_rounded,
+                        title: "Taarifa za Mtumiaji",
+                        items: [
+                          _buildDetailItem("Jina Kamili", user.userFullName ?? "Hakijapatikana"),
+                          _buildDetailItem("Namba ya Simu", "+${user.phone}"),
+                          _buildDetailItem("Jina la Mtumiaji", user.userName ?? "Hakijapatikana"),
+                          _buildDetailItem("Nafasi", user.role ?? "Hakijapatikana"),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      _buildDetailSection(
+                        icon: Icons.calendar_month_rounded,
+                        title: "Taarifa za Mwaka",
+                        items: [
+                          _buildDetailItem("Mwaka wa Kanisa", year.churchYear),
+                          _buildDetailItem("Hali ya Mwaka", year.isActive ? 'Hai' : 'Hauhai'),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      _buildDetailSection(
+                        icon: Icons.info_rounded,
+                        title: "Maelezo ya Usajili",
+                        items: [
+                          _buildDetailItem("Tarehe ya Usajili", item.registeredDate),
+                          _buildDetailItem("Alisajiliwa na", item.registeredBy),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
+
+Widget _buildDetailSection({
+  required IconData icon,
+  required String title,
+  required List<Widget> items,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          Icon(icon, color: mainFontColor, size: 20),
+          SizedBox(width: 8),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: mainFontColor,
+            ),
+          ),
+        ],
+      ),
+      SizedBox(height: 12),
+      Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[200]!),
+        ),
+        child: Column(
+          children: items,
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildDetailItem(String label, String value) {
+  return Padding(
+    padding: EdgeInsets.only(bottom: 8),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 100,
+          child: Text(
+            "$label:",
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }

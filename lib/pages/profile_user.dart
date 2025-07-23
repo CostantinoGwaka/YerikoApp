@@ -21,6 +21,9 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  bool oldPasswordVisible = false;
+  bool newPasswordVisible = false;
+  bool confirmPasswordVisible = false;
   bool _isLoading = false;
   List<CollectionType> collectionTypeResponse = [];
 
@@ -274,11 +277,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isSmallScreen = size.width < 360;
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
@@ -332,9 +334,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
-                    
-                    SizedBox(height: 16),
-                    
+
+                    const SizedBox(height: 16),
+
                     // User Name
                     Text(
                       userData?.user.userFullName ?? "Mtumiaji",
@@ -345,9 +347,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    
-                    SizedBox(height: 8),
-                    
+
+                    const SizedBox(height: 8),
+
                     // Phone Number
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -358,15 +360,15 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.phone_rounded,
                             color: Colors.white,
                             size: 16,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             "+${userData?.user.phone ?? ''}",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
@@ -375,9 +377,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                     ),
-                    
-                    SizedBox(height: 12),
-                    
+
+                    const SizedBox(height: 12),
+
                     // Role Badge
                     if (userData?.user.role != null)
                       StatusChip(
@@ -388,9 +390,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
               ),
-              
-              SizedBox(height: 24),
-              
+
+              const SizedBox(height: 24),
+
               // Menu Items
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
@@ -399,8 +401,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     // Settings Section
                     _buildSectionTitle("⚙️ Mipangilio", isSmallScreen),
-                    SizedBox(height: 16),
-                    
+                    const SizedBox(height: 16),
+
                     ModernCard(
                       padding: EdgeInsets.zero,
                       child: Column(
@@ -426,20 +428,20 @@ class _ProfilePageState extends State<ProfilePage> {
                               icon: Icons.category_rounded,
                               title: "Ongeza Aina ya Mchango",
                               subtitle: "Tengeneza mchango mpya",
-                              onTap: () => showAddCollectionTypeDialog(context),
+                              onTap: () => _showAddCollectionTypeDialog(context),
                               color: green,
                             ),
                           ],
                         ],
                       ),
                     ),
-                    
-                    SizedBox(height: 24),
-                    
+
+                    const SizedBox(height: 24),
+
                     // App Information Section
                     _buildSectionTitle("ℹ️ Taarifa za Programu", isSmallScreen),
-                    SizedBox(height: 16),
-                    
+                    const SizedBox(height: 16),
+
                     ModernCard(
                       padding: EdgeInsets.zero,
                       child: Column(
@@ -453,10 +455,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           Divider(height: 1, color: Colors.grey[200]),
                           _buildModernMenuItem(
-                            icon: Icons.privacy_tip_rounded,
-                            title: "Sera za Faragha",
-                            subtitle: "Juu ya data yako",
-                            onTap: () => _openPrivacyPolicy(),
+                            icon: Icons.help_rounded,
+                            title: "Msaada na Usaidizi",
+                            subtitle: "Wasiliana nasi",
+                            onTap: () => _contactSupport(),
                             color: blue,
                           ),
                           Divider(height: 1, color: Colors.grey[200]),
@@ -470,9 +472,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                     ),
-                    
-                    SizedBox(height: 32),
-                    
+
+                    const SizedBox(height: 32),
+
                     // Logout Button
                     ModernButton(
                       text: "Toka",
@@ -482,8 +484,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       isLoading: _isLoading,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    
-                    SizedBox(height: 24),
+
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -548,303 +550,229 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-                          ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            child: const Text('Hifadhi'),
-                            onPressed: () {
-                              updateUserName(rootContext, controller.text);
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
+
+  // Helper methods
+  void _showEditProfileDialog(BuildContext context) {
+    final TextEditingController controller = TextEditingController(text: userData?.user.userFullName ?? "");
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hariri Taarifa za Wasifu'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Jina Kamili',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Ghairi'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (controller.text.isNotEmpty) {
+                updateUserName(context, controller.text);
+              }
+            },
+            child: const Text('Hifadhi'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showChangePasswordDialog(BuildContext context) {
+    _showPasswordChangeSheet(context);
+  }
+
+  void _showAddCollectionTypeDialog(BuildContext context) {
+    final TextEditingController controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Ongeza Aina ya Mchango'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                labelText: 'Jina la Aina ya Mchango',
+                border: OutlineInputBorder(),
+              ),
             ),
-            if (userData != null && userData!.user.role == "ADMIN") ...[
-              ProfileMenuItem(
-                icon: Icons.catching_pokemon_rounded,
-                text: 'Aina ya Michango',
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                    ),
-                    builder: (context) {
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          top: 20,
-                          left: 20,
-                          right: 20,
-                          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              'Aina ya Michango',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 16),
-                            _isLoading
-                                ? const Center(child: CircularProgressIndicator())
-                                : Column(
-                                    children: collectionTypeResponse
-                                        .map(
-                                          (cat) => ListTile(
-                                            leading: CircleAvatar(
-                                              backgroundColor: Colors.blue.shade100,
-                                              child: Text(
-                                                (collectionTypeResponse.indexOf(cat) + 1).toString(),
-                                                style: const TextStyle(
-                                                  color: Colors.blue,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                            title: Text(cat.collectionName),
-                                            trailing: IconButton(
-                                              icon: const Icon(Icons.edit, color: Colors.blue),
-                                              onPressed: () {
-                                                final TextEditingController controller =
-                                                    TextEditingController(text: cat.collectionName);
-                                                showModalBottomSheet(
-                                                  context: context,
-                                                  isScrollControlled: true,
-                                                  shape: const RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                                  ),
-                                                  builder: (context) {
-                                                    return Padding(
-                                                      padding: EdgeInsets.only(
-                                                        top: 20,
-                                                        left: 20,
-                                                        right: 20,
-                                                        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                                                      ),
-                                                      child: Column(
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        children: [
-                                                          const Text(
-                                                            'Hariri Aina ya Mchango',
-                                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                                          ),
-                                                          const SizedBox(height: 16),
-                                                          TextField(
-                                                            controller: controller,
-                                                            decoration: const InputDecoration(
-                                                              labelText: 'Jina la Aina',
-                                                              border: OutlineInputBorder(),
-                                                            ),
-                                                          ),
-                                                          const SizedBox(height: 16),
-                                                          ElevatedButton(
-                                                            child: const Text('Hifadhi Mabadiliko'),
-                                                            onPressed: () {
-                                                              registerCollectionType(rootContext, controller.text, cat);
-                                                            },
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        )
-                                        .toList(),
-                                  ),
-                            const SizedBox(height: 16),
-                            ElevatedButton.icon(
-                              icon: const Icon(Icons.add),
-                              label: const Text('Ongeza Aina Mpya'),
-                              onPressed: () {
-                                Navigator.pop(context); // Dismiss current bottom sheet
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                  ),
-                                  builder: (context) {
-                                    final TextEditingController controller = TextEditingController();
-                                    return Padding(
-                                      padding: EdgeInsets.only(
-                                        top: 20,
-                                        left: 20,
-                                        right: 20,
-                                        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Text(
-                                            'Ongeza Aina Mpya ya Mchango',
-                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          TextField(
-                                            controller: controller,
-                                            decoration: const InputDecoration(
-                                              labelText: 'Jina la Aina',
-                                              border: OutlineInputBorder(),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          ElevatedButton(
-                                            child: const Text('Hifadhi'),
-                                            onPressed: () {
-                                              registerCollectionType(rootContext, controller.text, null);
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      );
+            const SizedBox(height: 16),
+            if (collectionTypeResponse.isNotEmpty) ...[
+              const Text('Aina za Michango Zilizopo:'),
+              const SizedBox(height: 8),
+              ...collectionTypeResponse.map(
+                (type) => ListTile(
+                  title: Text(type.collectionName),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _editCollectionType(context, type);
                     },
-                  );
-                },
+                  ),
+                ),
               ),
             ],
-            ProfileMenuItem(
-              icon: Icons.lock,
-              text: 'Badilisha Nenosiri',
-              onTap: () => _showPasswordChangeSheet(context),
-            ),
-            ProfileMenuItem(
-              icon: Icons.phone,
-              text: 'Msaada na Usaidizi',
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Ghairi'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (controller.text.isNotEmpty) {
+                registerCollectionType(context, controller.text, null);
+              }
+            },
+            child: const Text('Ongeza'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editCollectionType(BuildContext context, CollectionType type) {
+    final TextEditingController controller = TextEditingController(text: type.collectionName);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hariri Aina ya Mchango'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Jina la Aina ya Mchango',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Ghairi'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (controller.text.isNotEmpty) {
+                registerCollectionType(context, controller.text, type);
+              }
+            },
+            child: const Text('Hifadhi'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _shareApp() {
+    const String androidLink = "https://play.google.com/store/apps/details?id=com.isoftzt.jumuiya_yangu";
+    const String iosLink = "https://apps.apple.com/tz/app/jumuiya-yangu/id6748091565";
+    const String appName = "Jumuiya Yangu";
+    const String message =
+        "Habari! Jaribu $appName - mfumo bora wa usimamizi wa Jumuiya yako. Pakua sasa:\n\nAndroid: $androidLink\niOS: $iosLink\n\nUngana nasi kuboresha usimamizi wa Jumuiya yako!";
+
+    // ignore: deprecated_member_use
+    Share.share(message);
+  }
+
+  void _contactSupport() async {
+    final Uri launchUri = Uri(scheme: 'tel', path: '0659515041');
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Imeshindikana kupiga simu.")),
+      );
+    }
+  }
+
+  void _showAboutDialog(BuildContext context) {
+    showAboutDialog(
+      context: context,
+      applicationName: 'Jumuiya Yangu',
+      applicationVersion: '1.0.0',
+      applicationIcon: const Icon(Icons.app_registration),
+      children: [
+        const Text('Jumuiya Yangu App ni mfumo wa usimamizi wa Jumuiya.'),
+        const Text('Imeundwa na iSoftTz'),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            const Text('Wasiliana nasi:'),
+            const SizedBox(width: 8),
+            InkWell(
               onTap: () async {
-                final Uri launchUri = Uri(scheme: 'tel', path: '0659515041');
-                if (await canLaunchUrl(launchUri)) {
-                  await launchUrl(launchUri);
+                final Uri emailUri = Uri(
+                  scheme: 'mailto',
+                  path: 'info@isofttz.com',
+                );
+                if (await canLaunchUrl(emailUri)) {
+                  await launchUrl(emailUri);
                 } else {
                   // ignore: use_build_context_synchronously
-                  showSnackBar(context, "Imeshindikana kupiga simu.");
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Imeshindikana kufungua barua pepe.")),
+                  );
                 }
               },
-            ),
-            const Divider(),
-            const Padding(
-              padding: EdgeInsets.only(bottom: 10, top: 5),
-              child: Text("ℹ️ Maelezo ya Programu", style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-            ProfileMenuItem(
-              icon: Icons.share,
-              text: 'Shirikisha na Wengine',
-              onTap: () {
-                try {
-                  // URL for Android and iOS app downloads
-                  const String androidLink = "https://play.google.com/store/apps/details?id=com.isoftzt.jumuiya_yangu";
-                  const String iosLink =
-                      "https://apps.apple.com/tz/app/jumuiya-yangu/id6748091565"; // Replace with actual App Store ID
-                  const String appName = "Jumuiya Yangu";
-                  const String message =
-                      "Habari! Jaribu $appName - mfumo bora wa usimamizi wa Jumuiya yako. Pakua sasa:\n\nAndroid: $androidLink\niOS: $iosLink\n\nUngana nasi kuboresha usimamizi wa Jumuiya yako!";
-
-                  // Use the Share plugin to share the message
-                  // ignore: deprecated_member_use
-                  Share.share(message);
-                } catch (e) {
-                  showSnackBar(context, "Imeshindikana kushirikisha wengine.");
-                }
-              },
-            ),
-            ProfileMenuItem(
-              icon: Icons.info,
-              text: 'Taarifa ya Programu',
-              onTap: () {
-                showAboutDialog(
-                  context: context,
-                  applicationName: 'Jumuiya App',
-                  applicationVersion: '1.0.0',
-                  applicationIcon: const Icon(Icons.app_registration),
-                  children: [
-                    const Text('Jumuiya Yangu App ni mfumo wa usimamizi wa Jumuiya.'),
-                    const Text('Imeundwa na iSoftTz'),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Text('Wasiliana nasi:'),
-                        const SizedBox(width: 8),
-                        InkWell(
-                          onTap: () async {
-                            final Uri emailUri = Uri(
-                              scheme: 'mailto',
-                              path: 'info@isofttz.com',
-                            );
-                            if (await canLaunchUrl(emailUri)) {
-                              await launchUrl(emailUri);
-                            } else {
-                              // ignore: use_build_context_synchronously
-                              showSnackBar(context, "Imeshindikana kufungua barua pepe.");
-                            }
-                          },
-                          child: const Text(
-                            'info@isofttz.com',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        final Uri url = Uri.parse('https://www.instagram.com/isofttz_/?hl=en');
-                        if (await canLaunchUrl(url)) {
-                          await launchUrl(url);
-                        } else {
-                          // ignore: use_build_context_synchronously
-                          showSnackBar(context, "Imeshindikana kufungua tovuti.");
-                        }
-                      },
-                      child: const Text('Tembelea Tovuti Yetu'),
-                    ),
-                  ],
-                );
-              },
-            ),
-            ProfileMenuItem(
-              icon: Icons.logout,
-              text: 'Toka',
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: const Text('Toka'),
-                    content: const Text('Una uhakika unataka kutoka?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Ghairi'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          logout(context);
-                        },
-                        child: const Text('Toka'),
-                      ),
-                    ],
-                  ),
-                );
-              },
+              child: const Text(
+                'info@isofttz.com',
+                style: TextStyle(
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
             ),
           ],
         ),
+        TextButton(
+          onPressed: () async {
+            final Uri url = Uri.parse('https://www.instagram.com/isofttz_/?hl=en');
+            if (await canLaunchUrl(url)) {
+              await launchUrl(url);
+            } else {
+              // ignore: use_build_context_synchronously
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Imeshindikana kufungua tovuti.")),
+              );
+            }
+          },
+          child: const Text('Tembelea Tovuti Yetu'),
+        ),
+      ],
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Toka'),
+        content: const Text('Una uhakika unataka kutoka?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Ghairi'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              logout(context);
+            },
+            child: const Text('Toka'),
+          ),
+        ],
       ),
     );
   }

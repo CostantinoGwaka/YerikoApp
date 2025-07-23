@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:jumuiya_yangu/main.dart';
-import 'package:jumuiya_yangu/models/church_time_table.dart';
+import 'package:jumuiya_yangu/models/church_time_table.dart' as TimeTableModel;
 import 'package:jumuiya_yangu/pages/add_pages/add_time_table.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
@@ -18,7 +18,7 @@ class ChurchTimeTable extends StatefulWidget {
 }
 
 class _ChurchTimeTableState extends State<ChurchTimeTable> {
-  ChurchTimeTableResponse? collections;
+  TimeTableModel.ChurchTimeTableResponse? collections;
 
   @override
   void initState() {
@@ -31,7 +31,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     setState(() {}); // Refresh UI after fetching data
   }
 
-  Future<ChurchTimeTableResponse?> getTimeTableCollections() async {
+  Future<TimeTableModel.ChurchTimeTableResponse?> getTimeTableCollections() async {
     try {
       final String myApi = "$baseUrl/church_timetable/get_all.php?jumuiya_id=${userData!.user.jumuiya_id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
@@ -39,7 +39,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
-          collections = ChurchTimeTableResponse.fromJson(jsonResponse);
+          collections = TimeTableModel.ChurchTimeTableResponse.fromJson(jsonResponse);
           return collections;
         }
       } else {
@@ -120,7 +120,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
                   builder: (BuildContext context) {
-                    return AddTimeTablePageAdmin(
+                    return AddPrayerSchedulePage(
                       rootContext: context,
                       onSubmit: (data) {
                         _reloadData();
@@ -148,7 +148,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
           children: [
             FutureBuilder(
               future: getTimeTableCollections(),
-              builder: (context, AsyncSnapshot<ChurchTimeTableResponse?> snapshot) {
+              builder: (context, AsyncSnapshot<TimeTableModel.ChurchTimeTableResponse?> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                     child: Padding(
@@ -186,7 +186,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                       ],
                     ),
                   );
-                } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
+                } else if (!snapshot.hasData || snapshot.data?.data?.isEmpty == true) {
                   return EmptyState(
                     icon: Icons.schedule_rounded,
                     title: "Hakuna Ratiba",
@@ -199,7 +199,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                               isScrollControlled: true,
                               backgroundColor: Colors.transparent,
                               builder: (BuildContext context) {
-                                return AddTimeTablePageAdmin(
+                                return AddPrayerSchedulePage(
                                   rootContext: context,
                                   onSubmit: (data) {
                                     _reloadData();
@@ -212,7 +212,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                   );
                 }
 
-                final timeTable = snapshot.data!.data;
+                final timeTable = snapshot.data!.data!;
                 return _buildTimeTableList(timeTable);
               },
             ),
@@ -222,7 +222,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     );
   }
 
-  Widget _buildTimeTableList(List<ChurchTimeTableData> timeTable) {
+  Widget _buildTimeTableList(List<TimeTableModel.ChurchTimeTable> timeTable) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -249,7 +249,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     );
   }
 
-  Widget _buildTimeTableCard(ChurchTimeTableData item) {
+  Widget _buildTimeTableCard(TimeTableModel.ChurchTimeTable item) {
     return ModernCard(
       onTap: () => _showTimeTableDetails(context, item),
       child: Row(
@@ -276,7 +276,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.eventName,
+                  item.eventName ?? "Ratiba ya Jumuiya",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -293,7 +293,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      item.time,
+                      item.time ?? "Wakati haujatolewa",
                       style: TextStyle(
                         fontSize: 14,
                         color: textSecondary,
@@ -307,7 +307,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      item.datePrayer,
+                      item.datePrayer ?? "Tarehe haijatolewa",
                       style: TextStyle(
                         fontSize: 14,
                         color: textSecondary,
@@ -315,7 +315,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                     ),
                   ],
                 ),
-                if (item.location.isNotEmpty) ...[
+                if (item.location?.isNotEmpty == true) ...[
                   const SizedBox(height: 4),
                   Row(
                     children: [
@@ -327,7 +327,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          item.location,
+                          item.location ?? "",
                           style: TextStyle(
                             fontSize: 14,
                             color: textSecondary,
@@ -352,7 +352,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     );
   }
 
-  void _showTimeTableDetails(BuildContext context, ChurchTimeTableData item) {
+  void _showTimeTableDetails(BuildContext context, TimeTableModel.ChurchTimeTable item) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -386,7 +386,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                       ),
                     ),
                   ),
-                  
+
                   // Header
                   Row(
                     children: [
@@ -408,7 +408,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              item.eventName,
+                              item.eventName ?? "Ratiba ya Jumuiya",
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -436,7 +436,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                                 isScrollControlled: true,
                                 backgroundColor: Colors.transparent,
                                 builder: (BuildContext context) {
-                                  return AddTimeTablePageAdmin(
+                                  return AddPrayerSchedulePage(
                                     rootContext: context,
                                     initialData: item,
                                     onSubmit: (data) {
@@ -475,24 +475,25 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                         ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Event Details
                   _buildDetailSection(
                     "Taarifa za Shughuli",
                     Icons.event_rounded,
                     [
-                      _buildDetailRow("Jina la Shughuli", item.eventName),
-                      _buildDetailRow("Tarehe", item.datePrayer),
-                      _buildDetailRow("Muda", item.time),
-                      _buildDetailRow("Mahali", item.location.isNotEmpty ? item.location : "Halijatolewa"),
-                      _buildDetailRow("Maelezo", item.message.isNotEmpty ? item.message : "Hakuna maelezo zaidi"),
+                      _buildDetailRow("Jina la Shughuli", item.eventName ?? "Ratiba ya Jumuiya"),
+                      _buildDetailRow("Tarehe", item.datePrayer ?? "Haijatolewa"),
+                      _buildDetailRow("Muda", item.time ?? "Haujatolewa"),
+                      _buildDetailRow("Mahali", item.location?.isNotEmpty == true ? item.location! : "Halijatolewa"),
+                      _buildDetailRow(
+                          "Maelezo", item.message?.isNotEmpty == true ? item.message! : "Hakuna maelezo zaidi"),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // User Info
                   if (item.user != null)
                     _buildDetailSection(
@@ -504,18 +505,18 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                         _buildDetailRow("Nafasi", item.user!.role ?? ""),
                       ],
                     ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Location Action
-                  if (item.location.isNotEmpty)
+                  if (item.location?.isNotEmpty == true)
                     SizedBox(
                       width: double.infinity,
                       child: ModernButton(
                         text: "Onesha Mahali kwenye Ramani",
                         icon: Icons.map_rounded,
                         backgroundColor: infoColor,
-                        onPressed: () => _openMap(item.latId, item.longId),
+                        onPressed: () => _openMap(item.latId ?? "", item.longId ?? ""),
                       ),
                     ),
                 ],
@@ -587,13 +588,13 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context, ChurchTimeTableData item) {
+  void _showDeleteConfirmation(BuildContext context, TimeTableModel.ChurchTimeTable item) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Futa Ratiba'),
-          content: Text('Je, una uhakika unataka kufuta ratiba ya "${item.eventName}"?'),
+          content: Text('Je, una uhakika unataka kufuta ratiba ya "${item.eventName ?? "Hii"}"?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -623,207 +624,5 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
         const SnackBar(content: Text('Imeshindikana kufungua ramani')),
       );
     }
-  }
-}
-    ));
-  }
-
-  void _showChurchTimeTableDetails(BuildContext rootContext, item) {
-    final user = item.user;
-    final year = item.churchYearEntity;
-    var size = MediaQuery.of(context).size;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
-      ),
-      builder: (BuildContext context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.6,
-          maxChildSize: 0.95,
-          minChildSize: 0.5,
-          builder: (_, controller) => SingleChildScrollView(
-            controller: controller,
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    height: 5,
-                    width: 50,
-                    margin: const EdgeInsets.only(bottom: 15),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "📋 Maelezo ya Ratiba ya Jumuiya",
-                      style: TextStyle(fontSize: (size.width - 40) / 30, fontWeight: FontWeight.bold),
-                    ),
-                    if (userData!.user.role == "ADMIN") ...[
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue),
-                            tooltip: 'Hariri',
-                            onPressed: () {
-                              Navigator.pop(context); // Close bottom sheet
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                                ),
-                                builder: (_) => AddPrayerSchedulePage(
-                                  rootContext: rootContext,
-                                  initialData: item, // Pass current item for editing
-                                  onSubmit: (data) {
-                                    _reloadData();
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            tooltip: 'Futa',
-                            onPressed: () async {
-                              final confirm = await showDialog<bool>(
-                                context: context,
-                                builder: (ctx) => AlertDialog(
-                                  title: const Text('Futa Ratiba'),
-                                  content: const Text('Una uhakika unataka kufuta ratiba hii?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.of(ctx).pop(false),
-                                      child: const Text('Hapana'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () => Navigator.of(ctx).pop(true),
-                                      child: const Text('Ndiyo'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                              if (confirm == true) {
-                                deleteTimeTable(item.id);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ]
-                  ],
-                ),
-                const Divider(height: 20),
-                // 🕊 Ratiba ya Maombi
-                const Text("🕊 Taarifa za Jumuiya", style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                _buildDetailRow("Tarehe ya Maombi", item.datePrayer),
-                _buildDetailRow("Mahali", item.location),
-                _buildDetailRow("Ujumbe", item.message),
-                _buildDetailRow("Latitiude ID", item.latId),
-                _buildDetailRow("Longitude ID", item.longId),
-                _buildDetailRow("Tarehe ya Usajili", item.createdAt),
-                _buildDetailRow("Aliyesajili", item.registeredBy),
-
-                const SizedBox(height: 16),
-
-                // 👤 Mtumiaji
-                const Text("👤 Taarifa za Mwenyeji", style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                _buildDetailRow("Jina Kamili", user?.userFullName),
-                _buildDetailRow("Jina la Mtumiaji", user?.userName),
-                _buildDetailRow("Simu", user?.phone),
-                _buildDetailRow("Nafasi", user?.role),
-                _buildDetailRow("Mwaka wa Usajili", user?.yearRegistered),
-                _buildDetailRow("Alisajiliwa Tarehe", user?.createdAt),
-
-                const SizedBox(height: 16),
-
-                // 📆 Mwaka
-                const Text("📆 Taarifa za Mwaka", style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                _buildDetailRow("Mwaka", year?.churchYear),
-                // _buildDetailRow("Uhai", year?.isActive == true ? "Ndiyo" : "Hapana"),
-
-                const SizedBox(height: 24),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.call),
-                      label: const Text("Piga Simu"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () async {
-                        final phone = user.phone?.replaceAll(' ', '') ?? '';
-                        String formattedPhone = formatPhoneNumber(phone);
-                        if (phone.isNotEmpty) {
-                          final Uri url = Uri.parse('tel:$formattedPhone');
-                          // ignore: deprecated_member_use
-                          if (await canLaunchUrl(url)) {
-                            await launchUrl(url);
-                          } else {
-                            // ignore: use_build_context_synchronously
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Imeshindikana kupiga simu.")),
-                            );
-                          }
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  String formatPhoneNumber(String phone) {
-    if (phone.startsWith("255") && phone.length > 3) {
-      return "0${phone.substring(3)}";
-    }
-    return phone;
-  }
-
-  Widget _buildDetailRow(String label, String? value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "$label: ",
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          Expanded(
-            child: Text(
-              value ?? "Haipo",
-              style: const TextStyle(fontWeight: FontWeight.w400),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

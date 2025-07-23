@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/other_collection_model.dart' show OtherCollection, CollectionType;
+import 'package:jumuiya_yangu/shared/components/modern_widgets.dart';
+import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
 
@@ -196,142 +198,347 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       expand: false,
-      initialChildSize: 0.5,
+      initialChildSize: 0.6,
       maxChildSize: 0.95,
-      minChildSize: 0.5,
-      builder: (_, controller) => SingleChildScrollView(
-        controller: controller,
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Center(
-                child: Container(
-                  height: 5,
-                  width: 50,
-                  margin: const EdgeInsets.only(bottom: 15),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10),
+      minChildSize: 0.6,
+      builder: (_, controller) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: SingleChildScrollView(
+          controller: controller,
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Handle indicator
+                Center(
+                  child: Container(
+                    height: 4,
+                    width: 40,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: borderColor,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
-              const Text("➕ Ongeza Mchango wa Mwezi", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: selectedMonth,
-                decoration: const InputDecoration(labelText: "Chagua Mwezi", border: OutlineInputBorder()),
-                isExpanded: true,
-                items: [
-                  "JANUARY",
-                  "FEBRUARY",
-                  "MARCH",
-                  "APRIL",
-                  "MAY",
-                  "JUNE",
-                  "JULY",
-                  "AUGUST",
-                  "SEPTEMBER",
-                  "OCTOBER",
-                  "NOVEMBER",
-                  "DECEMBER"
-                ].map((month) => DropdownMenuItem(value: month, child: Text(month))).toList(),
-                onChanged: (val) {
-                  if (val != null) setState(() => selectedMonth = val);
-                },
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: amountController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: "💰 Kiasi cha Mchango", border: OutlineInputBorder()),
-                validator: (value) => value == null || value.isEmpty ? "Weka kiasi" : null,
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<User>(
-                value: selectedUser,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: "Chagua Mwanajumuiya",
-                  border: OutlineInputBorder(),
+
+                // Header
+                Text(
+                  widget.initialData != null ? "Hariri Mchango wa Mwezi" : "Ongeza Mchango wa Mwezi",
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: primaryGradient[0],
+                      ),
                 ),
-                items: users.map((user) {
-                  return DropdownMenuItem<User>(
-                    value: user,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.person, color: Colors.blueGrey, size: 20),
-                        const SizedBox(width: 8),
-                        Text(user.userFullName!),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                onChanged: (user) {
-                  if (user != null) {
-                    setState(() {
-                      selectedUser = user;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 20),
-              DropdownButtonFormField<CollectionType>(
-                value: selectedType,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: "Chagua Aina ya Mchango",
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 8),
+                Text(
+                  "Jaza taarifa za mchango wa mwezi",
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: textSecondary,
+                      ),
                 ),
-                items: collectionTypeResponse.map((type) {
-                  return DropdownMenuItem<CollectionType>(
-                    value: type,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.person, color: Colors.blueGrey, size: 20),
-                        const SizedBox(width: 8),
-                        Text(type.collectionName),
-                      ],
+                const SizedBox(height: 24),
+
+                // Month Selection
+                ModernCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Mwezi wa Mchango",
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: textPrimary,
+                            ),
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        value: selectedMonth,
+                        decoration: InputDecoration(
+                          hintText: "Chagua mwezi...",
+                          prefixIcon: Icon(Icons.calendar_month, color: primaryGradient[0]),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: primaryGradient[0], width: 2),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                        ),
+                        isExpanded: true,
+                        items: [
+                          "JANUARY",
+                          "FEBRUARY",
+                          "MARCH",
+                          "APRIL",
+                          "MAY",
+                          "JUNE",
+                          "JULY",
+                          "AUGUST",
+                          "SEPTEMBER",
+                          "OCTOBER",
+                          "NOVEMBER",
+                          "DECEMBER"
+                        ]
+                            .map((month) => DropdownMenuItem(
+                                  value: month,
+                                  child: Text(month),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          if (val != null) setState(() => selectedMonth = val);
+                        },
+                        validator: (value) => value == null ? "Chagua mwezi" : null,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Amount Input
+                ModernCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Kiasi cha Mchango",
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: textPrimary,
+                            ),
+                      ),
+                      const SizedBox(height: 12),
+                      ModernTextField(
+                        controller: amountController,
+                        hintText: "Weka kiasi cha mchango...",
+                        prefixIcon: Icons.attach_money,
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Weka kiasi cha mchango";
+                          }
+                          if (double.tryParse(value) == null || double.parse(value) <= 0) {
+                            return "Weka kiasi sahihi";
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // User Selection
+                ModernCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Mwanajumuiya",
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: textPrimary,
+                            ),
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<User>(
+                        value: selectedUser,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          hintText: "Chagua mwanajumuiya...",
+                          prefixIcon: Icon(Icons.person, color: primaryGradient[0]),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: primaryGradient[0], width: 2),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                        ),
+                        items: users.map((user) {
+                          return DropdownMenuItem<User>(
+                            value: user,
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 16,
+                                  backgroundColor: primaryGradient[0].withOpacity(0.1),
+                                  child: Text(
+                                    user.userFullName?.substring(0, 1).toUpperCase() ?? "?",
+                                    style: TextStyle(
+                                      color: primaryGradient[0],
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    user.userFullName!,
+                                    style: const TextStyle(fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (user) {
+                          if (user != null) {
+                            setState(() {
+                              selectedUser = user;
+                            });
+                          }
+                        },
+                        validator: (value) => value == null ? "Chagua mwanajumuiya" : null,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Collection Type Selection
+                ModernCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Aina ya Mchango",
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: textPrimary,
+                            ),
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<CollectionType>(
+                        value: selectedType,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          hintText: "Chagua aina ya mchango...",
+                          prefixIcon: Icon(Icons.category, color: primaryGradient[0]),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: primaryGradient[0], width: 2),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                        ),
+                        items: collectionTypeResponse.map((type) {
+                          return DropdownMenuItem<CollectionType>(
+                            value: type,
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: secondary.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    Icons.category_outlined,
+                                    color: secondary,
+                                    size: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    type.collectionName,
+                                    style: const TextStyle(fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (type) {
+                          if (type != null) {
+                            setState(() {
+                              selectedType = type;
+                            });
+                          }
+                        },
+                        validator: (value) => value == null ? "Chagua aina ya mchango" : null,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: ModernButton(
+                        text: "Ghairi",
+                        onPressed: () => Navigator.pop(context),
+                        backgroundColor: grey,
+                      ),
                     ),
-                  );
-                }).toList(),
-                onChanged: (type) {
-                  if (type != null) {
-                    setState(() {
-                      selectedType = type;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 20),
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ElevatedButton.icon(
-                      icon: const Icon(Icons.save),
-                      label: const Text("Hifadhi Mchango"),
-                      onPressed: () {
-                        final data = {
-                          // ignore: prefer_null_aware_operators
-                          "id": widget.initialData != null
-                              ? widget.initialData!.id
-                              : null, // Ensure this is set correctly
-                          "amount": amountController.text,
-                          "jumuiya_id": userData!.user.jumuiya_id, // Ensure this is set correctly
-                          "user": {"id": selectedUser?.id ?? 0},
-                          "churchYearEntity": {
-                            "id": currentYear!.data.id,
-                          },
-                          "collection_type": {
-                            "id": selectedType!.id,
-                          },
-                          "monthly": selectedMonth,
-                          "registered_by": userData!.user.userFullName,
-                        };
-                        saveOtherMonthlyContribution(data);
-                      },
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 2,
+                      child: ModernButton(
+                        text: widget.initialData != null ? "Sasisha Mchango" : "Hifadhi Mchango",
+                        onPressed: _isLoading
+                            ? null
+                            : () {
+                                if (_formKey.currentState!.validate()) {
+                                  final data = {
+                                    "id": widget.initialData?.id,
+                                    "amount": amountController.text,
+                                    "jumuiya_id": userData!.user.jumuiya_id,
+                                    "user": {"id": selectedUser?.id ?? 0},
+                                    "churchYearEntity": {"id": currentYear!.data.id},
+                                    "collection_type": {"id": selectedType!.id},
+                                    "monthly": selectedMonth,
+                                    "registered_by": userData!.user.userFullName,
+                                  };
+                                  saveOtherMonthlyContribution(data);
+                                }
+                              },
+                        isLoading: _isLoading,
+                        icon: widget.initialData != null ? Icons.update : Icons.save,
+                      ),
                     ),
-            ],
+                  ],
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),

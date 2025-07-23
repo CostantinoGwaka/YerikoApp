@@ -22,6 +22,8 @@ class ChurchTimeTableResponse {
 
 class ChurchTimeTable {
   final int id;
+  final String? eventName;
+  final String? time;
   final String? datePrayer;
   final String? latId;
   final String? longId;
@@ -34,6 +36,8 @@ class ChurchTimeTable {
 
   ChurchTimeTable({
     required this.id,
+    this.eventName,
+    this.time,
     this.datePrayer,
     this.latId,
     this.longId,
@@ -48,6 +52,8 @@ class ChurchTimeTable {
   factory ChurchTimeTable.fromJson(Map<String, dynamic> json) {
     return ChurchTimeTable(
       id: json['id'],
+      eventName: json['eventName'],
+      time: json['time'],
       datePrayer: json['datePrayer'],
       latId: json['latId'],
       longId: json['longId'],

@@ -118,7 +118,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: Colors.white,
                   builder: (BuildContext context) {
                     return AddPrayerSchedulePage(
                       rootContext: context,
@@ -227,7 +227,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Ratiba za Shughuli",
+          "Ratiba za Jumuiya",
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -253,6 +253,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     return ModernCard(
       onTap: () => _showTimeTableDetails(context, item),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: const EdgeInsets.all(12),
@@ -267,7 +268,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
             child: const Icon(
               Icons.schedule_rounded,
               color: Colors.white,
-              size: 24,
+              size: 15,
             ),
           ),
           const SizedBox(width: 16),
@@ -282,6 +283,9 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                     fontWeight: FontWeight.bold,
                     color: textPrimary,
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  softWrap: false,
                 ),
                 const SizedBox(height: 4),
                 Row(
@@ -292,11 +296,16 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                       color: textSecondary,
                     ),
                     const SizedBox(width: 4),
-                    Text(
-                      item.time ?? "Wakati haujatolewa",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: textSecondary,
+                    Flexible(
+                      child: Text(
+                        item.time ?? "Wakati haujatolewa",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: textSecondary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        softWrap: false,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -306,11 +315,16 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                       color: textSecondary,
                     ),
                     const SizedBox(width: 4),
-                    Text(
-                      item.datePrayer ?? "Tarehe haijatolewa",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: textSecondary,
+                    Flexible(
+                      child: Text(
+                        item.datePrayer ?? "Tarehe haijatolewa",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: textSecondary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        softWrap: false,
                       ),
                     ),
                   ],
@@ -333,6 +347,8 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                             color: textSecondary,
                           ),
                           overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          softWrap: false,
                         ),
                       ),
                     ],

@@ -214,17 +214,27 @@ class OtherCollectionsTablePage extends StatelessWidget {
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: infoColor.withValues(alpha: 0.1),
+                                      // color: infoColor.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: Text(
-                                      item.collectionType.collectionName,
-                                      style: const TextStyle(
-                                        color: infoColor,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
+                                    child: LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        return ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxWidth: constraints.maxWidth,
+                                          ),
+                                          child: Text(
+                                            item.collectionType.collectionName,
+                                            style: const TextStyle(
+                                              color: infoColor,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            softWrap: true,
+                                            overflow: TextOverflow.visible,
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
                                 ),

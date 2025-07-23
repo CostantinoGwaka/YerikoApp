@@ -251,10 +251,10 @@ class _DailyPageState extends State<DailyPage> {
           horizontal: isSmall ? 8 : 12,
         ),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.15),
+          color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -294,7 +294,7 @@ class _DailyPageState extends State<DailyPage> {
               style: TextStyle(
                 fontSize: isSmall ? 8 : 10,
                 fontWeight: FontWeight.w500,
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -368,7 +368,7 @@ class _DailyPageState extends State<DailyPage> {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
+                            color: Colors.grey.withValues(alpha: 0.1),
                             spreadRadius: 1,
                             blurRadius: 8,
                             offset: Offset(0, 2),
@@ -474,13 +474,13 @@ class _DailyPageState extends State<DailyPage> {
                     end: Alignment.bottomRight,
                     colors: [
                       mainFontColor,
-                      mainFontColor.withOpacity(0.8),
+                      mainFontColor.withValues(alpha: 0.8),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: mainFontColor.withOpacity(0.3),
+                      color: mainFontColor.withValues(alpha: 0.3),
                       spreadRadius: 1,
                       blurRadius: 15,
                       offset: Offset(0, 5),
@@ -498,7 +498,7 @@ class _DailyPageState extends State<DailyPage> {
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
@@ -524,7 +524,7 @@ class _DailyPageState extends State<DailyPage> {
                           Container(
                             padding: EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Icon(
@@ -545,7 +545,7 @@ class _DailyPageState extends State<DailyPage> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 width: 3,
                               ),
                             ),
@@ -573,7 +573,7 @@ class _DailyPageState extends State<DailyPage> {
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -669,7 +669,7 @@ class _DailyPageState extends State<DailyPage> {
                         Container(
                           padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: mainFontColor.withOpacity(0.1),
+                            color: mainFontColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
@@ -840,7 +840,7 @@ class _DailyPageState extends State<DailyPage> {
                               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                side: BorderSide(color: mainFontColor.withOpacity(0.3)),
+                                side: BorderSide(color: mainFontColor.withValues(alpha: 0.3)),
                               ),
                             ),
                             icon: Icon(Icons.expand_more_rounded),
@@ -879,7 +879,7 @@ class _DailyPageState extends State<DailyPage> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 8,
               offset: Offset(0, 2),
@@ -944,7 +944,7 @@ class _DailyPageState extends State<DailyPage> {
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: mainFontColor.withOpacity(0.1),
+                            color: mainFontColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -1076,7 +1076,7 @@ void _showCollectionDetails(BuildContext context, CollectionItem item) {
                     Container(
                       padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: mainFontColor.withOpacity(0.1),
+                        color: mainFontColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Icon(
@@ -1105,7 +1105,7 @@ void _showCollectionDetails(BuildContext context, CollectionItem item) {
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [mainFontColor.withOpacity(0.1), mainFontColor.withOpacity(0.05)],
+                      colors: [mainFontColor.withValues(alpha: 0.1), mainFontColor.withValues(alpha: 0.05)],
                     ),
                     borderRadius: BorderRadius.circular(16),
                   ),

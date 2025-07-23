@@ -344,7 +344,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                   end: Alignment.bottomRight,
                   colors: [
                     mainFontColor,
-                    mainFontColor.withOpacity(0.8),
+                    mainFontColor.withValues(alpha: 0.8),
                   ],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -381,7 +381,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: IconButton(
@@ -424,7 +424,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                   end: Alignment.bottomRight,
                   colors: [
                     mainFontColor,
-                    mainFontColor.withOpacity(0.8),
+                    mainFontColor.withValues(alpha: 0.8),
                   ],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -454,14 +454,14 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                             "Dhibiti na ufuatilie michango",
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                           ),
                         ],
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: IconButton(
@@ -503,7 +503,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
               borderRadius: BorderRadius.circular(25),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   spreadRadius: 2,
                   blurRadius: 10,
                   offset: const Offset(0, 3),
@@ -591,7 +591,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 2,
             blurRadius: 10,
             offset: const Offset(0, 3),
@@ -667,7 +667,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.08),
+                color: Colors.grey.withValues(alpha: 0.08),
                 spreadRadius: 2,
                 blurRadius: 10,
                 offset: const Offset(0, 3),
@@ -682,7 +682,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: mainFontColor.withOpacity(0.1),
+                      color: mainFontColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(Icons.dashboard, color: mainFontColor, size: 20),
@@ -731,7 +731,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                   Expanded(
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: mainFontColor.withOpacity(0.1),
+                        backgroundColor: mainFontColor.withValues(alpha: 0.1),
                         foregroundColor: mainFontColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
@@ -789,7 +789,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                               children: [
                                 CircleAvatar(
                                   radius: 12,
-                                  backgroundColor: mainFontColor.withOpacity(0.1),
+                                  backgroundColor: mainFontColor.withValues(alpha: 0.1),
                                   child: Text(
                                     (user.userFullName ?? '').isNotEmpty ? user.userFullName![0].toUpperCase() : '?',
                                     style: TextStyle(
@@ -884,7 +884,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       decoration: BoxDecoration(
         color: const Color(0xFFF8FAFF),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
       ),
       child: DropdownButtonFormField<T>(
         value: value,
@@ -913,7 +913,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
+            color: Colors.grey.withValues(alpha: 0.08),
             spreadRadius: 2,
             blurRadius: 10,
             offset: const Offset(0, 3),
@@ -945,7 +945,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
+            color: Colors.grey.withValues(alpha: 0.08),
             spreadRadius: 2,
             blurRadius: 10,
             offset: const Offset(0, 3),
@@ -978,7 +978,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
+            color: Colors.grey.withValues(alpha: 0.08),
             spreadRadius: 2,
             blurRadius: 10,
             offset: const Offset(0, 3),
@@ -1026,20 +1026,20 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.08),
+              color: Colors.grey.withValues(alpha: 0.08),
               spreadRadius: 1,
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
           ],
-          border: Border.all(color: Colors.grey.withOpacity(0.1)),
+          border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
         ),
         child: Row(
           children: [
             // Avatar
             CircleAvatar(
               radius: 24,
-              backgroundColor: mainFontColor.withOpacity(0.1),
+              backgroundColor: mainFontColor.withValues(alpha: 0.1),
               child: Text(
                 (item.user.userFullName?.isNotEmpty ?? false) ? item.user.userFullName![0].toUpperCase() : '?',
                 style: TextStyle(
@@ -1104,7 +1104,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: mainFontColor.withOpacity(0.1),
+                          color: mainFontColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
@@ -1177,7 +1177,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: mainFontColor.withOpacity(0.1),
+                          color: mainFontColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: Icon(Icons.receipt_long, color: mainFontColor, size: 24),
@@ -1208,7 +1208,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                       if (userData!.user.role == "ADMIN") ...[
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
+                            color: Colors.blue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: IconButton(
@@ -1241,7 +1241,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                         const SizedBox(width: 8),
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.1),
+                            color: Colors.red.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: IconButton(
@@ -1307,7 +1307,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                             decoration: BoxDecoration(
                               color: const Color(0xFFF8FAFF),
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: mainFontColor.withOpacity(0.1)),
+                              border: Border.all(color: mainFontColor.withValues(alpha: 0.1)),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1316,7 +1316,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                                   children: [
                                     CircleAvatar(
                                       radius: 24,
-                                      backgroundColor: mainFontColor.withOpacity(0.1),
+                                      backgroundColor: mainFontColor.withValues(alpha: 0.1),
                                       child: Text(
                                         (user.userFullName?.isNotEmpty ?? false)
                                             ? user.userFullName![0].toUpperCase()
@@ -1376,7 +1376,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.green.withOpacity(0.2)),
+                              border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1386,7 +1386,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.green.withOpacity(0.2),
+                                        color: Colors.green.withValues(alpha: 0.2),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Icon(Icons.payments, color: Colors.green[700], size: 20),
@@ -1423,7 +1423,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                              border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1433,7 +1433,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.blue.withOpacity(0.1),
+                                        color: Colors.blue.withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Icon(Icons.info_outline, color: Colors.blue[700], size: 20),

@@ -207,7 +207,7 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
@@ -388,7 +388,7 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                               children: [
                                 CircleAvatar(
                                   radius: 16,
-                                  backgroundColor: primaryGradient[0].withOpacity(0.1),
+                                  backgroundColor: primaryGradient[0].withValues(alpha: 0.1),
                                   child: Text(
                                     user.userFullName?.substring(0, 1).toUpperCase() ?? "?",
                                     style: TextStyle(
@@ -464,7 +464,7 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: secondary.withOpacity(0.1),
+                                    color: secondary.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Icon(

@@ -407,7 +407,7 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
               children: [
                 CircleAvatar(
                   radius: 12,
-                  backgroundColor: successColor.withOpacity(0.1),
+                  backgroundColor: successColor.withValues(alpha: 0.1),
                   child: Icon(
                     Icons.person,
                     color: successColor,

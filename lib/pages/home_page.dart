@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: mainFontColor.withOpacity(0.3),
+                    color: mainFontColor.withValues(alpha: 0.3),
                     spreadRadius: 2,
                     blurRadius: 12,
                     offset: const Offset(0, 4),
@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       end: Alignment.bottomRight,
                       colors: [
                         mainFontColor,
-                        mainFontColor.withOpacity(0.8),
+                        mainFontColor.withValues(alpha: 0.8),
                       ],
                     ),
                   ),
@@ -197,7 +197,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 0,
             blurRadius: 20,
             offset: const Offset(0, -5),
@@ -219,7 +219,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   duration: const Duration(milliseconds: 300),
                   padding: EdgeInsets.all(isCurrentActive ? 8 : 6),
                   decoration: BoxDecoration(
-                    color: isCurrentActive ? mainFontColor.withOpacity(0.1) : Colors.transparent,
+                    color: isCurrentActive ? mainFontColor.withValues(alpha: 0.1) : Colors.transparent,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -242,7 +242,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           );
         },
-        splashColor: mainFontColor.withOpacity(0.1),
+        splashColor: mainFontColor.withValues(alpha: 0.1),
         gapLocation: GapLocation.center,
         activeIndex: pageIndex == 4 && !isFloatingClicked ? 3 : pageIndex,
         notchSmoothness: NotchSmoothness.softEdge,

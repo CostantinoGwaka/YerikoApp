@@ -284,7 +284,7 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: infoColor.withOpacity(0.1),
+                            color: infoColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
@@ -534,7 +534,7 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: successColor.withOpacity(0.1),
+                            color: successColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(

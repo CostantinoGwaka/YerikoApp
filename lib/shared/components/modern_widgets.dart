@@ -32,7 +32,7 @@ class ModernCard extends StatelessWidget {
         boxShadow: boxShadow ??
             [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: Colors.grey.withValues(alpha: 0.1),
                 spreadRadius: 0,
                 blurRadius: 10,
                 offset: const Offset(0, 4),
@@ -124,7 +124,7 @@ class ModernButton extends StatelessWidget {
         ),
         padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         elevation: 2,
-        shadowColor: (backgroundColor ?? mainFontColor).withOpacity(0.3),
+        shadowColor: (backgroundColor ?? mainFontColor).withValues(alpha: 0.3),
       ),
       icon: isLoading
           ? SizedBox(
@@ -229,7 +229,7 @@ class ModernTextField extends StatelessWidget {
                       margin: const EdgeInsets.all(12),
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: mainFontColor.withOpacity(0.1),
+                        color: mainFontColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
@@ -320,10 +320,10 @@ class StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -367,7 +367,7 @@ class LoadingOverlay extends StatelessWidget {
         child,
         if (isLoading)
           Container(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             child: Center(
               child: ModernCard(
                 padding: const EdgeInsets.all(24),

@@ -111,7 +111,7 @@ class CollectionsTablePage extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                           decoration: BoxDecoration(
-                            color: primaryGradient[0].withOpacity(0.1),
+                            color: primaryGradient[0].withValues(alpha: 0.1),
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                           ),
                           child: Row(
@@ -181,7 +181,7 @@ class CollectionsTablePage extends StatelessWidget {
                             decoration: BoxDecoration(
                               border: Border(
                                 bottom: BorderSide(
-                                  color: borderColor.withOpacity(0.5),
+                                  color: borderColor.withValues(alpha: 0.5),
                                   width: 0.5,
                                 ),
                               ),
@@ -214,7 +214,7 @@ class CollectionsTablePage extends StatelessWidget {
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: infoColor.withOpacity(0.1),
+                                      color: infoColor.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(

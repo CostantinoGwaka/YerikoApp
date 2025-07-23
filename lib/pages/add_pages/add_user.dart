@@ -199,7 +199,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: primaryGradient[0].withOpacity(0.1),
+                        color: primaryGradient[0].withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(

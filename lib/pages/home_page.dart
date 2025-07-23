@@ -28,9 +28,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late AnimationController _fabAnimationController;
   late AnimationController _borderRadiusAnimationController;
   late Animation<double> _fabAnimation;
-  late Animation<double> _borderRadiusAnimation;
+  late Animation<double> borderRadiusAnimation;
   late CurvedAnimation _fabCurve;
-  late CurvedAnimation _borderRadiusCurve;
+  late CurvedAnimation borderRadiusCurve;
 
   List<Widget> get pages => [
         const DailyPage(), // index 0
@@ -59,13 +59,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       parent: _fabAnimationController,
       curve: const Interval(0.5, 1.0, curve: Curves.fastOutSlowIn),
     );
-    _borderRadiusCurve = CurvedAnimation(
+    borderRadiusCurve = CurvedAnimation(
       parent: _borderRadiusAnimationController,
       curve: const Interval(0.5, 1.0, curve: Curves.fastOutSlowIn),
     );
 
     _fabAnimation = Tween<double>(begin: 0, end: 1).animate(_fabCurve);
-    _borderRadiusAnimation = Tween<double>(begin: 0, end: 1).animate(_borderRadiusCurve);
+    borderRadiusAnimation = Tween<double>(begin: 0, end: 1).animate(borderRadiusCurve);
 
     Future.delayed(
       const Duration(seconds: 1),

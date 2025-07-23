@@ -5,6 +5,8 @@ import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/user_collection_model.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
+import 'package:jumuiya_yangu/shared/components/modern_widgets.dart';
+import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:http/http.dart' as http;
 
 class AddMonthCollectionUserAdmin extends StatefulWidget {
@@ -173,112 +175,286 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
       initialChildSize: 0.5,
       maxChildSize: 0.95,
       minChildSize: 0.5,
-      builder: (_, controller) => SingleChildScrollView(
-        controller: controller,
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Center(
-                child: Container(
-                  height: 5,
-                  width: 50,
-                  margin: const EdgeInsets.only(bottom: 15),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10),
+      builder: (_, controller) => Container(
+        decoration: const BoxDecoration(
+          color: surfaceColor,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: LoadingOverlay(
+          isLoading: _isLoading,
+          child: SingleChildScrollView(
+            controller: controller,
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Drag handle
+                  Center(
+                    child: Container(
+                      height: 4,
+                      width: 40,
+                      margin: const EdgeInsets.only(bottom: 24),
+                      decoration: BoxDecoration(
+                        color: borderColor,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const Text("➕ Ongeza Mchango wa Mwezi", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: selectedMonth,
-                decoration: const InputDecoration(labelText: "Chagua Mwezi", border: OutlineInputBorder()),
-                isExpanded: true,
-                items: [
-                  "JANUARY",
-                  "FEBRUARY",
-                  "MARCH",
-                  "APRIL",
-                  "MAY",
-                  "JUNE",
-                  "JULY",
-                  "AUGUST",
-                  "SEPTEMBER",
-                  "OCTOBER",
-                  "NOVEMBER",
-                  "DECEMBER"
-                ].map((month) => DropdownMenuItem(value: month, child: Text(month))).toList(),
-                onChanged: (val) {
-                  if (val != null) setState(() => selectedMonth = val);
-                },
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: amountController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: "💰 Kiasi cha Mchango", border: OutlineInputBorder()),
-                validator: (value) => value == null || value.isEmpty ? "Weka kiasi" : null,
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<User>(
-                value: selectedUser,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: "Chagua Mwanajumuiya",
-                  border: OutlineInputBorder(),
-                ),
-                items: users.map((user) {
-                  return DropdownMenuItem<User>(
-                    value: user,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.person, color: Colors.blueGrey, size: 20),
-                        const SizedBox(width: 8),
-                        Text(user.userFullName!),
-                      ],
+
+                  // Header
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: successGradient,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.savings_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.initialData != null ? "Hariri Mchango" : "Ongeza Mchango wa Mwezi",
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: textPrimary,
+                              ),
+                            ),
+                            Text(
+                              "Sajili mchango wa mwanajumuiya",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Form
+                  _buildFormSection(
+                    "Taarifa za Mchango",
+                    Icons.account_balance_wallet_rounded,
+                    [
+                      _buildMonthDropdown(),
+                      const SizedBox(height: 16),
+                      ModernTextField(
+                        controller: amountController,
+                        labelText: "Kiasi cha Mchango (TSh)",
+                        prefixIcon: Icons.monetization_on_rounded,
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Tafadhali weka kiasi cha mchango";
+                          }
+                          if (double.tryParse(value) == null || double.parse(value) <= 0) {
+                            return "Kiasi cha mchango lazima kiwe namba kubwa kuliko sifuri";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      _buildUserDropdown(),
+                    ],
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Submit Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ModernButton(
+                      onPressed: _handleSubmit,
+                      text: widget.initialData != null ? "Hifadhi Mabadiliko" : "Hifadhi Mchango",
+                      icon: widget.initialData != null ? Icons.update_rounded : Icons.save_rounded,
+                      backgroundColor: successColor,
+                      isLoading: _isLoading,
                     ),
-                  );
-                }).toList(),
-                onChanged: (user) {
-                  if (user != null) {
-                    setState(() {
-                      selectedUser = user;
-                    });
-                  }
-                },
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ElevatedButton.icon(
-                      icon: const Icon(Icons.save),
-                      label: const Text("Hifadhi Mchango"),
-                      onPressed: () {
-                        final data = {
-                          // ignore: prefer_null_aware_operators
-                          "id": widget.initialData != null
-                              ? widget.initialData!.id
-                              : null, // Ensure this is set correctly
-                          "amount": amountController.text,
-                          "jumuiya_id": userData!.user.jumuiya_id, // Ensure this is set correctly
-                          "user": {"id": selectedUser?.id ?? 0},
-                          "churchYearEntity": {
-                            "id": currentYear!.data.id,
-                          },
-                          "monthly": selectedMonth,
-                          "registeredBy": userData!.user.userFullName,
-                        };
-                        saveMonthlyContribution(data);
-                      },
-                    ),
-            ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildFormSection(String title, IconData icon, List<Widget> children) {
+    return ModernCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 20, color: successColor),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMonthDropdown() {
+    final months = [
+      {"value": "JANUARY", "label": "Januari"},
+      {"value": "FEBRUARY", "label": "Februari"},
+      {"value": "MARCH", "label": "Machi"},
+      {"value": "APRIL", "label": "Aprili"},
+      {"value": "MAY", "label": "Mei"},
+      {"value": "JUNE", "label": "Juni"},
+      {"value": "JULY", "label": "Julai"},
+      {"value": "AUGUST", "label": "Agosti"},
+      {"value": "SEPTEMBER", "label": "Septemba"},
+      {"value": "OCTOBER", "label": "Oktoba"},
+      {"value": "NOVEMBER", "label": "Novemba"},
+      {"value": "DECEMBER", "label": "Desemba"},
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor),
+      ),
+      child: DropdownButtonFormField<String>(
+        value: selectedMonth,
+        isExpanded: true,
+        decoration: InputDecoration(
+          labelText: "Chagua Mwezi",
+          prefixIcon: Icon(Icons.calendar_month_rounded, color: successColor),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: cardColor,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        ),
+        items: months.map((month) {
+          return DropdownMenuItem<String>(
+            value: month["value"],
+            child: Text(
+              month["label"]!,
+              style: const TextStyle(color: textPrimary),
+            ),
+          );
+        }).toList(),
+        onChanged: (val) {
+          if (val != null) setState(() => selectedMonth = val);
+        },
+        validator: (value) => value == null ? "Tafadhali chagua mwezi" : null,
+        dropdownColor: cardColor,
+        style: const TextStyle(color: textPrimary),
+      ),
+    );
+  }
+
+  Widget _buildUserDropdown() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor),
+      ),
+      child: DropdownButtonFormField<User>(
+        value: selectedUser,
+        isExpanded: true,
+        decoration: InputDecoration(
+          labelText: "Chagua Mwanajumuiya",
+          prefixIcon: Icon(Icons.person_rounded, color: successColor),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: cardColor,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        ),
+        items: users.map((user) {
+          return DropdownMenuItem<User>(
+            value: user,
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 12,
+                  backgroundColor: successColor.withOpacity(0.1),
+                  child: Icon(
+                    Icons.person,
+                    color: successColor,
+                    size: 16,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    user.userFullName ?? "Jina halijulikani",
+                    style: const TextStyle(color: textPrimary),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+        onChanged: (user) {
+          if (user != null) {
+            setState(() {
+              selectedUser = user;
+            });
+          }
+        },
+        validator: (value) => value == null ? "Tafadhali chagua mwanajumuiya" : null,
+        dropdownColor: cardColor,
+        style: const TextStyle(color: textPrimary),
+      ),
+    );
+  }
+
+  void _handleSubmit() {
+    if (_formKey.currentState!.validate()) {
+      final data = {
+        "id": widget.initialData?.id,
+        "amount": amountController.text,
+        "jumuiya_id": userData!.user.jumuiya_id,
+        "user": {"id": selectedUser?.id ?? 0},
+        "churchYearEntity": {
+          "id": currentYear!.data.id,
+        },
+        "monthly": selectedMonth,
+        "registeredBy": userData!.user.userFullName,
+      };
+      saveMonthlyContribution(data);
+    }
   }
 
   // Remove this duplicate method definition to avoid conflicts.

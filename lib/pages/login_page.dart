@@ -27,8 +27,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isSmallScreen = size.width < 360;
+    // final size = MediaQuery.of(context).size;
+    // final isSmallScreen = size.width < 360;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),

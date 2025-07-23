@@ -7,6 +7,7 @@ import 'package:jumuiya_yangu/models/church_time_table.dart';
 import 'package:jumuiya_yangu/pages/add_pages/add_time_table.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
+import 'package:jumuiya_yangu/shared/components/modern_widgets.dart';
 import 'package:http/http.dart' as http;
 
 class ChurchTimeTable extends StatefulWidget {
@@ -93,238 +94,537 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
 
   @override
   Widget build(BuildContext context) {
-    // ignore: deprecated_member_use
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        backgroundColor: primary,
-        body: RefreshIndicator(onRefresh: _reloadData, child: getBody()),
+    return Scaffold(
+      backgroundColor: surfaceColor,
+      appBar: ModernAppBar(
+        title: "Ratiba za Jumuiya",
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search_rounded),
+            onPressed: () {
+              // TODO: Implement search functionality
+            },
+          ),
+        ],
       ),
+      body: RefreshIndicator(
+        onRefresh: _reloadData,
+        color: primaryGradient[0],
+        child: getBody(),
+      ),
+      floatingActionButton: userData?.user.role == "ADMIN"
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (BuildContext context) {
+                    return AddTimeTablePageAdmin(
+                      rootContext: context,
+                      onSubmit: (data) {
+                        _reloadData();
+                      },
+                    );
+                  },
+                );
+              },
+              icon: const Icon(Icons.add_rounded),
+              label: const Text("Ongeza Ratiba"),
+              backgroundColor: primaryGradient[0],
+              foregroundColor: Colors.white,
+            )
+          : null,
     );
   }
 
   Widget getBody() {
-    var size = MediaQuery.of(context).size;
-
     return SafeArea(
-        child: SingleChildScrollView(
-      child: Column(
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FutureBuilder(
+              future: getTimeTableCollections(),
+              builder: (context, AsyncSnapshot<ChurchTimeTableResponse?> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(32),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return ModernCard(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.error_outline_rounded,
+                          size: 48,
+                          color: errorColor,
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          "Imeshindikana kupakia data",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Jaribu tena baada ya muda",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
+                  return EmptyState(
+                    icon: Icons.schedule_rounded,
+                    title: "Hakuna Ratiba",
+                    subtitle: "Hakuna ratiba za jumuiya zilizosajiliwa bado.",
+                    actionText: userData?.user.role == "ADMIN" ? "Ongeza Ratiba" : null,
+                    onAction: userData?.user.role == "ADMIN"
+                        ? () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (BuildContext context) {
+                                return AddTimeTablePageAdmin(
+                                  rootContext: context,
+                                  onSubmit: (data) {
+                                    _reloadData();
+                                  },
+                                );
+                              },
+                            );
+                          }
+                        : null,
+                  );
+                }
+
+                final timeTable = snapshot.data!.data;
+                return _buildTimeTableList(timeTable);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimeTableList(List<ChurchTimeTableData> timeTable) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Ratiba za Shughuli",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: textPrimary,
+          ),
+        ),
+        const SizedBox(height: 16),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: timeTable.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final item = timeTable[index];
+            return _buildTimeTableCard(item);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTimeTableCard(ChurchTimeTableData item) {
+    return ModernCard(
+      onTap: () => _showTimeTableDetails(context, item),
+      child: Row(
         children: [
           Container(
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: primary,
-              boxShadow: [
-                BoxShadow(
-                  color: grey.withAlpha((0.01 * 255).toInt()),
-                  spreadRadius: 10,
-                  blurRadius: 3,
+              gradient: LinearGradient(
+                colors: primaryGradient,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.schedule_rounded,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.eventName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: textPrimary,
+                  ),
                 ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.access_time_rounded,
+                      size: 16,
+                      color: textSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      item.time,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: textSecondary,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Icon(
+                      Icons.calendar_today_rounded,
+                      size: 16,
+                      color: textSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      item.datePrayer,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+                if (item.location.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_rounded,
+                        size: 16,
+                        color: textSecondary,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          item.location,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: textSecondary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
-            child: const Padding(
-              padding: EdgeInsets.only(top: 20, bottom: 25, right: 20, left: 20),
+          ),
+          const SizedBox(width: 8),
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: textSecondary,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showTimeTableDetails(BuildContext context, ChurchTimeTableData item) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: surfaceColor,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.6,
+            maxChildSize: 0.9,
+            minChildSize: 0.4,
+            builder: (_, controller) => SingleChildScrollView(
+              controller: controller,
+              padding: const EdgeInsets.all(24),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [Text(""), Icon(CupertinoIcons.search)],
+                  // Drag handle
+                  Center(
+                    child: Container(
+                      height: 4,
+                      width: 40,
+                      margin: const EdgeInsets.only(bottom: 24),
+                      decoration: BoxDecoration(
+                        color: borderColor,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                   ),
+                  
+                  // Header
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: primaryGradient),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.schedule_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.eventName,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: textPrimary,
+                              ),
+                            ),
+                            Text(
+                              "Maelezo ya ratiba ya shughuli",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (userData?.user.role == "ADMIN")
+                        PopupMenuButton<String>(
+                          icon: Icon(Icons.more_vert_rounded, color: textSecondary),
+                          onSelected: (value) {
+                            if (value == 'edit') {
+                              Navigator.pop(context);
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (BuildContext context) {
+                                  return AddTimeTablePageAdmin(
+                                    rootContext: context,
+                                    initialData: item,
+                                    onSubmit: (data) {
+                                      _reloadData();
+                                    },
+                                  );
+                                },
+                              );
+                            } else if (value == 'delete') {
+                              Navigator.pop(context);
+                              _showDeleteConfirmation(context, item);
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            const PopupMenuItem(
+                              value: 'edit',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit_rounded, size: 20),
+                                  SizedBox(width: 8),
+                                  Text('Hariri'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete_rounded, size: 20, color: errorColor),
+                                  SizedBox(width: 8),
+                                  Text('Futa', style: TextStyle(color: errorColor)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 32),
+                  
+                  // Event Details
+                  _buildDetailSection(
+                    "Taarifa za Shughuli",
+                    Icons.event_rounded,
+                    [
+                      _buildDetailRow("Jina la Shughuli", item.eventName),
+                      _buildDetailRow("Tarehe", item.datePrayer),
+                      _buildDetailRow("Muda", item.time),
+                      _buildDetailRow("Mahali", item.location.isNotEmpty ? item.location : "Halijatolewa"),
+                      _buildDetailRow("Maelezo", item.message.isNotEmpty ? item.message : "Hakuna maelezo zaidi"),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // User Info
+                  if (item.user != null)
+                    _buildDetailSection(
+                      "Aliyesajili",
+                      Icons.person_rounded,
+                      [
+                        _buildDetailRow("Jina", item.user!.userFullName ?? ""),
+                        _buildDetailRow("Simu", item.user!.phone ?? ""),
+                        _buildDetailRow("Nafasi", item.user!.role ?? ""),
+                      ],
+                    ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Location Action
+                  if (item.location.isNotEmpty)
+                    SizedBox(
+                      width: double.infinity,
+                      child: ModernButton(
+                        text: "Onesha Mahali kwenye Ramani",
+                        icon: Icons.map_rounded,
+                        backgroundColor: infoColor,
+                        onPressed: () => _openMap(item.latId, item.longId),
+                      ),
+                    ),
                 ],
               ),
             ),
           ),
-          const SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 25, right: 25, bottom: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Ratiba za Jumuiya",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: (size.width - 40) / 22,
-                      color: mainFontColor,
-                    )),
-                if (userData != null && userData!.user.role == "ADMIN") ...[
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: mainFontColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: (size.width - 40) / 22,
-                        vertical: (size.width - 40) / 50,
-                      ),
-                      elevation: 2,
-                    ),
-                    icon: const Icon(Icons.plus_one, size: 15),
-                    label: const Text(
-                      "Ongeza",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                        ),
-                        builder: (_) => AddPrayerSchedulePage(
-                          rootContext: context,
-                          onSubmit: (data) {
-                            _reloadData();
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ]
-              ],
-            ),
-          ),
+        );
+      },
+    );
+  }
 
-          FutureBuilder(
-            future: getTimeTableCollections(),
-            builder: (context, AsyncSnapshot<ChurchTimeTableResponse?> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return const Center(child: Text("Imeshindikana kupakia data ya michango."));
-              } else if (!snapshot.hasData || snapshot.data!.data!.isEmpty) {
-                return const Center(child: Text("Hakuna data ya michango iliyopatikana."));
-              }
-
-              final collections = snapshot.data!.data;
-
-              return ListView.builder(
-                itemCount: collections!.length,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  final item = collections[index];
-                  return GestureDetector(
-                    onTap: () => _showChurchTimeTableDetails(context, item),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              margin: EdgeInsets.only(
-                                top: (size.width - 40) / 30, // slightly reduced
-                                left: (size.width - 40) / 20, // slightly reduced
-                                right: (size.width - 40) / 20, // slightly reduced
-                                bottom: (size.width - 40) / 30, // slightly reduced
-                              ),
-                              decoration:
-                                  BoxDecoration(color: white, borderRadius: BorderRadius.circular(25), boxShadow: [
-                                BoxShadow(
-                                  color: grey.withValues(alpha: (0.03 * 255)),
-                                  spreadRadius: 10,
-                                  blurRadius: 3,
-                                ),
-                              ]),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14), // less padding
-                                child: Row(
-                                  children: [
-                                    const SizedBox(width: 2),
-                                    Expanded(
-                                      child: SizedBox(
-                                        width: (size.width - 90) * 0.2,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                const Icon(Icons.person, size: 18, color: Colors.black54),
-                                                const SizedBox(width: 5),
-                                                Expanded(
-                                                  child: Text(
-                                                    "${item.user?.userFullName} (${item.datePrayer})",
-                                                    style: const TextStyle(
-                                                      fontSize: 15,
-                                                      color: Colors.black,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 5),
-                                            Row(
-                                              children: [
-                                                const Icon(Icons.location_on, size: 16, color: Colors.redAccent),
-                                                const SizedBox(width: 5),
-                                                Expanded(
-                                                  child: Text(
-                                                    item.location ?? 'No location',
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.black.withAlpha((0.5 * 255).toInt()),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 5),
-                                            Row(
-                                              children: [
-                                                const Icon(Icons.verified_user, size: 16, color: Colors.blueGrey),
-                                                const SizedBox(width: 5),
-                                                Expanded(
-                                                  child: Text(
-                                                    'Imesajiliwa na: ${item.registeredBy ?? 'N/A'}',
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.black.withValues(alpha: 128),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    const Icon(
-                                      Icons.arrow_forward_ios_rounded,
-                                      size: 16,
-                                      color: Colors.black,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
+  Widget _buildDetailSection(String title, IconData icon, List<Widget> children) {
+    return ModernCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 20, color: primaryGradient[0]),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: textPrimary,
+                ),
+              ),
+            ],
           ),
-          // Container(
-          //   padding: const EdgeInsets.all(16),
-          //   margin: const EdgeInsets.all(25),
-          //   decoration: BoxDecoration(color: buttoncolor, borderRadius: BorderRadius.circular(25)),
-          //   child: const Center(
-          //     child: Text(
-          //       "See Details",
-          //       style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-          //     ),
-          //   ),
-          // ),
+          const SizedBox(height: 16),
+          ...children,
         ],
       ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                color: textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 14,
+                color: textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context, ChurchTimeTableData item) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Futa Ratiba'),
+          content: Text('Je, una uhakika unataka kufuta ratiba ya "${item.eventName}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Ghairi'),
+            ),
+            ModernButton(
+              text: 'Futa',
+              backgroundColor: errorColor,
+              onPressed: () {
+                Navigator.pop(context);
+                deleteTimeTable(item.id);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _openMap(String lat, String lng) async {
+    final Uri url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Imeshindikana kufungua ramani')),
+      );
+    }
+  }
+}
     ));
   }
 

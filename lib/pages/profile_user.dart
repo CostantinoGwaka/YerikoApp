@@ -8,6 +8,8 @@ import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/other_collection_model.dart';
 import 'package:jumuiya_yangu/pages/login_page.dart';
 import 'package:jumuiya_yangu/shared/localstorage/index.dart';
+import 'package:jumuiya_yangu/shared/components/modern_widgets.dart';
+import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
 
@@ -19,9 +21,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  bool oldPasswordVisible = false;
-  bool newPasswordVisible = false;
-  bool confirmPasswordVisible = false;
   bool _isLoading = false;
   List<CollectionType> collectionTypeResponse = [];
 
@@ -275,79 +274,280 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
-  Widget build(BuildContext rootContext) {
-    // ignore: deprecated_member_use
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Akaunti'),
-          centerTitle: true,
-          automaticallyImplyLeading: false, // Removes the back arrow
-        ),
-        body: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          children: [
-            const SizedBox(height: 20),
-            Center(
-              child: CircleAvatar(
-                radius: 48,
-                backgroundColor: Colors.grey[200],
-                backgroundImage: const AssetImage("assets/avatar.png"),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Center(
-              child: Text(
-                userData!.user.userFullName ?? "User Name",
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-            Center(
-              child: Text(
-                "+${userData!.user.phone}",
-                style: const TextStyle(color: Colors.grey),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Divider(),
-            const Padding(
-              padding: EdgeInsets.only(bottom: 10, top: 5),
-              child: Text("⚙️ Mipangilio", style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-            ProfileMenuItem(
-              icon: Icons.person,
-              text: 'Hariri Taarifa',
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360;
+    
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Header Section
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(isSmallScreen ? 20 : 24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      mainFontColor,
+                      mainFontColor.withOpacity(0.8),
+                    ],
                   ),
-                  builder: (context) {
-                    final TextEditingController controller = TextEditingController();
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        top: 20,
-                        left: 20,
-                        right: 20,
-                        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Profile Image
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 4,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            spreadRadius: 0,
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
-                      child: Column(
+                      child: CircleAvatar(
+                        radius: isSmallScreen ? 45 : 55,
+                        backgroundColor: Colors.white,
+                        child: CircleAvatar(
+                          radius: isSmallScreen ? 42 : 52,
+                          backgroundColor: Colors.white,
+                          backgroundImage: const AssetImage("assets/avatar.png"),
+                        ),
+                      ),
+                    ),
+                    
+                    SizedBox(height: 16),
+                    
+                    // User Name
+                    Text(
+                      userData?.user.userFullName ?? "Mtumiaji",
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 20 : 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    
+                    SizedBox(height: 8),
+                    
+                    // Phone Number
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text(
-                            'Hariri Jina Lako',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          Icon(
+                            Icons.phone_rounded,
+                            color: Colors.white,
+                            size: 16,
                           ),
-                          const SizedBox(height: 16),
-                          TextField(
-                            controller: controller..text = userData!.user.userFullName ?? "User Name",
-                            decoration: const InputDecoration(
-                              labelText: 'Hariri Jina Lako',
-                              border: OutlineInputBorder(),
+                          SizedBox(width: 8),
+                          Text(
+                            "+${userData?.user.phone ?? ''}",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
                             ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    SizedBox(height: 12),
+                    
+                    // Role Badge
+                    if (userData?.user.role != null)
+                      StatusChip(
+                        label: userData!.user.role!,
+                        color: Colors.white,
+                        icon: Icons.verified_user_rounded,
+                      ),
+                  ],
+                ),
+              ),
+              
+              SizedBox(height: 24),
+              
+              // Menu Items
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Settings Section
+                    _buildSectionTitle("⚙️ Mipangilio", isSmallScreen),
+                    SizedBox(height: 16),
+                    
+                    ModernCard(
+                      padding: EdgeInsets.zero,
+                      child: Column(
+                        children: [
+                          _buildModernMenuItem(
+                            icon: Icons.person_rounded,
+                            title: "Hariri Taarifa",
+                            subtitle: "Badilisha jina lako",
+                            onTap: () => _showEditProfileDialog(context),
+                            color: blue,
+                          ),
+                          Divider(height: 1, color: Colors.grey[200]),
+                          _buildModernMenuItem(
+                            icon: Icons.lock_rounded,
+                            title: "Badili Nenosiri",
+                            subtitle: "Hifadhi akaunti yako",
+                            onTap: () => _showChangePasswordDialog(context),
+                            color: orange,
+                          ),
+                          if (userData?.user.role == "ADMIN") ...[
+                            Divider(height: 1, color: Colors.grey[200]),
+                            _buildModernMenuItem(
+                              icon: Icons.category_rounded,
+                              title: "Ongeza Aina ya Mchango",
+                              subtitle: "Tengeneza mchango mpya",
+                              onTap: () => showAddCollectionTypeDialog(context),
+                              color: green,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    
+                    SizedBox(height: 24),
+                    
+                    // App Information Section
+                    _buildSectionTitle("ℹ️ Taarifa za Programu", isSmallScreen),
+                    SizedBox(height: 16),
+                    
+                    ModernCard(
+                      padding: EdgeInsets.zero,
+                      child: Column(
+                        children: [
+                          _buildModernMenuItem(
+                            icon: Icons.share_rounded,
+                            title: "Shiriki Programu",
+                            subtitle: "Shiriki na marafiki",
+                            onTap: () => _shareApp(),
+                            color: purple,
+                          ),
+                          Divider(height: 1, color: Colors.grey[200]),
+                          _buildModernMenuItem(
+                            icon: Icons.privacy_tip_rounded,
+                            title: "Sera za Faragha",
+                            subtitle: "Juu ya data yako",
+                            onTap: () => _openPrivacyPolicy(),
+                            color: blue,
+                          ),
+                          Divider(height: 1, color: Colors.grey[200]),
+                          _buildModernMenuItem(
+                            icon: Icons.info_rounded,
+                            title: "Kuhusu Programu",
+                            subtitle: "Toleo na maelezo",
+                            onTap: () => _showAboutDialog(context),
+                            color: grey,
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    SizedBox(height: 32),
+                    
+                    // Logout Button
+                    ModernButton(
+                      text: "Toka",
+                      icon: Icons.logout_rounded,
+                      backgroundColor: errorColor,
+                      onPressed: () => _showLogoutDialog(context),
+                      isLoading: _isLoading,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    
+                    SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title, bool isSmallScreen) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: isSmallScreen ? 16 : 18,
+        fontWeight: FontWeight.bold,
+        color: textPrimary,
+      ),
+    );
+  }
+
+  Widget _buildModernMenuItem({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    required Color color,
+  }) {
+    return ListTile(
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      leading: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(
+          icon,
+          color: color,
+          size: 24,
+        ),
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: textPrimary,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: const TextStyle(
+          fontSize: 13,
+          color: textSecondary,
+        ),
+      ),
+      trailing: Icon(
+        Icons.chevron_right_rounded,
+        color: Colors.grey[400],
+      ),
+    );
+  }
                           ),
                           const SizedBox(height: 16),
                           ElevatedButton(

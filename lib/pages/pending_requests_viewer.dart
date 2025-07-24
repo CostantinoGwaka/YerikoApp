@@ -87,64 +87,6 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
     return null;
   }
 
-  Future<void> approveRequest(int requestId) async {
-    try {
-      final String myApi = "$baseUrl/auth/approve_request.php";
-      final response = await http.post(
-        Uri.parse(myApi),
-        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-        body: json.encode({'request_id': requestId}),
-      );
-
-      if (response.statusCode == 200) {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ombi limekubaliwa kikamilifu.')),
-        );
-        _reloadData();
-      } else {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${response.statusCode}")),
-        );
-      }
-    } catch (e) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
-      );
-    }
-  }
-
-  Future<void> rejectRequest(int requestId) async {
-    try {
-      final String myApi = "$baseUrl/auth/reject_request.php";
-      final response = await http.post(
-        Uri.parse(myApi),
-        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-        body: json.encode({'request_id': requestId}),
-      );
-
-      if (response.statusCode == 200) {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ombi limekataliwa.')),
-        );
-        _reloadData();
-      } else {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${response.statusCode}")),
-        );
-      }
-    } catch (e) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -525,23 +467,6 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
                 ),
                 child: Row(
                   children: [
-                    // Expanded(
-                    //   child: _buildActionButton(
-                    //     icon: Icons.check_circle,
-                    //     label: "Kubali",
-                    //     color: Colors.green,
-                    //     onPressed: () => _showApprovalDialog(request),
-                    //   ),
-                    // ),
-                    // const SizedBox(width: 12),
-                    // Expanded(
-                    //   child: _buildActionButton(
-                    //     icon: Icons.cancel,
-                    //     label: "Kataa",
-                    //     color: Colors.red,
-                    //     onPressed: () => _showRejectionDialog(request),
-                    //   ),
-                    // ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildActionButton(
@@ -685,84 +610,6 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
       ),
     );
   }
-
-  // void _showApprovalDialog(PendingRequest request) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  //         title: Row(
-  //           children: [
-  //             Icon(Icons.check_circle, color: Colors.green, size: 24),
-  //             const SizedBox(width: 8),
-  //             const Text("Kubali Ombi"),
-  //           ],
-  //         ),
-  //         content: Text(
-  //           "Je, una uhakika unataka kukubali ombi la ${request.userFullName}?",
-  //           style: const TextStyle(fontSize: 16),
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () => Navigator.of(context).pop(),
-  //             child: const Text("Ghairi"),
-  //           ),
-  //           ElevatedButton(
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //               approveRequest(request.requestId);
-  //             },
-  //             style: ElevatedButton.styleFrom(
-  //               backgroundColor: Colors.green,
-  //               foregroundColor: Colors.white,
-  //             ),
-  //             child: const Text("Kubali"),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
-  // void _showRejectionDialog(PendingRequest request) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  //         title: Row(
-  //           children: [
-  //             Icon(Icons.cancel, color: Colors.red, size: 24),
-  //             const SizedBox(width: 8),
-  //             const Text("Kataa Ombi"),
-  //           ],
-  //         ),
-  //         content: Text(
-  //           "Je, una uhakika unataka kukataa ombi la ${request.userFullName}?",
-  //           style: const TextStyle(fontSize: 16),
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () => Navigator.of(context).pop(),
-  //             child: const Text("Ghairi"),
-  //           ),
-  //           ElevatedButton(
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //               rejectRequest(request.requestId);
-  //             },
-  //             style: ElevatedButton.styleFrom(
-  //               backgroundColor: Colors.red,
-  //               foregroundColor: Colors.white,
-  //             ),
-  //             child: const Text("Kataa"),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
 
   String _formatDate(String dateString) {
     try {

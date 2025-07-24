@@ -6,6 +6,7 @@ import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/all_users_model.dart';
 import 'package:jumuiya_yangu/pages/add_pages/add_user.dart';
 import 'package:jumuiya_yangu/pages/pending_requests_viewer.dart';
+import 'package:jumuiya_yangu/pages/user_pending_requests_viewer.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
@@ -21,11 +22,16 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
   AllUsersResponse? collections;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  bool _hasUserPendingRequests = false;
+  int _pendingRequestsCount = 0;
 
   @override
   void initState() {
     super.initState();
     getUsersCollections();
+    if (userData != null && (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
+      checkUserPendingRequests();
+    }
     _searchController.addListener(() {
       setState(() {
         _searchQuery = _searchController.text.toLowerCase();
@@ -41,7 +47,42 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
 
   Future<void> _reloadData() async {
     await getUsersCollections();
+    if (userData != null && (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
+      await checkUserPendingRequests();
+    }
     setState(() {}); // Refresh UI after fetching data
+  }
+
+  Future<void> checkUserPendingRequests() async {
+    try {
+      final String myApi = "$baseUrl/auth/get_all_user_associated_by_user_id.php";
+      final response = await http.post(
+        Uri.parse(myApi),
+        headers: {'Content-type': 'application/json'},
+        body: json.encode({'user_id': userData!.user.id}),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse != null && jsonResponse['data'] != null) {
+          final dataList = jsonResponse['data'] as List;
+          setState(() {
+            _pendingRequestsCount = dataList.length;
+            _hasUserPendingRequests = dataList.isNotEmpty;
+          });
+        } else {
+          setState(() {
+            _pendingRequestsCount = 0;
+            _hasUserPendingRequests = false;
+          });
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _pendingRequestsCount = 0;
+        _hasUserPendingRequests = false;
+      });
+    }
   }
 
   Future<AllUsersResponse?> getUsersCollections() async {
@@ -203,6 +244,75 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                       size: 24,
                                     ),
                                   ),
+                                ),
+                              ],
+                              if (userData != null &&
+                                  (userData!.user.role == "USER" || userData!.user.role == "ADMIN") &&
+                                  _hasUserPendingRequests) ...[
+                                Stack(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withValues(alpha: 0.2),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      padding: const EdgeInsets.all(8),
+                                      child: InkWell(
+                                        onTap: () async {
+                                          await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => const UserPendingRequestsViewer(),
+                                            ),
+                                          );
+                                          // Refresh the count when user returns
+                                          if (userData != null && (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
+                                            checkUserPendingRequests();
+                                          }
+                                        },
+                                        child: const Icon(
+                                          CupertinoIcons.bell_circle_fill,
+                                          color: Colors.orange,
+                                          size: 24,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      right: 0,
+                                      top: 0,
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 300),
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [Colors.red[400]!, Colors.red[600]!],
+                                          ),
+                                          borderRadius: BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.red.withValues(alpha: 0.4),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        constraints: const BoxConstraints(
+                                          minWidth: 20,
+                                          minHeight: 20,
+                                        ),
+                                        child: Text(
+                                          _pendingRequestsCount > 99 ? '99+' : _pendingRequestsCount.toString(),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.5,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                               const SizedBox(width: 8),

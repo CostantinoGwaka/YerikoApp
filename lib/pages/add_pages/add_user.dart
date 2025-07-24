@@ -116,12 +116,12 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
           if (widget.initialData != null) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("✅ Umefanikiwa! Kuhuisha ratiba mfumo kwa mafanikio")),
+              SnackBar(content: Text("✅ Umefanikiwa! Kuhuisha taarifa za mwanajumuiya katika mfumo kwa mafanikio")),
             );
           } else {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("✅ Umefanikiwa! Kusajili ratiba mfumo kwa mafanikio")),
+              SnackBar(content: Text("✅ Umefanikiwa! Kusajili taarifa za mwanajumuiya katika mfumo kwa mafanikio")),
             );
           }
         } else if (response.statusCode == 404) {

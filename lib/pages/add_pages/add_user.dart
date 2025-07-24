@@ -37,10 +37,14 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController jumuiyaIdController = TextEditingController();
+  final TextEditingController searchPhoneController = TextEditingController();
   String selectedRole = "USER"; // default
   String selectedGender = "MWANAUME"; // default
   String selectedMartialStatus = "AMEOLEWA"; // default
   bool _isLoading = false;
+  bool _isSearchMode = false; // Toggle between create and search modes
+  bool _isSearching = false;
+  User? _searchedUser;
   final roles = ["USER", "ADMIN"];
   final listGenders = ["MWANAUME", "MWANAMKE"];
   final listStatus = ["AMEOLEWA", "AMEOA", "HAJAOA", "HAJAOLEWA", "WALIOACHANA", "MJANE", "MGANE"];
@@ -158,6 +162,121 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
     }
   }
 
+  Future<void> searchUserByPhone(String phone) async {
+    try {
+      setState(() {
+        _isSearching = true;
+        _searchedUser = null;
+      });
+
+      String formattedPhone = phone.trim().replaceFirst(RegExp(r'^0'), '255');
+      String myApi = "$baseUrl/auth/find_user_by_phone.php";
+
+      final response = await http.post(
+        Uri.parse(myApi),
+        headers: {
+          'Accept': 'application/json',
+        },
+        body: {
+          "phone": formattedPhone,
+        },
+      );
+
+      var jsonResponse = json.decode(response.body);
+
+      if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == '200') {
+        setState(() {
+          _searchedUser = User.fromJson(jsonResponse['data']);
+          _isSearching = false;
+        });
+      } else {
+        setState(() {
+          _isSearching = false;
+        });
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(jsonResponse['message'] ?? "Mtumiaji hajapatikana")),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isSearching = false;
+      });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Kosa katika kutafuta mtumiaji: $e")),
+      );
+    }
+  }
+
+  Future<void> associateUserWithJumuiya(User user) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      String myApi = "$baseUrl/auth/associate_user.php";
+
+      final response = await http.post(
+        Uri.parse(myApi),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "user_id": user.id.toString(),
+          "jumuiya_id": userData!.user.jumuiya_id.toString(),
+          "associated_by": userData!.user.userFullName.toString(),
+        }),
+      );
+
+      var jsonResponse = json.decode(response.body);
+
+      if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == '200') {
+        setState(() {
+          _isLoading = false;
+        });
+
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
+
+        if (widget.onSubmit != null) {
+          widget.onSubmit!({
+            'user_id': user.id.toString(),
+            'jumuiya_id': userData!.user.jumuiya_id,
+          });
+        }
+
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(widget.rootContext).showSnackBar(
+          SnackBar(content: Text("✅ Umefanikiwa! ${user.userFullName} ameunganishwa na jumuiya hii")),
+        );
+      } else {
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
+
+        setState(() {
+          _isLoading = false;
+        });
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(jsonResponse['message'] ?? "Imeshindwa kuunganisha mtumiaji")),
+        );
+      }
+    } catch (e) {
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+
+      setState(() {
+        _isLoading = false;
+      });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Kosa: $e")),
+      );
+    }
+  }
+
   bool isActive = true;
 
   @override
@@ -203,7 +322,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
-                        Icons.person_add_rounded,
+                        _isSearchMode ? Icons.search_rounded : Icons.person_add_rounded,
                         color: primaryGradient[0],
                         size: 24,
                       ),
@@ -214,7 +333,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.initialData != null ? "Hariri Mwanajumuiya" : "Ongeza Mwanajumuiya",
+                            _isSearchMode
+                                ? "Unganisha Mtumiaji"
+                                : (widget.initialData != null ? "Hariri Mwanajumuiya" : "Ongeza Mwanajumuiya"),
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -222,7 +343,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                             ),
                           ),
                           Text(
-                            "Jaza taarifa za mwanajumuiya mpya",
+                            _isSearchMode ? "Tafuta na kuunganisha mtumiaji" : "Jaza taarifa za mwanajumuiya mpya",
                             style: TextStyle(
                               fontSize: 14,
                               color: textSecondary,
@@ -234,108 +355,16 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                   ],
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
 
-                // Form
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildFormSection(
-                        "Taarifa za Kibinafsi",
-                        Icons.person_outline_rounded,
-                        [
-                          ModernTextField(
-                            controller: fullNameController,
-                            labelText: "Jina Kamili",
-                            prefixIcon: Icons.person_rounded,
-                            validator: (value) => value == null || value.isEmpty ? "Tafadhali jaza sehemu hii" : null,
-                          ),
-                          const SizedBox(height: 16),
-                          ModernTextField(
-                            controller: locationController,
-                            labelText: "Mahali anapoishi",
-                            prefixIcon: Icons.location_on_rounded,
-                            validator: (value) => value == null || value.isEmpty ? "Tafadhali jaza sehemu hii" : null,
-                          ),
-                          const SizedBox(height: 16),
-                          _buildModernDropdown(
-                            "Jinsia",
-                            selectedGender,
-                            listGenders,
-                            Icons.wc_rounded,
-                            (value) => setState(() => selectedGender = value!),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildDatePickerField("Tarehe ya kuzaliwa", dobController),
-                          const SizedBox(height: 16),
-                          _buildModernDropdown(
-                            "Hali ya Ndoa",
-                            selectedMartialStatus,
-                            listStatus,
-                            Icons.favorite_rounded,
-                            (value) => setState(() => selectedMartialStatus = value!),
-                          ),
-                        ],
-                      ),
+                // Mode Toggle (only show when not editing existing user)
+                if (widget.initialData == null) ...[
+                  _buildModeToggle(),
+                  const SizedBox(height: 24),
+                ],
 
-                      const SizedBox(height: 24),
-
-                      _buildFormSection(
-                        "Taarifa za Mawasiliano",
-                        Icons.contact_phone_rounded,
-                        [
-                          ModernTextField(
-                            controller: phoneController,
-                            labelText: "Namba ya Simu",
-                            prefixIcon: Icons.phone_rounded,
-                            keyboardType: TextInputType.phone,
-                            maxLength: 10,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Tafadhali jaza sehemu hii";
-                              }
-                              if (!RegExp(r'^(06|07)\d{8}$').hasMatch(value)) {
-                                return "Namba ya simu lazima ianze na 06 au 07 na iwe tarakimu 10";
-                              }
-                              return null;
-                            },
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      _buildFormSection(
-                        "Taarifa za Mfumo",
-                        Icons.admin_panel_settings_rounded,
-                        [
-                          _buildModernDropdown(
-                            "Aina ya Mtumiaji",
-                            selectedRole,
-                            roles,
-                            Icons.admin_panel_settings_rounded,
-                            (value) => setState(() => selectedRole = value!),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // Submit Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ModernButton(
-                          onPressed: _handleSubmit,
-                          text: widget.initialData != null ? "Hifadhi Mabadiliko" : "Hifadhi Mtumiaji",
-                          icon: widget.initialData != null ? Icons.update_rounded : Icons.save_rounded,
-                          isLoading: _isLoading,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Content based on mode
+                if (_isSearchMode) _buildSearchMode() else _buildCreateMode(),
               ],
             ),
           ),
@@ -519,6 +548,294 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
           ),
           validator: (value) => value == null || value.isEmpty ? "Tafadhali chagua tarehe" : null,
         ),
+      ),
+    );
+  }
+
+  Widget _buildModeToggle() {
+    return ModernCard(
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _isSearchMode = false),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: !_isSearchMode ? primaryGradient[0] : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.person_add_rounded,
+                      size: 18,
+                      color: !_isSearchMode ? Colors.white : textSecondary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Ongeza Mpya",
+                      style: TextStyle(
+                        color: !_isSearchMode ? Colors.white : textSecondary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _isSearchMode = true),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: _isSearchMode ? primaryGradient[0] : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.search_rounded,
+                      size: 18,
+                      color: _isSearchMode ? Colors.white : textSecondary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Unganisha",
+                      style: TextStyle(
+                        color: _isSearchMode ? Colors.white : textSecondary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchMode() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildFormSection(
+          "Tafuta Mtumiaji",
+          Icons.search_rounded,
+          [
+            ModernTextField(
+              controller: searchPhoneController,
+              labelText: "Namba ya Simu",
+              prefixIcon: Icons.phone_rounded,
+              keyboardType: TextInputType.phone,
+              maxLength: 10,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Tafadhali jaza namba ya simu";
+                }
+                if (!RegExp(r'^(06|07)\d{8}$').hasMatch(value)) {
+                  return "Namba ya simu lazima ianze na 06 au 07 na iwe tarakimu 10";
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ModernButton(
+                onPressed: () {
+                  if (searchPhoneController.text.trim().isNotEmpty) {
+                    searchUserByPhone(searchPhoneController.text.trim());
+                  }
+                },
+                text: "Tafuta Mtumiaji",
+                icon: Icons.search_rounded,
+                isLoading: _isSearching,
+              ),
+            ),
+          ],
+        ),
+        if (_searchedUser != null) ...[
+          const SizedBox(height: 24),
+          _buildUserDetails(),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ModernButton(
+              onPressed: () => associateUserWithJumuiya(_searchedUser!),
+              text: "Unganisha na Jumuiya Hii",
+              icon: Icons.group_add_rounded,
+              isLoading: _isLoading,
+              backgroundColor: Colors.green,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildUserDetails() {
+    if (_searchedUser == null) return const SizedBox.shrink();
+
+    return _buildFormSection(
+      "Taarifa za Mtumiaji",
+      Icons.person_rounded,
+      [
+        _buildDetailRow("Jina Kamili", _searchedUser!.userFullName ?? 'N/A'),
+        const SizedBox(height: 12),
+        _buildDetailRow("Namba ya Simu", _searchedUser!.phone ?? 'N/A'),
+        const SizedBox(height: 12),
+        _buildDetailRow("Mahali Anapoishi", _searchedUser!.location ?? 'N/A'),
+        const SizedBox(height: 12),
+        _buildDetailRow("Jinsia", _searchedUser!.gender ?? 'N/A'),
+        const SizedBox(height: 12),
+        _buildDetailRow("Tarehe ya Kuzaliwa", _searchedUser!.dobdate ?? 'N/A'),
+        const SizedBox(height: 12),
+        _buildDetailRow("Hali ya Ndoa", _searchedUser!.martialstatus ?? 'N/A'),
+        const SizedBox(height: 12),
+        _buildDetailRow("Aina ya Mtumiaji", _searchedUser!.role ?? 'N/A'),
+      ],
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 120,
+          child: Text(
+            label,
+            style: TextStyle(
+              color: textSecondary,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        const Text(": ", style: TextStyle(color: textSecondary)),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              color: textPrimary,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCreateMode() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildFormSection(
+            "Taarifa za Kibinafsi",
+            Icons.person_outline_rounded,
+            [
+              ModernTextField(
+                controller: fullNameController,
+                labelText: "Jina Kamili",
+                prefixIcon: Icons.person_rounded,
+                validator: (value) => value == null || value.isEmpty ? "Tafadhali jaza sehemu hii" : null,
+              ),
+              const SizedBox(height: 16),
+              ModernTextField(
+                controller: locationController,
+                labelText: "Mahali anapoishi",
+                prefixIcon: Icons.location_on_rounded,
+                validator: (value) => value == null || value.isEmpty ? "Tafadhali jaza sehemu hii" : null,
+              ),
+              const SizedBox(height: 16),
+              _buildModernDropdown(
+                "Jinsia",
+                selectedGender,
+                listGenders,
+                Icons.wc_rounded,
+                (value) => setState(() => selectedGender = value!),
+              ),
+              const SizedBox(height: 16),
+              _buildDatePickerField("Tarehe ya kuzaliwa", dobController),
+              const SizedBox(height: 16),
+              _buildModernDropdown(
+                "Hali ya Ndoa",
+                selectedMartialStatus,
+                listStatus,
+                Icons.favorite_rounded,
+                (value) => setState(() => selectedMartialStatus = value!),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          _buildFormSection(
+            "Taarifa za Mawasiliano",
+            Icons.contact_phone_rounded,
+            [
+              ModernTextField(
+                controller: phoneController,
+                labelText: "Namba ya Simu",
+                prefixIcon: Icons.phone_rounded,
+                keyboardType: TextInputType.phone,
+                maxLength: 10,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Tafadhali jaza sehemu hii";
+                  }
+                  if (!RegExp(r'^(06|07)\d{8}$').hasMatch(value)) {
+                    return "Namba ya simu lazima ianze na 06 au 07 na iwe tarakimu 10";
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          _buildFormSection(
+            "Taarifa za Mfumo",
+            Icons.admin_panel_settings_rounded,
+            [
+              _buildModernDropdown(
+                "Aina ya Mtumiaji",
+                selectedRole,
+                roles,
+                Icons.admin_panel_settings_rounded,
+                (value) => setState(() => selectedRole = value!),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 32),
+
+          // Submit Button
+          SizedBox(
+            width: double.infinity,
+            child: ModernButton(
+              onPressed: _handleSubmit,
+              text: widget.initialData != null ? "Hifadhi Mabadiliko" : "Hifadhi Mtumiaji",
+              icon: widget.initialData != null ? Icons.update_rounded : Icons.save_rounded,
+              isLoading: _isLoading,
+            ),
+          ),
+        ],
       ),
     );
   }

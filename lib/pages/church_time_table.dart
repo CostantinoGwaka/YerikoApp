@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:jumuiya_yangu/main.dart';
+// ignore: library_prefixes
 import 'package:jumuiya_yangu/models/church_time_table.dart' as TimeTableModel;
 import 'package:jumuiya_yangu/pages/add_pages/add_time_table.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
@@ -101,9 +101,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),
-            onPressed: () {
-              // TODO: Implement search functionality
-            },
+            onPressed: () {},
           ),
         ],
       ),

@@ -114,9 +114,7 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),
-            onPressed: () {
-              // TODO: Implement search functionality
-            },
+            onPressed: () {},
           ),
         ],
       ),

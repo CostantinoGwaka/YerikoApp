@@ -297,7 +297,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
             future: getUsersCollections(),
             builder: (context, AsyncSnapshot<AllUsersResponse?> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Container(
+                return SizedBox(
                   height: 300,
                   child: Center(
                     child: Column(
@@ -317,7 +317,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                   ),
                 );
               } else if (snapshot.hasError) {
-                return Container(
+                return SizedBox(
                   height: 300,
                   child: Center(
                     child: Column(
@@ -338,7 +338,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                   ),
                 );
               } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                return Container(
+                return SizedBox(
                   height: 300,
                   child: Center(
                     child: Column(
@@ -364,7 +364,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
               final filteredUsers = _filterUsers(collections);
 
               if (filteredUsers.isEmpty && _searchQuery.isNotEmpty) {
-                return Container(
+                return SizedBox(
                   height: 300,
                   child: Center(
                     child: Column(

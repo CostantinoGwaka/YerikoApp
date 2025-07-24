@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jumuiya_yangu/main.dart';
@@ -208,6 +207,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       }
     } catch (e) {
       if (context.mounted) {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
         );
@@ -1489,6 +1489,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                                 ),
                               );
                               if (confirm == true) {
+                                // ignore: use_build_context_synchronously
                                 Navigator.of(context).pop(); // Close the modal first
                                 deleteTimeTable(dataItem.id);
                               }

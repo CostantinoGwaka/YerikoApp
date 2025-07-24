@@ -197,7 +197,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                             showModalBottomSheet(
                               context: context,
                               isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
+                              backgroundColor: Colors.white,
                               builder: (BuildContext context) {
                                 return AddPrayerSchedulePage(
                                   rootContext: context,

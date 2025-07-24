@@ -1172,7 +1172,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   Widget _buildEmptyCard(String message) {
     return Container(
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(30),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -1189,12 +1189,19 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.inbox_outlined, size: 48, color: Colors.grey[400]),
-            const SizedBox(height: 16),
+            Icon(
+              Icons.inbox_outlined,
+              size: 30,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 2),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 10,
+              ),
             ),
           ],
         ),

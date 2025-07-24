@@ -847,7 +847,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                   size: 18,
                   color: mainFontColor,
                 ),
-                label: Text(showUserCollections ? "Ficha Vichujio" : "Onyesha Vichujio"),
+                label: Text(showUserCollections ? "Onyesha Vichujio" : "Ficha Vichujio"),
                 onPressed: () {
                   setState(() {
                     showUserCollections = !showUserCollections;

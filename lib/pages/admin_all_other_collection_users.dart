@@ -24,6 +24,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
   int selectedTabIndex = 0;
   bool viewTable = false;
   bool isLoading = false;
+  bool showUserCollections = false;
 
   //month
   String filterOption = 'TAARIFA ZOTE';
@@ -386,170 +387,197 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
   Widget _buildListView(Size size) {
     return Column(
       children: [
-        // Filters Card
+        // Toggle button to show/hide controls
         Container(
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withValues(alpha: 0.08),
-                spreadRadius: 2,
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: mainFontColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(Icons.filter_list, color: mainFontColor, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    "Chuja Michango",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Filter Option Dropdown
-              _buildModernDropdown<String>(
-                value: filterOption,
-                hint: "Chagua Aina ya Utafutaji",
-                icon: Icons.search,
-                items: filterOptions
-                    .map((option) => DropdownMenuItem(
-                          value: option,
-                          child: Text(option),
-                        ))
-                    .toList(),
-                onChanged: (value) {
+              TextButton.icon(
+                style: TextButton.styleFrom(
+                  foregroundColor: mainFontColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+                icon: Icon(
+                  isLoading ? Icons.hourglass_top : (showUserCollections ? Icons.visibility_off : Icons.visibility),
+                  size: 18,
+                  color: mainFontColor,
+                ),
+                label: Text(showUserCollections ? "Onyesha Vichujio" : "Ficha Vichujio"),
+                onPressed: () {
                   setState(() {
-                    filterOption = value!;
-                    selectedUser = null;
-                    selectedMonth = null;
-                    selectedCollectionType = null;
-                    loadData();
+                    showUserCollections = !showUserCollections;
                   });
                 },
               ),
-
-              // Conditional dropdowns
-              if (filterOption == 'TAARIFA KWA MWANAJUMUIYA') ...[
-                const SizedBox(height: 16),
-                _buildModernDropdown<User>(
-                  value: selectedUser,
-                  hint: "Chagua Mwanajumuiya",
-                  icon: Icons.person,
-                  items: users
-                      .map((user) => DropdownMenuItem<User>(
-                            value: user,
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 12,
-                                  backgroundColor: mainFontColor.withValues(alpha: 0.1),
-                                  child: Text(
-                                    (user.userFullName ?? '').isNotEmpty ? user.userFullName![0].toUpperCase() : '?',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: mainFontColor,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(child: Text(user.userFullName ?? '')),
-                              ],
-                            ),
-                          ))
-                      .toList(),
-                  onChanged: (user) {
-                    if (user != null) {
-                      setState(() {
-                        selectedUser = user;
-                      });
-                      loadData();
-                    }
-                  },
+            ],
+          ),
+        ),
+        if (!showUserCollections)
+          // Filters Card
+          Container(
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withValues(alpha: 0.08),
+                  spreadRadius: 2,
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
                 ),
               ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: mainFontColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(Icons.filter_list, color: mainFontColor, size: 20),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      "Chuja Michango",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
 
-              if (filterOption == 'KWA MWEZI') ...[
-                const SizedBox(height: 16),
+                // Filter Option Dropdown
                 _buildModernDropdown<String>(
-                  value: selectedMonth,
-                  hint: "Chagua Mwezi",
-                  icon: Icons.calendar_month,
-                  items: months
-                      .map((month) => DropdownMenuItem(
-                            value: month,
-                            child: Text(month),
+                  value: filterOption,
+                  hint: "Chagua Aina ya Utafutaji",
+                  icon: Icons.search,
+                  items: filterOptions
+                      .map((option) => DropdownMenuItem(
+                            value: option,
+                            child: Text(option),
                           ))
                       .toList(),
                   onChanged: (value) {
                     setState(() {
-                      selectedMonth = value;
+                      filterOption = value!;
+                      selectedUser = null;
+                      selectedMonth = null;
+                      selectedCollectionType = null;
                       loadData();
                     });
                   },
                 ),
-              ],
 
-              if (filterOption == 'KWA AINA YA MCHANGO') ...[
-                const SizedBox(height: 16),
-                _buildModernDropdown<CollectionType>(
-                  value: selectedCollectionType,
-                  hint: "Chagua Aina ya Mchango",
-                  icon: Icons.category,
-                  items: collectionTypeResponse
-                      .map((type) => DropdownMenuItem<CollectionType>(
-                            value: type,
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    color: mainFontColor.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(6),
+                // Conditional dropdowns
+                if (filterOption == 'TAARIFA KWA MWANAJUMUIYA') ...[
+                  const SizedBox(height: 16),
+                  _buildModernDropdown<User>(
+                    value: selectedUser,
+                    hint: "Chagua Mwanajumuiya",
+                    icon: Icons.person,
+                    items: users
+                        .map((user) => DropdownMenuItem<User>(
+                              value: user,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 12,
+                                    backgroundColor: mainFontColor.withValues(alpha: 0.1),
+                                    child: Text(
+                                      (user.userFullName ?? '').isNotEmpty ? user.userFullName![0].toUpperCase() : '?',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: mainFontColor,
+                                      ),
+                                    ),
                                   ),
-                                  child: Icon(Icons.payments, color: mainFontColor, size: 16),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(child: Text(type.collectionName)),
-                              ],
-                            ),
-                          ))
-                      .toList(),
-                  onChanged: (type) {
-                    if (type != null) {
+                                  const SizedBox(width: 8),
+                                  Expanded(child: Text(user.userFullName ?? '')),
+                                ],
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (user) {
+                      if (user != null) {
+                        setState(() {
+                          selectedUser = user;
+                        });
+                        loadData();
+                      }
+                    },
+                  ),
+                ],
+
+                if (filterOption == 'KWA MWEZI') ...[
+                  const SizedBox(height: 16),
+                  _buildModernDropdown<String>(
+                    value: selectedMonth,
+                    hint: "Chagua Mwezi",
+                    icon: Icons.calendar_month,
+                    items: months
+                        .map((month) => DropdownMenuItem(
+                              value: month,
+                              child: Text(month),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
                       setState(() {
-                        selectedCollectionType = type;
+                        selectedMonth = value;
+                        loadData();
                       });
-                      loadData();
-                    }
-                  },
-                ),
+                    },
+                  ),
+                ],
+
+                if (filterOption == 'KWA AINA YA MCHANGO') ...[
+                  const SizedBox(height: 16),
+                  _buildModernDropdown<CollectionType>(
+                    value: selectedCollectionType,
+                    hint: "Chagua Aina ya Mchango",
+                    icon: Icons.category,
+                    items: collectionTypeResponse
+                        .map((type) => DropdownMenuItem<CollectionType>(
+                              value: type,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: mainFontColor.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Icon(Icons.payments, color: mainFontColor, size: 16),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(child: Text(type.collectionName)),
+                                ],
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (type) {
+                      if (type != null) {
+                        setState(() {
+                          selectedCollectionType = type;
+                        });
+                        loadData();
+                      }
+                    },
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
-        ),
 
         // Collections List
         Expanded(
@@ -656,10 +684,13 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(color: mainFontColor),
-            const SizedBox(height: 16),
+            const SizedBox(height: 2),
             Text(
               "Inapakia...",
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 10,
+              ),
             ),
           ],
         ),
@@ -720,12 +751,12 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.inbox_outlined, size: 48, color: Colors.grey[400]),
-            const SizedBox(height: 16),
+            Icon(Icons.inbox_outlined, size: 40, color: Colors.grey[400]),
+            const SizedBox(height: 2),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: Colors.grey[600], fontSize: 10),
             ),
           ],
         ),

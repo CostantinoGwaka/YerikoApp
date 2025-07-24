@@ -686,83 +686,83 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
     );
   }
 
-  void _showApprovalDialog(PendingRequest request) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 24),
-              const SizedBox(width: 8),
-              const Text("Kubali Ombi"),
-            ],
-          ),
-          content: Text(
-            "Je, una uhakika unataka kukubali ombi la ${request.userFullName}?",
-            style: const TextStyle(fontSize: 16),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Ghairi"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                approveRequest(request.requestId);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text("Kubali"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // void _showApprovalDialog(PendingRequest request) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  //         title: Row(
+  //           children: [
+  //             Icon(Icons.check_circle, color: Colors.green, size: 24),
+  //             const SizedBox(width: 8),
+  //             const Text("Kubali Ombi"),
+  //           ],
+  //         ),
+  //         content: Text(
+  //           "Je, una uhakika unataka kukubali ombi la ${request.userFullName}?",
+  //           style: const TextStyle(fontSize: 16),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.of(context).pop(),
+  //             child: const Text("Ghairi"),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //               approveRequest(request.requestId);
+  //             },
+  //             style: ElevatedButton.styleFrom(
+  //               backgroundColor: Colors.green,
+  //               foregroundColor: Colors.white,
+  //             ),
+  //             child: const Text("Kubali"),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
-  void _showRejectionDialog(PendingRequest request) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Row(
-            children: [
-              Icon(Icons.cancel, color: Colors.red, size: 24),
-              const SizedBox(width: 8),
-              const Text("Kataa Ombi"),
-            ],
-          ),
-          content: Text(
-            "Je, una uhakika unataka kukataa ombi la ${request.userFullName}?",
-            style: const TextStyle(fontSize: 16),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Ghairi"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                rejectRequest(request.requestId);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text("Kataa"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // void _showRejectionDialog(PendingRequest request) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  //         title: Row(
+  //           children: [
+  //             Icon(Icons.cancel, color: Colors.red, size: 24),
+  //             const SizedBox(width: 8),
+  //             const Text("Kataa Ombi"),
+  //           ],
+  //         ),
+  //         content: Text(
+  //           "Je, una uhakika unataka kukataa ombi la ${request.userFullName}?",
+  //           style: const TextStyle(fontSize: 16),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.of(context).pop(),
+  //             child: const Text("Ghairi"),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //               rejectRequest(request.requestId);
+  //             },
+  //             style: ElevatedButton.styleFrom(
+  //               backgroundColor: Colors.red,
+  //               foregroundColor: Colors.white,
+  //             ),
+  //             child: const Text("Kataa"),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   String _formatDate(String dateString) {
     try {

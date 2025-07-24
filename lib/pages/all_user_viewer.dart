@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/all_users_model.dart';
 import 'package:jumuiya_yangu/pages/add_pages/add_user.dart';
+import 'package:jumuiya_yangu/pages/pending_requests_viewer.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
@@ -178,17 +179,46 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                               ),
                             ],
                           ),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(
-                              CupertinoIcons.person_3_fill,
-                              color: Colors.white,
-                              size: 24,
-                            ),
+                          Row(
+                            children: [
+                              if (userData != null && userData!.user.role == "ADMIN") ...[
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: const EdgeInsets.all(8),
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const PendingRequestsViewer(),
+                                        ),
+                                      );
+                                    },
+                                    child: const Icon(
+                                      CupertinoIcons.clock_fill,
+                                      color: Colors.orange,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(width: 8),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.all(8),
+                                child: Icon(
+                                  CupertinoIcons.person_3_fill,
+                                  color: const Color.fromARGB(255, 32, 21, 234).withValues(alpha: 0.7),
+                                  size: 24,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

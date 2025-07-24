@@ -334,9 +334,9 @@ class _DailyPageState extends State<DailyPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Hujambo 👋",
+                          userData!.user.jina_jumuiya ?? 'Hujambo 👋',
                           style: TextStyle(
-                            fontSize: isSmallScreen ? 20 : 24,
+                            fontSize: isSmallScreen ? 12 : 24,
                             fontWeight: FontWeight.bold,
                             color: mainFontColor,
                           ),

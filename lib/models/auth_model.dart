@@ -35,6 +35,8 @@ class User {
   final String? gender;
   final String? dobdate;
   final String? martialstatus;
+  // ignore: non_constant_identifier_names
+  final String? jina_jumuiya; // Optional field, not used in the current context
   final String? role;
   // ignore: non_constant_identifier_names
   final dynamic jumuiya_id; // Optional field, not used in the current context
@@ -49,6 +51,8 @@ class User {
     this.location,
     this.gender,
     this.dobdate,
+    // ignore: non_constant_identifier_names
+    this.jina_jumuiya,
     this.martialstatus,
     this.role,
     // ignore: non_constant_identifier_names
@@ -69,6 +73,7 @@ class User {
       martialstatus: json['martialstatus']?.toString(), //
       role: json['role']?.toString(),
       jumuiya_id: json['jumuiya_id']?.toString(), // Optional field, not used in the current context
+      jina_jumuiya: json['jina_jumuiya']?.toString(), // Optional field, not used in the current context
     );
   }
 
@@ -85,6 +90,7 @@ class User {
         'martialstatus': martialstatus, // Optional field, not used in the current context
         'role': role,
         'jumuiya_id': jumuiya_id, // Optional field, not used in the current context
+        'jina_jumuiya': jina_jumuiya, // Optional field, not used in the current context
       };
 
   // ✅ This is the fix

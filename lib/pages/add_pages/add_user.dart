@@ -226,7 +226,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
         body: jsonEncode({
           "user_id": user.id.toString(),
           "jumuiya_id": userData!.user.jumuiya_id.toString(),
-          "associated_by": userData!.user.userFullName.toString(),
+          "registered_by": userData!.user.userFullName,
         }),
       );
 

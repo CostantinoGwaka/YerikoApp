@@ -28,13 +28,24 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   int selectedTabIndex = 0;
   bool viewTable = false;
   bool isLoading = false;
+  bool showUserCollections = false;
+  bool isDataLoaded = false;
+
+  // Totals
+  double totalMonthlyCollections = 0.0;
+  double totalOtherCollections = 0.0;
 
   //month
   String filterOption = 'TAARIFA ZOTE';
   User? selectedUser;
   String? selectedMonth;
 
-  List<String> filterOptions = ['TAARIFA ZOTE', 'TAARIFA KWA MWANAJUMUIYA', 'KWA MWEZI'];
+  List<String> filterOptions = [
+    'TAARIFA ZOTE',
+    'TAARIFA KWA MWANAJUMUIYA',
+    'KWA MWEZI',
+    'MICHANGO YOTE YA MWANAJUMUIYA'
+  ];
   List<User> users = []; // replace with real User objects
   List<String> months = [
     'JANUARY',
@@ -57,8 +68,82 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   @override
   void initState() {
     super.initState();
-    getUserCollections();
-    fetchUsers();
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
+    setState(() {
+      isDataLoaded = false;
+    });
+
+    await Future.wait([
+      getUserCollections(),
+      getOtherUserCollections(),
+      fetchUsers(),
+    ]);
+
+    setState(() {
+      isDataLoaded = true;
+    });
+  }
+
+  Future<void> getOtherUserCollections() async {
+    try {
+      if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
+        return;
+      }
+
+      final String myApi =
+          "$baseUrl/monthly/get_all_other_collection_user_by_year.php?yearId=${currentYear!.data.id}&jumuiya_id=${userData!.user.jumuiya_id}";
+      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse != null) {
+          collectionsOthers = CollectionResponse.fromJson(jsonResponse);
+          calculateTotals();
+        }
+      }
+    } catch (e) {
+      // Handle error silently
+    }
+  }
+
+  void calculateTotals() {
+    totalMonthlyCollections = 0.0;
+    totalOtherCollections = 0.0;
+
+    if (collectionsMonthly?.data != null) {
+      for (var item in collectionsMonthly!.data) {
+        totalMonthlyCollections += double.tryParse(item.amount) ?? 0.0;
+      }
+    }
+
+    if (collectionsOthers?.data != null) {
+      for (var item in collectionsOthers!.data) {
+        totalOtherCollections += double.tryParse(item.amount) ?? 0.0;
+      }
+    }
+
+    setState(() {});
+  }
+
+  double _calculateUserMonthlyTotal() {
+    if (collectionsMonthly?.data == null) return 0.0;
+    double total = 0.0;
+    for (var item in collectionsMonthly!.data) {
+      total += double.tryParse(item.amount) ?? 0.0;
+    }
+    return total;
+  }
+
+  double _calculateUserOtherTotal() {
+    if (collectionsOthers?.data == null) return 0.0;
+    double total = 0.0;
+    for (var item in collectionsOthers!.data) {
+      total += double.tryParse(item.amount) ?? 0.0;
+    }
+    return total;
   }
 
   Future<void> fetchUsers() async {
@@ -75,21 +160,75 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
     }
   }
 
-  void loadData() {
+  void loadData() async {
     setState(() {
-      if (filterOption == 'TAARIFA ZOTE') {
-        displayedData = allData;
-      } else if (filterOption == 'TAARIFA KWA MWANAJUMUIYA' && selectedUser != null) {
-        getUserYearCollections();
-      } else if (filterOption == 'KWA MWEZI' && selectedMonth != null) {
-        displayedData = allData.where((item) => item.monthly == selectedMonth).toList();
-      }
+      showUserCollections = false;
+      isDataLoaded = false;
+    });
+
+    if (filterOption == 'TAARIFA ZOTE') {
+      await getUserCollections();
+    } else if (filterOption == 'TAARIFA KWA MWANAJUMUIYA' && selectedUser != null) {
+      await getUserYearCollections();
+    } else if (filterOption == 'KWA MWEZI' && selectedMonth != null) {
+      await getUserMonthCollections();
+    } else if (filterOption == 'MICHANGO YOTE YA MWANAJUMUIYA' && selectedUser != null) {
+      showUserCollections = true;
+      await getUserAllCollections();
+    }
+
+    setState(() {
+      isDataLoaded = true;
     });
   }
 
+  Future<void> getUserAllCollections() async {
+    // This will show both monthly and other collections for the selected user
+    await getUserYearCollections();
+    await getUserOtherCollections();
+  }
+
+  Future<CollectionResponse?> getUserOtherCollections() async {
+    try {
+      if (userData?.user.id == null || userData!.user.id.toString().isEmpty || selectedUser == null) {
+        return null;
+      }
+
+      final String myApi =
+          "$baseUrl/monthly/get_all_other_collection_by_user_id_year_id.php?user_id=${selectedUser!.id}&year_id=${currentYear!.data.id}";
+
+      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse != null) {
+          collectionsOthers = CollectionResponse.fromJson(jsonResponse);
+          return collectionsOthers;
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        );
+      }
+    }
+    return null;
+  }
+
   Future<void> _reloadData() async {
-    await getUserCollections();
-    setState(() {}); // Refresh UI after fetching data
+    setState(() {
+      isDataLoaded = false;
+    });
+
+    await Future.wait([
+      getUserCollections(),
+      getOtherUserCollections(),
+    ]);
+
+    setState(() {
+      isDataLoaded = true;
+    });
   }
 
   Future<CollectionResponse?> getUserCollections() async {
@@ -113,6 +252,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         if (jsonResponse != null) {
           // setState(() => _isLoading = false);
           collectionsMonthly = CollectionResponse.fromJson(jsonResponse);
+          calculateTotals();
           return collectionsMonthly;
         }
       } else {
@@ -377,6 +517,22 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                               color: Colors.white.withAlpha((0.8 * 255).toInt()),
                             ),
                           ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              "Jumla: TZS ${NumberFormat("#,##0", "en_US").format(totalMonthlyCollections)}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       Container(
@@ -455,6 +611,22 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.white.withValues(alpha: 0.8),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              "Jumla: TZS ${NumberFormat("#,##0", "en_US").format(totalOtherCollections)}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ],
@@ -659,215 +831,264 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
     return Column(
       children: [
         // Controls Card
+        // Toggle button to show/hide controls
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withValues(alpha: 0.08),
-                spreadRadius: 2,
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: mainFontColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(Icons.dashboard, color: mainFontColor, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    "Dhibiti Michango",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Action buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue[50],
-                        foregroundColor: Colors.blue[700],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        elevation: 0,
-                      ),
-                      icon: const Icon(Icons.table_chart, size: 18),
-                      label: const Text(
-                        "Jedwali",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      onPressed: () async {
-                        setState(() {
-                          viewTable = true;
-                        });
-                        await getUserCollectionAgainstTable();
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: mainFontColor.withValues(alpha: 0.1),
-                        foregroundColor: mainFontColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        elevation: 0,
-                      ),
-                      icon: const Icon(Icons.filter_list, size: 18),
-                      label: const Text(
-                        "Chuja",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      onPressed: () {
-                        // Filter functionality can be expanded here
-                      },
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // Filter dropdown
-              _buildModernDropdown<String>(
-                value: filterOption,
-                hint: "Chagua Aina ya Utafutaji",
-                icon: Icons.search,
-                items: filterOptions
-                    .map((option) => DropdownMenuItem(
-                          value: option,
-                          child: Text(option),
-                        ))
-                    .toList(),
-                onChanged: (value) {
+              TextButton.icon(
+                style: TextButton.styleFrom(
+                  foregroundColor: mainFontColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+                icon: Icon(
+                  isLoading ? Icons.hourglass_top : (showUserCollections ? Icons.visibility_off : Icons.visibility),
+                  size: 18,
+                  color: mainFontColor,
+                ),
+                label: Text(showUserCollections ? "Ficha Vichujio" : "Onyesha Vichujio"),
+                onPressed: () {
                   setState(() {
-                    filterOption = value!;
-                    selectedUser = null;
-                    selectedMonth = null;
-                    loadData();
+                    showUserCollections = !showUserCollections;
                   });
                 },
               ),
-
-              // Conditional dropdowns
-              if (filterOption == 'TAARIFA KWA MWANAJUMUIYA') ...[
-                const SizedBox(height: 16),
-                _buildModernDropdown<User>(
-                  value: selectedUser,
-                  hint: "Chagua Mwanajumuiya",
-                  icon: Icons.person,
-                  items: users
-                      .map((user) => DropdownMenuItem<User>(
-                            value: user,
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 12,
-                                  backgroundColor: mainFontColor.withValues(alpha: 0.1),
-                                  child: Text(
-                                    (user.userFullName ?? '').isNotEmpty ? user.userFullName![0].toUpperCase() : '?',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: mainFontColor,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(child: Text(user.userFullName ?? '')),
-                              ],
-                            ),
-                          ))
-                      .toList(),
-                  onChanged: (user) {
-                    if (user != null) {
-                      setState(() {
-                        selectedUser = user;
-                      });
-                      loadData();
-                    }
-                  },
+            ],
+          ),
+        ),
+        // Controls Card (show/hide based on showUserCollections)
+        if (!showUserCollections)
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withValues(alpha: 0.08),
+                  spreadRadius: 2,
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
                 ),
               ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: mainFontColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(Icons.dashboard, color: mainFontColor, size: 20),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      "Dhibiti Michango",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
 
-              if (filterOption == 'KWA MWEZI') ...[
-                const SizedBox(height: 16),
+                // Action buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue[50],
+                          foregroundColor: Colors.blue[700],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          elevation: 0,
+                        ),
+                        icon: const Icon(Icons.table_chart, size: 18),
+                        label: const Text(
+                          "Jedwali",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        onPressed: () async {
+                          setState(() {
+                            viewTable = true;
+                          });
+                          await getUserCollectionAgainstTable();
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: mainFontColor.withValues(alpha: 0.1),
+                          foregroundColor: mainFontColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          elevation: 0,
+                        ),
+                        icon: const Icon(Icons.filter_list, size: 18),
+                        label: const Text(
+                          "Chuja",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        onPressed: () {
+                          // Filter functionality can be expanded here
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Filter dropdown
                 _buildModernDropdown<String>(
-                  value: selectedMonth,
-                  hint: "Chagua Mwezi",
-                  icon: Icons.calendar_month,
-                  items: months
-                      .map((month) => DropdownMenuItem(
-                            value: month,
-                            child: Text(month),
+                  value: filterOption,
+                  hint: "Chagua Aina ya Utafutaji",
+                  icon: Icons.search,
+                  items: filterOptions
+                      .map((option) => DropdownMenuItem(
+                            value: option,
+                            child: Text(option),
                           ))
                       .toList(),
                   onChanged: (value) {
                     setState(() {
-                      selectedMonth = value;
-                      loadData();
+                      filterOption = value!;
+                      selectedUser = null;
+                      selectedMonth = null;
                     });
+                    loadData();
                   },
                 ),
+
+                // Conditional dropdowns
+                if (filterOption == 'TAARIFA KWA MWANAJUMUIYA') ...[
+                  const SizedBox(height: 16),
+                  _buildModernDropdown<User>(
+                    value: selectedUser,
+                    hint: "Chagua Mwanajumuiya",
+                    icon: Icons.person,
+                    items: users
+                        .map((user) => DropdownMenuItem<User>(
+                              value: user,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 12,
+                                    backgroundColor: mainFontColor.withValues(alpha: 0.1),
+                                    child: Text(
+                                      (user.userFullName ?? '').isNotEmpty ? user.userFullName![0].toUpperCase() : '?',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: mainFontColor,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(child: Text(user.userFullName ?? '')),
+                                ],
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (user) {
+                      if (user != null) {
+                        setState(() {
+                          selectedUser = user;
+                        });
+                        loadData();
+                      }
+                    },
+                  ),
+                ],
+
+                if (filterOption == 'MICHANGO YOTE YA MWANAJUMUIYA') ...[
+                  const SizedBox(height: 16),
+                  _buildModernDropdown<User>(
+                    value: selectedUser,
+                    hint: "Chagua Mwanajumuiya",
+                    icon: Icons.person,
+                    items: users
+                        .map((user) => DropdownMenuItem<User>(
+                              value: user,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 12,
+                                    backgroundColor: mainFontColor.withValues(alpha: 0.1),
+                                    child: Text(
+                                      (user.userFullName ?? '').isNotEmpty ? user.userFullName![0].toUpperCase() : '?',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: mainFontColor,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(child: Text(user.userFullName ?? '')),
+                                ],
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (user) {
+                      if (user != null) {
+                        setState(() {
+                          selectedUser = user;
+                        });
+                        loadData();
+                      }
+                    },
+                  ),
+                ],
+
+                if (filterOption == 'KWA MWEZI') ...[
+                  const SizedBox(height: 16),
+                  _buildModernDropdown<String>(
+                    value: selectedMonth,
+                    hint: "Chagua Mwezi",
+                    icon: Icons.calendar_month,
+                    items: months
+                        .map((month) => DropdownMenuItem(
+                              value: month,
+                              child: Text(month),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedMonth = value;
+                      });
+                      loadData();
+                    },
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
-        ),
 
         const SizedBox(height: 16),
 
         // Collections List
         Expanded(
-          child: FutureBuilder(
-            future: filterOption == 'TAARIFA ZOTE'
-                ? getUserCollections()
-                : (filterOption == 'TAARIFA KWA MWANAJUMUIYA' && selectedUser != null)
-                    ? getUserYearCollections()
-                    : (filterOption == 'KWA MWEZI' && selectedMonth != null)
-                        ? getUserMonthCollections()
-                        : getUserCollections(),
-            builder: (context, AsyncSnapshot<CollectionResponse?> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return _buildLoadingCard();
-              } else if (snapshot.hasError) {
-                return _buildErrorCard("Imeshindikana kupakia data ya michango.");
-              } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                String message = selectedUser != null
-                    ? "Hakuna data ya michango iliyopatikana ya ${selectedUser!.userFullName}."
-                    : "Hakuna data ya michango iliyopatikana.";
-                return _buildEmptyCard(message);
-              }
-
-              final collections = snapshot.data!.data;
-              return _buildCollectionsList(collections, size);
-            },
-          ),
+          child: showUserCollections && filterOption == 'MICHANGO YOTE YA MWANAJUMUIYA' && selectedUser != null
+              ? _buildUserAllCollectionsView(size)
+              : !isDataLoaded
+                  ? _buildLoadingCard()
+                  : _buildCollectionsContent(size),
         ),
       ],
     );
@@ -904,6 +1125,18 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
     );
   }
 
+  Widget _buildCollectionsContent(Size size) {
+    if (collectionsMonthly == null || collectionsMonthly!.data.isEmpty) {
+      String message = selectedUser != null
+          ? "Hakuna data ya michango iliyopatikana ya ${selectedUser!.userFullName}."
+          : "Hakuna data ya michango iliyopatikana.";
+      return _buildEmptyCard(message);
+    }
+
+    final collections = collectionsMonthly!.data;
+    return _buildCollectionsList(collections, size);
+  }
+
   Widget _buildLoadingCard() {
     return Container(
       margin: const EdgeInsets.all(16),
@@ -928,39 +1161,6 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
             const SizedBox(height: 16),
             Text(
               "Inapakia...",
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildErrorCard(String message) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.08),
-            spreadRadius: 2,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: Colors.red[400]),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey[600]),
             ),
           ],
@@ -1500,4 +1700,304 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       ),
     );
   }
+
+  Widget _buildUserAllCollectionsView(Size size) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          // Header showing user info
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  mainFontColor.withValues(alpha: 0.1),
+                  mainFontColor.withValues(alpha: 0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: mainFontColor.withValues(alpha: 0.2)),
+            ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 28,
+                  backgroundColor: mainFontColor.withValues(alpha: 0.1),
+                  child: Text(
+                    (selectedUser?.userFullName?.isNotEmpty ?? false)
+                        ? selectedUser!.userFullName![0].toUpperCase()
+                        : '?',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: mainFontColor,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Michango ya ${selectedUser?.userFullName ?? ''}",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: mainFontColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Michango ya kila mwezi na michango mingineyo",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Summary Card showing totals
+          SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.green[50]!,
+                    Colors.green[100]!,
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.account_balance_wallet, color: Colors.green[700]),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Muhtasari wa Michango",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green[800],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Text(
+                              "Michango ya Mwezi",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "TZS ${NumberFormat("#,##0", "en_US").format(_calculateUserMonthlyTotal())}",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 1,
+                        height: 30,
+                        color: Colors.grey[300],
+                      ),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Text(
+                              "Michango Mingineyo",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "TZS ${NumberFormat("#,##0", "en_US").format(_calculateUserOtherTotal())}",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 1,
+                        height: 30,
+                        color: Colors.grey[300],
+                      ),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Text(
+                              "Jumla",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "TZS ${NumberFormat("#,##0", "en_US").format(_calculateUserMonthlyTotal() + _calculateUserOtherTotal())}",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green[800],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // // Tab selector for Monthly vs Other collections
+          // Container(
+          //   padding: const EdgeInsets.all(4),
+          //   decoration: BoxDecoration(
+          //     color: Colors.white,
+          //     borderRadius: BorderRadius.circular(25),
+          //     boxShadow: [
+          //       BoxShadow(
+          //         color: Colors.grey.withValues(alpha: 0.1),
+          //         spreadRadius: 2,
+          //         blurRadius: 10,
+          //         offset: const Offset(0, 3),
+          //       ),
+          //     ],
+          //   ),
+          //   child: Row(
+          //     children: [
+          //       Expanded(
+          //         child: GestureDetector(
+          //           onTap: () {
+          //             setState(() {
+          //               selectedTabIndex = 0;
+          //             });
+          //           },
+          //           child: Container(
+          //             padding: const EdgeInsets.symmetric(vertical: 8),
+          //             decoration: BoxDecoration(
+          //               color: selectedTabIndex == 0 ? mainFontColor : Colors.transparent,
+          //               borderRadius: BorderRadius.circular(20),
+          //             ),
+          //             child: Center(
+          //               child: Text(
+          //                 "Michango ya Mwezi",
+          //                 style: TextStyle(
+          //                   color: selectedTabIndex == 0 ? Colors.white : Colors.grey[600],
+          //                   fontSize: 12,
+          //                   fontWeight: FontWeight.w600,
+          //                 ),
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //       ),
+          //       Expanded(
+          //         child: GestureDetector(
+          //           onTap: () {
+          //             setState(() {
+          //               selectedTabIndex = 1;
+          //             });
+          //           },
+          //           child: Container(
+          //             padding: const EdgeInsets.symmetric(vertical: 8),
+          //             decoration: BoxDecoration(
+          //               color: selectedTabIndex == 1 ? mainFontColor : Colors.transparent,
+          //               borderRadius: BorderRadius.circular(20),
+          //             ),
+          //             child: Center(
+          //               child: Text(
+          //                 "Michango Mingineyo",
+          //                 style: TextStyle(
+          //                   color: selectedTabIndex == 1 ? Colors.white : Colors.grey[600],
+          //                   fontSize: 12,
+          //                   fontWeight: FontWeight.w600,
+          //                 ),
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+
+          // const SizedBox(height: 16),
+
+          // // Collections List based on selected tab
+          // Expanded(
+          //   child: selectedTabIndex == 0 ? _buildUserMonthlyCollections(size) : _buildUserOtherCollections(size),
+          // ),
+        ],
+      ),
+    );
+  }
+
+  // Widget _buildUserMonthlyCollections(Size size) {
+  //   if (collectionsMonthly == null || collectionsMonthly!.data.isEmpty) {
+  //     return _buildEmptyCard("Hakuna michango ya kila mwezi ya ${selectedUser?.userFullName ?? ''}.");
+  //   }
+
+  //   return ListView.separated(
+  //     itemCount: collectionsMonthly!.data.length,
+  //     separatorBuilder: (context, index) => const SizedBox(height: 12),
+  //     itemBuilder: (context, index) {
+  //       final item = collectionsMonthly!.data[index];
+  //       return _buildCollectionCard(item, size);
+  //     },
+  //   );
+  // }
+
+  // Widget _buildUserOtherCollections(Size size) {
+  //   if (collectionsOthers == null || collectionsOthers!.data.isEmpty) {
+  //     return _buildEmptyCard("Hakuna michango mingineyo ya ${selectedUser?.userFullName ?? ''}.");
+  //   }
+
+  //   return ListView.separated(
+  //     itemCount: collectionsOthers!.data.length,
+  //     separatorBuilder: (context, index) => const SizedBox(height: 12),
+  //     itemBuilder: (context, index) {
+  //       final item = collectionsOthers!.data[index];
+  //       return _buildCollectionCard(item, size);
+  //     },
+  //   );
+  // }
 }

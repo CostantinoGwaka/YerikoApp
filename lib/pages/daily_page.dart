@@ -185,7 +185,7 @@ class _DailyPageState extends State<DailyPage> {
       }
 
       final String myApi =
-          "$baseUrl/monthly/get_all_other_collection_by_user.php?userId=${userData!.user.id}&jumuiya_id=${userData!.user.jumuiya_id}";
+          "$baseUrl/monthly/get_all_other_collection_by_user.php?userId=${userData!.user.id}&jumuiyaId=${userData!.user.jumuiya_id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {

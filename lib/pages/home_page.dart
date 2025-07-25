@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    checkAppSettings();
+    // checkAppSettings();
 
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 500),

@@ -87,7 +87,8 @@ class _DailyPageState extends State<DailyPage> {
         });
         return;
       } else {
-        String myApi = "$baseUrl/monthly/get_total_by_user_statistics.php?userId=$userId&year=$year";
+        String myApi =
+            "$baseUrl/monthly/get_total_by_user_statistics.php?userId=$userId&year=$year&jumuiya_id=${userData!.user.jumuiya_id}";
         final response = await http.get(
           Uri.parse(myApi),
           headers: await authHeader,
@@ -139,7 +140,8 @@ class _DailyPageState extends State<DailyPage> {
         return null;
       }
 
-      final String myApi = "$baseUrl/monthly/get_collection_by_user_id.php?user_id=${userData!.user.id}";
+      final String myApi =
+          "$baseUrl/monthly/get_collection_by_user_id.php?user_id=${userData!.user.id}&jumuiya_id=${userData!.user.jumuiya_id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
@@ -182,7 +184,8 @@ class _DailyPageState extends State<DailyPage> {
         return null;
       }
 
-      final String myApi = "$baseUrl/monthly/get_all_other_collection_by_user.php?userId=${userData!.user.id}";
+      final String myApi =
+          "$baseUrl/monthly/get_all_other_collection_by_user.php?userId=${userData!.user.id}&jumuiya_id=${userData!.user.jumuiya_id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {

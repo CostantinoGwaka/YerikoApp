@@ -47,11 +47,11 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
       final String myApi = "$baseUrl/auth/approve_request.php";
       final response = await http.post(
         Uri.parse(myApi),
-        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json'},
         body: json.encode({'request_id': requestId}),
       );
-
-      if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      if (response.statusCode == 200 && jsonResponse['status'] == '200') {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Ombi limekubaliwa kikamilifu.')),
@@ -76,11 +76,11 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
       final String myApi = "$baseUrl/auth/reject_request.php";
       final response = await http.post(
         Uri.parse(myApi),
-        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json'},
         body: json.encode({'request_id': requestId}),
       );
-
-      if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      if (response.statusCode == 200 && jsonResponse['status'] == '200') {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Ombi limekataliwa.')),
@@ -163,13 +163,8 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
           floating: true,
           pinned: true,
           backgroundColor: primary,
+          automaticallyImplyLeading: false,
           elevation: 0,
-          // leading: IconButton(
-          //   icon: const Icon(Icons.arrow_back, color: Colors.white),
-          //   onPressed: () {
-          //     Navigator.pop(context);
-          //   },
-          // ),
           flexibleSpace: FlexibleSpaceBar(
             background: Container(
               decoration: BoxDecoration(
@@ -565,6 +560,11 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
                       ],
                     ),
                     const SizedBox(height: 16),
+                    Text(request.requestId.toString(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[500],
+                        )),
 
                     // Request Info
                     _buildInfoRow(

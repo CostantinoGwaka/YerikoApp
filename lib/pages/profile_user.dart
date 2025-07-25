@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:share_plus/share_plus.dart';
@@ -57,13 +58,15 @@ class _ProfilePageState extends State<ProfilePage> {
         final data = jsonDecode(response.body);
         if (data['status'] == "200" && data['data'] != null) {
           setState(() {
-            jumuiyaNames = List<String>.from(data['data']);
+            jumuiyaNames = (data['data'] as List).map((item) => item['name'] as String).toList();
           });
         }
       }
     } catch (e) {
       // Handle error silently or show message
-      print('Error fetching jumuiya names: $e');
+      if (kDebugMode) {
+        print('Error fetching jumuiya names: $e');
+      }
     }
   }
 

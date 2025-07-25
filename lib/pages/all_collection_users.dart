@@ -41,7 +41,8 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
         return null;
       }
 
-      final String myApi = "$baseUrl/monthly/get_collection_by_user_id.php?user_id=${userData!.user.id}";
+      final String myApi =
+          "$baseUrl/monthly/get_collection_by_user_id.php?user_id=${userData!.user.id}&jumuiya_id=${userData!.user.jumuiya_id}";
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {

@@ -270,7 +270,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       }
 
       final String myApi =
-          "$baseUrl/monthly/get_all_other_collection_by_user_id_year_id.php?user_id=${selectedUser!.id}&year_id=${currentYear!.data.id}";
+          "$baseUrl/monthly/get_all_other_collection_by_user_id_year_id.php?user_id=${selectedUser!.id}&year_id=${currentYear!.data.id}&jumuiya_id${userData!.user.jumuiya_id}";
 
       final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 

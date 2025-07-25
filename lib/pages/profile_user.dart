@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool confirmPasswordVisible = false;
   bool _isLoading = false;
   List<CollectionType> collectionTypeResponse = [];
-  List<String> jumuiyaNames = [];
+  List<Map<String, dynamic>> jumuiyaData = [];
 
   Future<void> fetchCollectionTypes() async {
     collectionTypeResponse = [];
@@ -58,14 +58,19 @@ class _ProfilePageState extends State<ProfilePage> {
         final data = jsonDecode(response.body);
         if (data['status'] == "200" && data['data'] != null) {
           setState(() {
-            jumuiyaNames = (data['data'] as List).map((item) => item['name'] as String).toList();
+            jumuiyaData = (data['data'] as List)
+                .map((item) => {
+                      'name': item['name'] as String,
+                      'id': item['id'] as dynamic,
+                    })
+                .toList();
           });
         }
       }
     } catch (e) {
       // Handle error silently or show message
       if (kDebugMode) {
-        print('Error fetching jumuiya names: $e');
+        print('Error fetching jumuiya data: $e');
       }
     }
   }
@@ -417,7 +422,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
 
                     // Jumuiya Names Section (show if more than 2)
-                    if (jumuiyaNames.length >= 2) ...[
+                    if (jumuiyaData.length >= 2) ...[
                       const SizedBox(height: 10),
                       Container(
                         width: double.infinity,
@@ -455,27 +460,48 @@ class _ProfilePageState extends State<ProfilePage> {
                             Wrap(
                               spacing: 8,
                               runSpacing: 8,
-                              children: jumuiyaNames
-                                  .map((name) => Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withValues(alpha: 0.2),
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: Colors.white.withValues(alpha: 0.4),
-                                            width: 1,
-                                          ),
+                              children: jumuiyaData.map((jumuiyaItem) {
+                                final name = jumuiyaItem['name'] as String;
+                                final id = jumuiyaItem['id'];
+                                final isActive = userData?.user.jumuiya_id.toString() == id.toString();
+
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: isActive
+                                        ? Colors.white.withValues(alpha: 0.3)
+                                        : Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isActive
+                                          ? Colors.white.withValues(alpha: 0.8)
+                                          : Colors.white.withValues(alpha: 0.4),
+                                      width: isActive ? 2 : 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (isActive) ...[
+                                        Icon(
+                                          Icons.check_circle,
+                                          color: Colors.white,
+                                          size: 16,
                                         ),
-                                        child: Text(
-                                          name,
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                        const SizedBox(width: 6),
+                                      ],
+                                      Text(
+                                        name,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                          fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
                                         ),
-                                      ))
-                                  .toList(),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
                             ),
                           ],
                         ),

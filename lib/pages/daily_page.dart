@@ -30,7 +30,7 @@ class _DailyPageState extends State<DailyPage> {
   UserTotalsResponse? userTotalData;
   CollectionResponse? collections;
   OtherCollectionResponse? otherCollectionResponse;
-  List<String> jumuiyaNames = [];
+  List<Map<String, dynamic>> jumuiyaData = [];
   // UserCollectionResponse userCollectionData;
 
   @override
@@ -92,100 +92,75 @@ class _DailyPageState extends State<DailyPage> {
         final data = jsonDecode(response.body);
         if (data['status'] == "200" && data['data'] != null) {
           setState(() {
-            jumuiyaNames = (data['data'] as List).map((item) => item['name'] as String).toList();
+            jumuiyaData = (data['data'] as List)
+                .map((item) => {
+                      'name': item['name'] as String,
+                      'id': item['id'] as dynamic,
+                    })
+                .toList();
           });
         }
       }
     } catch (e) {
       // Handle error silently or show message
       if (kDebugMode) {
-        print('Error fetching jumuiya names: $e');
+        print('Error fetching jumuiya data: $e');
       }
     }
   }
 
-  Future<void> switchJumuiya(String selectedJumuiya) async {
+  Future<void> switchJumuiya(dynamic jumuiyaId, String jumuiyaName) async {
     try {
       setState(() {
         _isLoadingJumuiya = true;
       });
 
-      final response = await http.post(
-          headers: {'Accept': 'application/json'},
-          Uri.parse('$baseUrl/auth/switch_jumuiya.php'),
-          body: jsonEncode({
-            "user_id": userData!.user.id.toString(),
-            "jumuiya_name": selectedJumuiya,
-          }));
+      // Locally update user jumuiya info without API call
+      final updatedUser = User(
+        id: userData!.user.id,
+        phone: userData!.user.phone,
+        userFullName: userData!.user.userFullName,
+        yearRegistered: userData!.user.yearRegistered,
+        createdAt: userData!.user.createdAt,
+        userName: userData!.user.userName,
+        location: userData!.user.location,
+        gender: userData!.user.gender,
+        dobdate: userData!.user.dobdate,
+        martialstatus: userData!.user.martialstatus,
+        role: userData!.user.role,
+        jina_jumuiya: jumuiyaName,
+        jumuiya_id: jumuiyaId,
+      );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['status'] == "200" && data['data'] != null) {
-          // Update user data with new jumuiya info
-          final updatedUser = User(
-            id: userData!.user.id,
-            phone: userData!.user.phone,
-            userFullName: userData!.user.userFullName,
-            yearRegistered: userData!.user.yearRegistered,
-            createdAt: userData!.user.createdAt,
-            userName: userData!.user.userName,
-            location: userData!.user.location,
-            gender: userData!.user.gender,
-            dobdate: userData!.user.dobdate,
-            martialstatus: userData!.user.martialstatus,
-            role: userData!.user.role,
-            jina_jumuiya: data['data']['jina_jumuiya'],
-            jumuiya_id: data['data']['jumuiya_id'],
-          );
+      userData = LoginResponse(
+        status: userData!.status,
+        message: userData!.message,
+        user: updatedUser,
+      );
 
-          userData = LoginResponse(
-            status: userData!.status,
-            message: userData!.message,
-            user: updatedUser,
-          );
+      // Save updated user data to local storage
+      String updatedUserJson = jsonEncode(userData!.toJson());
+      await LocalStorage.setStringItem("user_data", updatedUserJson);
 
-          // Save updated user data to local storage
-          String updatedUserJson = jsonEncode(userData!.toJson());
-          await LocalStorage.setStringItem("user_data", updatedUserJson);
+      setState(() {
+        _isLoadingJumuiya = false;
+      });
 
-          setState(() {
-            _isLoadingJumuiya = false;
-          });
+      // Refresh data for new jumuiya
+      _reloadData();
 
-          // Refresh data for new jumuiya
-          _reloadData();
-
-          // Show success message
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("✅ Umebadilishwa kwa jumuiya: $selectedJumuiya")),
-            );
-          }
-        } else {
-          setState(() {
-            _isLoadingJumuiya = false;
-          });
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("⚠️ ${data['message'] ?? 'Imeshindwa kubadilisha jumuiya'}")),
-            );
-          }
-        }
-      } else {
-        setState(() {
-          _isLoadingJumuiya = false;
-        });
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("⚠️ Imeshindwa kubadilisha jumuiya")),
-          );
-        }
+      // Show success message
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("✅ Umebadilishwa kwa jumuiya: $jumuiyaName")),
+        );
       }
     } catch (e) {
       setState(() {
         _isLoadingJumuiya = false;
       });
       if (context.mounted) {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
         );
@@ -194,7 +169,7 @@ class _DailyPageState extends State<DailyPage> {
   }
 
   void _showJumuiyaSwitchDialog() {
-    if (jumuiyaNames.length < 2) {
+    if (jumuiyaData.length < 2) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("⚠️ Huna jumuiya zaidi ya moja za kubadilishia")),
       );
@@ -221,74 +196,78 @@ class _DailyPageState extends State<DailyPage> {
             children: [
               Text('Chagua jumuiya unayotaka kubadilisha:'),
               SizedBox(height: 16),
-              ...jumuiyaNames
-                  .map((jumuiya) => Card(
-                        margin: EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          leading: Icon(
-                            Icons.group_rounded,
-                            color: userData!.user.jina_jumuiya == jumuiya ? mainFontColor : Colors.grey,
-                          ),
-                          title: Text(
-                            jumuiya,
-                            style: TextStyle(
-                              fontWeight: userData!.user.jina_jumuiya == jumuiya ? FontWeight.bold : FontWeight.normal,
-                              color: userData!.user.jina_jumuiya == jumuiya ? mainFontColor : Colors.black87,
-                            ),
-                          ),
-                          trailing: userData!.user.jina_jumuiya == jumuiya
-                              ? Icon(Icons.check_circle, color: mainFontColor)
-                              : null,
-                          onTap: userData!.user.jina_jumuiya == jumuiya
-                              ? null
-                              : () {
-                                  Navigator.of(context).pop();
-                                  // Show confirmation dialog before switching
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext confirmContext) {
-                                      return AlertDialog(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(16),
+              ...jumuiyaData.map(
+                (jumuiyaItem) {
+                  final jumuiyaName = jumuiyaItem['name'] as String;
+                  final jumuiyaId = jumuiyaItem['id'];
+                  final isCurrentJumuiya = userData!.user.jina_jumuiya == jumuiyaName;
+
+                  return Card(
+                    margin: EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.group_rounded,
+                        color: isCurrentJumuiya ? mainFontColor : Colors.grey,
+                      ),
+                      title: Text(
+                        jumuiyaName,
+                        style: TextStyle(
+                          fontWeight: isCurrentJumuiya ? FontWeight.bold : FontWeight.normal,
+                          color: isCurrentJumuiya ? mainFontColor : Colors.black87,
+                        ),
+                      ),
+                      trailing: isCurrentJumuiya ? Icon(Icons.check_circle, color: mainFontColor) : null,
+                      onTap: isCurrentJumuiya
+                          ? null
+                          : () {
+                              Navigator.of(context).pop();
+                              // Show confirmation dialog before switching
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext confirmContext) {
+                                  return AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    title: Row(
+                                      children: [
+                                        Icon(Icons.warning_rounded, color: Colors.orange[400]),
+                                        SizedBox(width: 8),
+                                        Text('Thibitisha'),
+                                      ],
+                                    ),
+                                    content: Text('Una uhakika unataka kubadilisha hadi jumuiya "$jumuiyaName"?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(confirmContext).pop(),
+                                        child: Text(
+                                          'Hapana',
+                                          style: TextStyle(color: Colors.grey[600]),
                                         ),
-                                        title: Row(
-                                          children: [
-                                            Icon(Icons.warning_rounded, color: Colors.orange[400]),
-                                            SizedBox(width: 8),
-                                            Text('Thibitisha'),
-                                          ],
+                                      ),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: mainFontColor,
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
                                         ),
-                                        content: Text('Una uhakika unataka kubadilisha hadi jumuiya "$jumuiya"?'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.of(confirmContext).pop(),
-                                            child: Text(
-                                              'Hapana',
-                                              style: TextStyle(color: Colors.grey[600]),
-                                            ),
-                                          ),
-                                          ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: mainFontColor,
-                                              foregroundColor: Colors.white,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                            ),
-                                            onPressed: () {
-                                              Navigator.of(confirmContext).pop();
-                                              switchJumuiya(jumuiya);
-                                            },
-                                            child: const Text('Ndiyo'),
-                                          ),
-                                        ],
-                                      );
-                                    },
+                                        onPressed: () {
+                                          Navigator.of(confirmContext).pop();
+                                          switchJumuiya(jumuiyaId, jumuiyaName);
+                                        },
+                                        child: const Text('Ndiyo'),
+                                      ),
+                                    ],
                                   );
                                 },
-                        ),
-                      ))
-                  .toList(),
+                              );
+                            },
+                    ),
+                  );
+                },
+              ),
             ],
           ),
           actions: [
@@ -670,7 +649,7 @@ class _DailyPageState extends State<DailyPage> {
                         },
                         itemBuilder: (BuildContext context) => [
                           // Switch Jumuiya option - only show if user has 2 or more jumuiya
-                          if (jumuiyaNames.length >= 2)
+                          if (jumuiyaData.length >= 2)
                             PopupMenuItem<String>(
                               value: 'switch_jumuiya',
                               child: Row(

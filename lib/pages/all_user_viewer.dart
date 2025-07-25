@@ -246,88 +246,99 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                   ),
                                 ),
                               ],
+                              const SizedBox(width: 5),
                               if (userData != null &&
                                   (userData!.user.role == "USER" || userData!.user.role == "ADMIN") &&
                                   _hasUserPendingRequests) ...[
-                                Stack(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.orange.withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(12),
+                                GestureDetector(
+                                  onTap: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const UserPendingRequestsViewer(),
                                       ),
-                                      padding: const EdgeInsets.all(8),
-                                      child: InkWell(
-                                        onTap: () async {
-                                          await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => const UserPendingRequestsViewer(),
-                                            ),
-                                          );
-                                          // Refresh the count when user returns
-                                          if (userData != null && (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
-                                            checkUserPendingRequests();
-                                          }
-                                        },
-                                        child: const Icon(
-                                          CupertinoIcons.bell_circle_fill,
-                                          color: Colors.orange,
-                                          size: 24,
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      right: 0,
-                                      top: 0,
-                                      child: AnimatedContainer(
-                                        duration: const Duration(milliseconds: 300),
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    );
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      Container(
                                         decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [Colors.red[400]!, Colors.red[600]!],
-                                          ),
-                                          borderRadius: BorderRadius.circular(10),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.red.withValues(alpha: 0.4),
-                                              blurRadius: 6,
-                                              offset: const Offset(0, 2),
-                                            ),
-                                          ],
+                                          color: Colors.orange.withValues(alpha: 0.2),
+                                          borderRadius: BorderRadius.circular(12),
                                         ),
-                                        constraints: const BoxConstraints(
-                                          minWidth: 20,
-                                          minHeight: 20,
-                                        ),
-                                        child: Text(
-                                          _pendingRequestsCount > 99 ? '99+' : _pendingRequestsCount.toString(),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 0.5,
+                                        padding: const EdgeInsets.all(8),
+                                        child: InkWell(
+                                          onTap: () async {
+                                            await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => const UserPendingRequestsViewer(),
+                                              ),
+                                            );
+                                            // Refresh the count when user returns
+                                            if (userData != null &&
+                                                (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
+                                              checkUserPendingRequests();
+                                            }
+                                          },
+                                          child: const Icon(
+                                            CupertinoIcons.bell_circle_fill,
+                                            color: Colors.orange,
+                                            size: 24,
                                           ),
-                                          textAlign: TextAlign.center,
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                      Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        child: AnimatedContainer(
+                                          duration: const Duration(milliseconds: 300),
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [Colors.red[400]!, Colors.red[600]!],
+                                            ),
+                                            borderRadius: BorderRadius.circular(10),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.red.withValues(alpha: 0.4),
+                                                blurRadius: 6,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          constraints: const BoxConstraints(
+                                            minWidth: 20,
+                                            minHeight: 20,
+                                          ),
+                                          child: Text(
+                                            _pendingRequestsCount > 99 ? '99+' : _pendingRequestsCount.toString(),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 0.5,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
-                              const SizedBox(width: 8),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                padding: const EdgeInsets.all(8),
-                                child: Icon(
-                                  CupertinoIcons.person_3_fill,
-                                  color: const Color.fromARGB(255, 32, 21, 234).withValues(alpha: 0.7),
-                                  size: 24,
-                                ),
-                              ),
+                              // Container(
+                              //   decoration: BoxDecoration(
+                              //     color: Colors.white.withValues(alpha: 0.2),
+                              //     borderRadius: BorderRadius.circular(12),
+                              //   ),
+                              //   padding: const EdgeInsets.all(8),
+                              //   child: Icon(
+                              //     CupertinoIcons.person_3_fill,
+                              //     color: const Color.fromARGB(255, 32, 21, 234).withValues(alpha: 0.7),
+                              //     size: 24,
+                              //   ),
+                              // ),
                             ],
                           ),
                         ],

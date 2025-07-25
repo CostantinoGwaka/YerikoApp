@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:jumuiya_yangu/main.dart';
+import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/other_collection_model.dart';
 import 'package:jumuiya_yangu/models/user_collection_model.dart';
 import 'package:jumuiya_yangu/models/user_total_model.dart';
@@ -24,9 +26,11 @@ class DailyPage extends StatefulWidget {
 
 class _DailyPageState extends State<DailyPage> {
   bool _isLoading = false;
+  bool _isLoadingJumuiya = false;
   UserTotalsResponse? userTotalData;
   CollectionResponse? collections;
   OtherCollectionResponse? otherCollectionResponse;
+  List<String> jumuiyaNames = [];
   // UserCollectionResponse userCollectionData;
 
   @override
@@ -36,6 +40,7 @@ class _DailyPageState extends State<DailyPage> {
       setState(() {});
       getTotalSummary(userData!.user.id!, currentYear!.data.churchYear);
       getUserOtherCollections();
+      fetchJumuiyaNames();
     }
   }
 
@@ -44,6 +49,8 @@ class _DailyPageState extends State<DailyPage> {
     if (userData != null && currentYear != null) {
       getTotalSummary(userData!.user.id!, currentYear!.data.churchYear);
     }
+    // Refresh jumuiya names as well
+    fetchJumuiyaNames();
     setState(() {}); // Refresh UI after fetching data
   }
 
@@ -70,6 +77,232 @@ class _DailyPageState extends State<DailyPage> {
         const SnackBar(content: Text("✅ Umefanikiwa! Umetoka kwenye mfumo.")),
       );
     });
+  }
+
+  Future<void> fetchJumuiyaNames() async {
+    try {
+      final response = await http.post(
+          headers: {'Accept': 'application/json'},
+          Uri.parse('$baseUrl/auth/get_my_jumuiya.php'),
+          body: jsonEncode({
+            "user_id": userData!.user.id.toString(),
+          }));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == "200" && data['data'] != null) {
+          setState(() {
+            jumuiyaNames = (data['data'] as List).map((item) => item['name'] as String).toList();
+          });
+        }
+      }
+    } catch (e) {
+      // Handle error silently or show message
+      if (kDebugMode) {
+        print('Error fetching jumuiya names: $e');
+      }
+    }
+  }
+
+  Future<void> switchJumuiya(String selectedJumuiya) async {
+    try {
+      setState(() {
+        _isLoadingJumuiya = true;
+      });
+
+      final response = await http.post(
+          headers: {'Accept': 'application/json'},
+          Uri.parse('$baseUrl/auth/switch_jumuiya.php'),
+          body: jsonEncode({
+            "user_id": userData!.user.id.toString(),
+            "jumuiya_name": selectedJumuiya,
+          }));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == "200" && data['data'] != null) {
+          // Update user data with new jumuiya info
+          final updatedUser = User(
+            id: userData!.user.id,
+            phone: userData!.user.phone,
+            userFullName: userData!.user.userFullName,
+            yearRegistered: userData!.user.yearRegistered,
+            createdAt: userData!.user.createdAt,
+            userName: userData!.user.userName,
+            location: userData!.user.location,
+            gender: userData!.user.gender,
+            dobdate: userData!.user.dobdate,
+            martialstatus: userData!.user.martialstatus,
+            role: userData!.user.role,
+            jina_jumuiya: data['data']['jina_jumuiya'],
+            jumuiya_id: data['data']['jumuiya_id'],
+          );
+
+          userData = LoginResponse(
+            status: userData!.status,
+            message: userData!.message,
+            user: updatedUser,
+          );
+
+          // Save updated user data to local storage
+          String updatedUserJson = jsonEncode(userData!.toJson());
+          await LocalStorage.setStringItem("user_data", updatedUserJson);
+
+          setState(() {
+            _isLoadingJumuiya = false;
+          });
+
+          // Refresh data for new jumuiya
+          _reloadData();
+
+          // Show success message
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("✅ Umebadilishwa kwa jumuiya: $selectedJumuiya")),
+            );
+          }
+        } else {
+          setState(() {
+            _isLoadingJumuiya = false;
+          });
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("⚠️ ${data['message'] ?? 'Imeshindwa kubadilisha jumuiya'}")),
+            );
+          }
+        }
+      } else {
+        setState(() {
+          _isLoadingJumuiya = false;
+        });
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("⚠️ Imeshindwa kubadilisha jumuiya")),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isLoadingJumuiya = false;
+      });
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        );
+      }
+    }
+  }
+
+  void _showJumuiyaSwitchDialog() {
+    if (jumuiyaNames.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("⚠️ Huna jumuiya zaidi ya moja za kubadilishia")),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.swap_horizontal_circle_rounded, color: mainFontColor),
+              SizedBox(width: 8),
+              Text('Badilisha Jumuiya'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Chagua jumuiya unayotaka kubadilisha:'),
+              SizedBox(height: 16),
+              ...jumuiyaNames
+                  .map((jumuiya) => Card(
+                        margin: EdgeInsets.only(bottom: 8),
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.group_rounded,
+                            color: userData!.user.jina_jumuiya == jumuiya ? mainFontColor : Colors.grey,
+                          ),
+                          title: Text(
+                            jumuiya,
+                            style: TextStyle(
+                              fontWeight: userData!.user.jina_jumuiya == jumuiya ? FontWeight.bold : FontWeight.normal,
+                              color: userData!.user.jina_jumuiya == jumuiya ? mainFontColor : Colors.black87,
+                            ),
+                          ),
+                          trailing: userData!.user.jina_jumuiya == jumuiya
+                              ? Icon(Icons.check_circle, color: mainFontColor)
+                              : null,
+                          onTap: userData!.user.jina_jumuiya == jumuiya
+                              ? null
+                              : () {
+                                  Navigator.of(context).pop();
+                                  // Show confirmation dialog before switching
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext confirmContext) {
+                                      return AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        title: Row(
+                                          children: [
+                                            Icon(Icons.warning_rounded, color: Colors.orange[400]),
+                                            SizedBox(width: 8),
+                                            Text('Thibitisha'),
+                                          ],
+                                        ),
+                                        content: Text('Una uhakika unataka kubadilisha hadi jumuiya "$jumuiya"?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(confirmContext).pop(),
+                                            child: Text(
+                                              'Hapana',
+                                              style: TextStyle(color: Colors.grey[600]),
+                                            ),
+                                          ),
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: mainFontColor,
+                                              foregroundColor: Colors.white,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.of(confirmContext).pop();
+                                              switchJumuiya(jumuiya);
+                                            },
+                                            child: const Text('Ndiyo'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                        ),
+                      ))
+                  .toList(),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Funga',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<dynamic> getTotalSummary(int userId, String year) async {
@@ -431,9 +664,40 @@ class _DailyPageState extends State<DailyPage> {
                                 );
                               },
                             );
+                          } else if (value == 'switch_jumuiya') {
+                            _showJumuiyaSwitchDialog();
                           }
                         },
                         itemBuilder: (BuildContext context) => [
+                          // Switch Jumuiya option - only show if user has 2 or more jumuiya
+                          if (jumuiyaNames.length >= 2)
+                            PopupMenuItem<String>(
+                              value: 'switch_jumuiya',
+                              child: Row(
+                                children: [
+                                  if (_isLoadingJumuiya)
+                                    SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  else
+                                    Icon(
+                                      Icons.swap_horizontal_circle_rounded,
+                                      color: mainFontColor,
+                                      size: 18,
+                                    ),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    'Badilisha Jumuiya',
+                                    style: TextStyle(
+                                      color: mainFontColor,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           PopupMenuItem<String>(
                             value: 'logout',
                             child: Row(
@@ -539,30 +803,12 @@ class _DailyPageState extends State<DailyPage> {
                         ],
                       ),
 
-                      SizedBox(height: 24),
+                      SizedBox(height: 10),
 
                       // Profile Info
                       Column(
                         children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
-                                width: 3,
-                              ),
-                            ),
-                            child: CircleAvatar(
-                              radius: isSmallScreen ? 35 : 45,
-                              backgroundColor: Colors.white,
-                              child: CircleAvatar(
-                                radius: isSmallScreen ? 32 : 42,
-                                backgroundColor: Colors.white,
-                                backgroundImage: const AssetImage("assets/avatar.png"),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 16),
+                          SizedBox(height: 2),
                           Text(
                             userData != null ? userData!.user.userFullName! : "Mtumiaji",
                             textAlign: TextAlign.center,
@@ -572,7 +818,7 @@ class _DailyPageState extends State<DailyPage> {
                               color: Colors.white,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          SizedBox(height: 2),
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                             decoration: BoxDecoration(
@@ -602,7 +848,7 @@ class _DailyPageState extends State<DailyPage> {
                         ],
                       ),
 
-                      SizedBox(height: 32),
+                      SizedBox(height: 10),
 
                       // Statistics Cards
                       Row(
@@ -658,7 +904,7 @@ class _DailyPageState extends State<DailyPage> {
                 ),
               ),
 
-              SizedBox(height: 32),
+              SizedBox(height: 24),
 
               // Collections Section
               Container(

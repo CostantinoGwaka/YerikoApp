@@ -26,6 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool confirmPasswordVisible = false;
   bool _isLoading = false;
   List<CollectionType> collectionTypeResponse = [];
+  List<String> jumuiyaNames = [];
 
   Future<void> fetchCollectionTypes() async {
     collectionTypeResponse = [];
@@ -40,6 +41,29 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {});
     } else {
       // handle error
+    }
+  }
+
+  Future<void> fetchJumuiyaNames() async {
+    try {
+      final response = await http.post(
+          headers: {'Accept': 'application/json'},
+          Uri.parse('$baseUrl/auth/get_my_jumuiya.php'),
+          body: jsonEncode({
+            "user_id": userData!.user.id.toString(),
+          }));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == "200" && data['data'] != null) {
+          setState(() {
+            jumuiyaNames = List<String>.from(data['data']);
+          });
+        }
+      }
+    } catch (e) {
+      // Handle error silently or show message
+      print('Error fetching jumuiya names: $e');
     }
   }
 
@@ -274,6 +298,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     fetchCollectionTypes();
+    fetchJumuiyaNames();
   }
 
   @override
@@ -387,6 +412,72 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: Colors.white,
                         icon: Icons.verified_user_rounded,
                       ),
+
+                    // Jumuiya Names Section (show if more than 2)
+                    if (jumuiyaNames.length >= 2) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.group_rounded,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  "Jumuiya Zangu",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: jumuiyaNames
+                                  .map((name) => Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withValues(alpha: 0.2),
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: Colors.white.withValues(alpha: 0.4),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          name,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ))
+                                  .toList(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

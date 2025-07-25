@@ -666,19 +666,41 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
           ],
         ),
         if (_searchedUser != null) ...[
-          const SizedBox(height: 24),
+          const SizedBox(height: 10),
           _buildUserDetails(),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ModernButton(
-              onPressed: () => associateUserWithJumuiya(_searchedUser!),
-              text: "Unganisha na Jumuiya Hii",
-              icon: Icons.group_add_rounded,
-              isLoading: _isLoading,
-              backgroundColor: Colors.green,
+          const SizedBox(height: 10),
+          if (_searchedUser!.role == "ADMIN") ...[
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.warning_amber_rounded, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "Mtumiaji huyu ni ADMIN na hawezi kuunganishwa na jumuiya hii.",
+                      style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+          ] else ...[
+            SizedBox(
+              width: double.infinity,
+              child: ModernButton(
+                onPressed: () => associateUserWithJumuiya(_searchedUser!),
+                text: "Unganisha na Jumuiya Hii",
+                icon: Icons.group_add_rounded,
+                isLoading: _isLoading,
+                backgroundColor: Colors.green,
+              ),
+            ),
+          ],
         ],
       ],
     );

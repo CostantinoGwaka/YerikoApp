@@ -35,23 +35,25 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  animated_bottom_navigation_bar: ^1.1.0+1
-  percent_indicator: ^4.0.1
-  google_fonts: ^6.2.1
-  icon_badge: ^1.0.0
-  win32: ^5.14.0
-  intl: ^0.20.2
+  cupertino_icons: 
+  animated_bottom_navigation_bar: 
+  percent_indicator: 
+  google_fonts:
+  icon_badge: 
+  win32:
+  intl:
   lottie:
-  http: ^1.4.0
+  http:
   provider:
-  shared_preferences: ^2.5.3
-  page_transition: ^2.0.5
-  url_launcher: ^6.3.1
-  flutter_localization: ^0.3.3
+  shared_preferences: 
+  page_transition:
+  url_launcher:
+  flutter_localization: 
   flutter_phoenix: ^1.1.0
-  share_plus: ^11.0.0
+  share_plus:
   open_store:
+  # dependencies:
+  restart_app:
 
 
 

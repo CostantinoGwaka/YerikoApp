@@ -16,6 +16,7 @@ import 'package:jumuiya_yangu/shared/localstorage/index.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
+import 'package:restart_app/restart_app.dart';
 
 class DailyPage extends StatefulWidget {
   const DailyPage({super.key});
@@ -44,7 +45,7 @@ class _DailyPageState extends State<DailyPage> {
     }
   }
 
-  Future<void> _reloadData() async {
+  Future<void> reloadData() async {
     await getUserCollections();
     if (userData != null && currentYear != null) {
       getTotalSummary(userData!.user.id!, currentYear!.data.churchYear);
@@ -147,10 +148,15 @@ class _DailyPageState extends State<DailyPage> {
       });
 
       // Refresh data for new jumuiya
-      _reloadData();
+      reloadData();
+      Restart.restartApp(
+        notificationTitle: 'Jumuiya Yangu',
+        notificationBody: 'Tafadhali gusa hapa kufungua programu tena.',
+      );
 
       // Show success message
       if (context.mounted) {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("✅ Umebadilishwa kwa jumuiya: $jumuiyaName")),
         );
@@ -529,7 +535,7 @@ class _DailyPageState extends State<DailyPage> {
 
     return SafeArea(
       child: RefreshIndicator(
-        onRefresh: _reloadData,
+        onRefresh: reloadData,
         color: mainFontColor,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),

@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:jumuiya_yangu/main.dart';
@@ -24,6 +26,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   bool oldPasswordVisible = false;
   bool newPasswordVisible = false;
+  bool _isLoadingJumuiya = false;
   bool confirmPasswordVisible = false;
   bool _isLoading = false;
   List<CollectionType> collectionTypeResponse = [];
@@ -98,6 +101,72 @@ class _ProfilePageState extends State<ProfilePage> {
         const SnackBar(content: Text("✅ Umefanikiwa! Umetoka kwenye mfumo.")),
       );
     });
+  }
+
+  Future<void> switchJumuiya(dynamic jumuiyaId, String jumuiyaName) async {
+    try {
+      setState(() {
+        _isLoadingJumuiya = true;
+      });
+
+      // Locally update user jumuiya info without API call
+      final updatedUser = User(
+        id: userData!.user.id,
+        phone: userData!.user.phone,
+        userFullName: userData!.user.userFullName,
+        yearRegistered: userData!.user.yearRegistered,
+        createdAt: userData!.user.createdAt,
+        userName: userData!.user.userName,
+        location: userData!.user.location,
+        gender: userData!.user.gender,
+        dobdate: userData!.user.dobdate,
+        martialstatus: userData!.user.martialstatus,
+        role: userData!.user.role,
+        jina_jumuiya: jumuiyaName,
+        jumuiya_id: jumuiyaId,
+      );
+
+      userData = LoginResponse(
+        status: userData!.status,
+        message: userData!.message,
+        user: updatedUser,
+      );
+
+      // Save updated user data to local storage
+      String updatedUserJson = jsonEncode(userData!.toJson());
+      await LocalStorage.setStringItem("user_data", updatedUserJson);
+
+      setState(() {
+        _isLoadingJumuiya = false;
+      });
+
+      // Refresh data for new jumuiya
+      fetchCollectionTypes();
+      // Refresh daily data if needed
+      // fetchJumuiyaNames();
+      Restart.restartApp(
+        notificationTitle: 'Jumuiya Yangu',
+        notificationBody: 'Tafadhali gusa hapa kufungua programu tena.',
+      );
+
+      // Onyesha ujumbe wa mafanikio
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("✅ Umefanikiwa kubadilisha jumuiya: $jumuiyaName")),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoadingJumuiya = false;
+      });
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        );
+      }
+    }
   }
 
   Future<dynamic> registerCollectionType(
@@ -309,6 +378,57 @@ class _ProfilePageState extends State<ProfilePage> {
     fetchJumuiyaNames();
   }
 
+  void _showJumuiyaSwitchDialog(jumuiyaId, jumuiyaName) {
+    if (jumuiyaData.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("⚠️ Huna jumuiya zaidi ya moja za kubadilishia")),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext confirmContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.warning_rounded, color: Colors.orange[400]),
+              SizedBox(width: 8),
+              Text('Thibitisha'),
+            ],
+          ),
+          content: Text('Una uhakika unataka kubadilisha hadi jumuiya "$jumuiyaName"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(confirmContext).pop(),
+              child: Text(
+                'Hapana',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: mainFontColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(confirmContext).pop();
+                switchJumuiya(jumuiyaId, jumuiyaName);
+              },
+              child: const Text('Ndiyo'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -457,52 +577,66 @@ class _ProfilePageState extends State<ProfilePage> {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: jumuiyaData.map((jumuiyaItem) {
-                                final name = jumuiyaItem['name'] as String;
-                                final id = jumuiyaItem['id'];
-                                final isActive = userData?.user.jumuiya_id.toString() == id.toString();
+                            if (_isLoadingJumuiya)
+                              SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            else
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: jumuiyaData.map((jumuiyaItem) {
+                                  final name = jumuiyaItem['name'] as String;
+                                  final id = jumuiyaItem['id'];
+                                  final isActive = userData?.user.jumuiya_id.toString() == id.toString();
 
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: isActive
-                                        ? Colors.white.withValues(alpha: 0.3)
-                                        : Colors.white.withValues(alpha: 0.2),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: isActive
-                                          ? Colors.white.withValues(alpha: 0.8)
-                                          : Colors.white.withValues(alpha: 0.4),
-                                      width: isActive ? 2 : 1,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (isActive) ...[
-                                        Icon(
-                                          Icons.check_circle,
-                                          color: Colors.white,
-                                          size: 16,
-                                        ),
-                                        const SizedBox(width: 6),
-                                      ],
-                                      Text(
-                                        name,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white,
-                                          fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                                  return GestureDetector(
+                                    onTap: () {
+                                      if (!isActive) {
+                                        _showJumuiyaSwitchDialog(id, name);
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: isActive
+                                            ? Colors.white.withValues(alpha: 0.3)
+                                            : Colors.white.withValues(alpha: 0.2),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: isActive
+                                              ? Colors.white.withValues(alpha: 0.8)
+                                              : Colors.white.withValues(alpha: 0.4),
+                                          width: isActive ? 2 : 1,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
-                            ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          if (isActive) ...[
+                                            Icon(
+                                              Icons.check_circle,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                            const SizedBox(width: 6),
+                                          ],
+                                          Text(
+                                            name,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white,
+                                              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
                           ],
                         ),
                       ),
@@ -593,7 +727,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
 
                     // Logout Button
                     ModernButton(
@@ -602,7 +736,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       backgroundColor: errorColor,
                       onPressed: () => _showLogoutDialog(context),
                       isLoading: _isLoading,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.all(10),
                     ),
 
                     const SizedBox(height: 24),

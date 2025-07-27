@@ -303,7 +303,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
 
   Future<void> deleteTimeTable(dynamic id) async {
     try {
-      final String myApi = "$baseUrl/church_timetable/delete_time_table.php?id=$id";
+      final String myApi = "$baseUrl/monthly/delete_other.php?id=$id";
       final response = await http.delete(
         Uri.parse(myApi),
         headers: {'Accept': 'application/json'},

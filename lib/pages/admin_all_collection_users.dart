@@ -423,12 +423,13 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
 
   Future<void> deleteTimeTable(dynamic id) async {
     try {
-      final String myApi = "$baseUrl/church_timetable/delete_time_table.php?id=$id";
+      final String myApi = "$baseUrl/monthly/delete.php?id=$id";
       final response = await http.delete(
         Uri.parse(myApi),
         headers: {'Accept': 'application/json'},
       );
-
+      // final jsonResponse = json.decode(response.body);
+      // print(jsonResponse);
       if (response.statusCode == 200) {
         // final jsonResponse = json.decode(response.body);
         // print(jsonResponse);
@@ -1490,7 +1491,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                               );
                               if (confirm == true) {
                                 // ignore: use_build_context_synchronously
-                                Navigator.of(context).pop(); // Close the modal first
+                                // Navigator.of(context).pop(); // Close the modal first
                                 deleteTimeTable(dataItem.id);
                               }
                             },

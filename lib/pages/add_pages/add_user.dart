@@ -189,10 +189,14 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
           _searchedUser = User.fromJson(jsonResponse['data']);
           _isSearching = false;
         });
+        // ignore: use_build_context_synchronously
+        FocusScope.of(context).unfocus(); // Dismiss keyboard after getting data
       } else {
         setState(() {
           _isSearching = false;
         });
+        // ignore: use_build_context_synchronously
+        FocusScope.of(context).unfocus(); // Dismiss keyboard after getting data
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(jsonResponse['message'] ?? "Mtumiaji hajapatikana")),
@@ -202,6 +206,8 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
       setState(() {
         _isSearching = false;
       });
+      // ignore: use_build_context_synchronously
+      FocusScope.of(context).unfocus(); // Dismiss keyboard after getting data
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Kosa katika kutafuta mtumiaji: $e")),

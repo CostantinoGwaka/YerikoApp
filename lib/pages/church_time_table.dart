@@ -448,7 +448,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                               showModalBottomSheet(
                                 context: context,
                                 isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
+                                backgroundColor: Colors.white,
                                 builder: (BuildContext context) {
                                   return AddPrayerSchedulePage(
                                     rootContext: context,
@@ -460,7 +460,6 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                                 },
                               );
                             } else if (value == 'delete') {
-                              Navigator.pop(context);
                               _showDeleteConfirmation(context, item);
                             }
                           },

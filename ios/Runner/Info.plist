@@ -61,7 +61,7 @@
 		<string>com.isoftzt.jumuiyayangu</string>
 		<key>CFBundleURLSchemes</key>
 		<array>
-		<string>Jumuiya Yangu</string>
+			<string>com.isoftzt.jumuiyayangu</string>
 		</array>
 	</dict>
 	</array>

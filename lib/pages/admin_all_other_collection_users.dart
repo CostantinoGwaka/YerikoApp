@@ -314,7 +314,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
         Navigator.pop(context); // Close bottom sheet
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ratiba imefutwa kikamirifu.')),
+          const SnackBar(content: Text('Mchango umefutwa kikamirifu.')),
         );
         _reloadData();
       } else {

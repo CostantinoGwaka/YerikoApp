@@ -423,13 +423,12 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
 
   Future<void> deleteTimeTable(dynamic id) async {
     try {
-      final String myApi = "$baseUrl/monthly/delete.php?id=$id";
+      final String myApi = "$baseUrl/church_timetable/delete_time_table.php?id=$id";
       final response = await http.delete(
         Uri.parse(myApi),
         headers: {'Accept': 'application/json'},
       );
-      // final jsonResponse = json.decode(response.body);
-      // print(jsonResponse);
+
       if (response.statusCode == 200) {
         // final jsonResponse = json.decode(response.body);
         // print(jsonResponse);
@@ -438,7 +437,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         Navigator.pop(context); // Close bottom sheet
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ratiba imefutwa kikamirifu.')),
+          const SnackBar(content: Text('Mchango umefutwa kikamirifu.')),
         );
         _reloadData();
       } else {
@@ -1139,12 +1138,16 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   }
 
   Widget _buildLoadingCard() {
+    final screenSize = MediaQuery.of(context).size;
+    final horizontalMargin = screenSize.width * 0.02; // 4% of width
+    final verticalPadding = screenSize.height * 0.01; // 3% of height
+
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(40),
+      margin: EdgeInsets.all(horizontalMargin),
+      padding: EdgeInsets.all(verticalPadding),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(screenSize.width * 0.02), // 5% of width
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withValues(alpha: 0.08),
@@ -1158,11 +1161,18 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: mainFontColor),
-            const SizedBox(height: 16),
+            SizedBox(
+              width: screenSize.width * 0.08,
+              height: screenSize.width * 0.08,
+              child: CircularProgressIndicator(color: mainFontColor),
+            ),
+            SizedBox(height: screenSize.height * 0.02),
             Text(
               "Inapakia...",
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: screenSize.width * 0.04,
+              ),
             ),
           ],
         ),
@@ -1491,7 +1501,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                               );
                               if (confirm == true) {
                                 // ignore: use_build_context_synchronously
-                                // Navigator.of(context).pop(); // Close the modal first
+                                Navigator.of(context).pop(); // Close the modal first
                                 deleteTimeTable(dataItem.id);
                               }
                             },

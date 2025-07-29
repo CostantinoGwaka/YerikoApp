@@ -140,327 +140,339 @@ class _LoginPageState extends State<LoginPage> {
           physics: const BouncingScrollPhysics(),
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: size.width * 0.08),
-            child: Column(
-              children: [
-                SizedBox(height: size.height * 0.05),
-
-                // Logo and Title Section
-                Column(
-                  children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            mainFontColor,
-                            mainFontColor.withValues(alpha: 0.7),
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: mainFontColor.withValues(alpha: 0.3),
-                            spreadRadius: 2,
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
+            child: Column(children: [
+              SizedBox(height: size.height * 0.01),
+              // Logo and Title Section
+              Column(
+                children: [
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          mainFontColor,
+                          mainFontColor.withOpacity(0.7),
                         ],
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Image.asset(
-                          'assets/appicon.png',
-                          fit: BoxFit.contain,
+                      boxShadow: [
+                        BoxShadow(
+                          color: mainFontColor.withOpacity(0.3),
+                          spreadRadius: 2,
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
                         ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Image.asset(
+                        'assets/appicon.png',
+                        fit: BoxFit.contain,
                       ),
                     ),
-                    SizedBox(height: 24),
-                    Text(
-                      "Jumuiya Yangu",
-                      style: TextStyle(
-                        fontSize: isSmallScreen ? 28 : 32,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
-                        color: mainFontColor,
-                      ),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Text(
+                    "Jumuiya Yangu",
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 28 : 32,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                      color: mainFontColor,
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      "Karibu tena! Ingia kwenye akaunti yako",
-                      style: TextStyle(
-                        fontSize: isSmallScreen ? 14 : 16,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "Karibu tena! Ingia kwenye akaunti yako",
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 14 : 16,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+
+              SizedBox(height: size.height * 0.02),
+
+              // Login Form
+              Container(
+                padding: EdgeInsets.all(isSmallScreen ? 20 : 28),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 0,
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
-
-                SizedBox(height: size.height * 0.05),
-
-                // Login Form
-                Container(
-                  padding: EdgeInsets.all(isSmallScreen ? 20 : 28),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withValues(alpha: 0.1),
-                        spreadRadius: 0,
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Phone Number Field
+                    Text(
+                      "Namba ya Simu",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: mainFontColor,
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Phone Number Field
-                      Text(
-                        "Namba ya Simu",
+                    ),
+                    SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.grey[200]!,
+                          width: 1,
+                        ),
+                      ),
+                      child: TextField(
+                        controller: _phone,
+                        cursorColor: mainFontColor,
+                        keyboardType: TextInputType.phone,
+                        maxLength: 10,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
                         style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: mainFontColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                        decoration: InputDecoration(
+                          prefixIcon: Container(
+                            margin: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: mainFontColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.phone_rounded,
+                              color: mainFontColor,
+                              size: 20,
+                            ),
+                          ),
+                          hintText: "0700123456",
+                          hintStyle: TextStyle(
+                            color: Colors.grey[400],
+                            fontWeight: FontWeight.w400,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                          counterText: "",
                         ),
                       ),
-                      SizedBox(height: 12),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Colors.grey[200]!,
-                            width: 1,
-                          ),
-                        ),
-                        child: TextField(
-                          controller: _phone,
-                          cursorColor: mainFontColor,
-                          keyboardType: TextInputType.phone,
-                          maxLength: 10,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(10),
-                          ],
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black87,
-                          ),
-                          decoration: InputDecoration(
-                            prefixIcon: Container(
-                              margin: const EdgeInsets.all(12),
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: mainFontColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                Icons.phone_rounded,
-                                color: mainFontColor,
-                                size: 20,
-                              ),
-                            ),
-                            hintText: "0700123456",
-                            hintStyle: TextStyle(
-                              color: Colors.grey[400],
-                              fontWeight: FontWeight.w400,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 16,
-                            ),
-                            counterText: "",
-                          ),
+                    ),
+
+                    SizedBox(height: 24),
+
+                    // Password Field
+                    Text(
+                      "Nenosiri",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: mainFontColor,
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.grey[200]!,
+                          width: 1,
                         ),
                       ),
-
-                      SizedBox(height: 24),
-
-                      // Password Field
-                      Text(
-                        "Nenosiri",
+                      child: TextField(
+                        obscureText: !isPasswordVisible,
+                        controller: _password,
+                        cursorColor: mainFontColor,
                         style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: mainFontColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
                         ),
-                      ),
-                      SizedBox(height: 12),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Colors.grey[200]!,
-                            width: 1,
+                        decoration: InputDecoration(
+                          prefixIcon: Container(
+                            margin: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: mainFontColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.lock_rounded,
+                              color: mainFontColor,
+                              size: 20,
+                            ),
                           ),
-                        ),
-                        child: TextField(
-                          obscureText: !isPasswordVisible,
-                          controller: _password,
-                          cursorColor: mainFontColor,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black87,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              isPasswordVisible ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                              color: Colors.grey[500],
+                              size: 22,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                isPasswordVisible = !isPasswordVisible;
+                              });
+                            },
                           ),
-                          decoration: InputDecoration(
-                            prefixIcon: Container(
-                              margin: const EdgeInsets.all(12),
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: mainFontColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                Icons.lock_rounded,
-                                color: mainFontColor,
-                                size: 20,
-                              ),
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                isPasswordVisible ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                                color: Colors.grey[500],
-                                size: 22,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  isPasswordVisible = !isPasswordVisible;
-                                });
-                              },
-                            ),
-                            hintText: "Weka nenosiri lako",
-                            hintStyle: TextStyle(
-                              color: Colors.grey[400],
-                              fontWeight: FontWeight.w400,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 16,
-                            ),
+                          hintText: "Weka nenosiri lako",
+                          hintStyle: TextStyle(
+                            color: Colors.grey[400],
+                            fontWeight: FontWeight.w400,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
                           ),
                         ),
                       ),
+                    ),
 
-                      SizedBox(height: 32),
+                    SizedBox(height: 32),
 
-                      // Login Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _isLoading
-                              ? null
-                              : () async {
-                                  if (_phone.text.length == 10 && _password.text.isNotEmpty) {
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-                                    login(context, _phone.text, _password.text);
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: const Text("⚠️ Tafadhali weka namba sahihi ya simu na nenosiri."),
-                                        backgroundColor: Colors.orange[400],
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _isLoading ? mainFontColor.withValues(alpha: 0.7) : mainFontColor,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: _isLoading ? 0 : 3,
-                            shadowColor: mainFontColor.withValues(alpha: 0.3),
-                          ),
-                          child: _isLoading
-                              ? SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                  ),
-                                )
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.login_rounded, size: 20),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      "Ingia",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
+                    // Login Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _isLoading
+                            ? null
+                            : () async {
+                                if (_phone.text.length == 10 && _password.text.isNotEmpty) {
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+                                  login(context, _phone.text, _password.text);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text("⚠️ Tafadhali weka namba sahihi ya simu na nenosiri."),
+                                      backgroundColor: Colors.orange[400],
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  );
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isLoading ? mainFontColor.withOpacity(0.7) : mainFontColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: _isLoading ? 0 : 3,
+                          shadowColor: mainFontColor.withOpacity(0.3),
                         ),
+                        child: _isLoading
+                            ? SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.login_rounded, size: 20),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    "Ingia",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 24),
+
+              // Forgot Password Link
+              TextButton(
+                onPressed: () {
+                  showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: mainFontColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                ),
+                child: Text(
+                  "Umesahau nenosiri?",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    decoration: TextDecoration.underline,
                   ),
                 ),
+              ),
 
-                SizedBox(height: 24),
+              SizedBox(height: size.height * 0.01),
 
-                // Forgot Password Link
-                TextButton(
-                  onPressed: () {
-                    showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: mainFontColor,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  ),
-                  child: Text(
-                    "Umesahau nenosiri?",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      decoration: TextDecoration.underline,
+              // App Version
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      "Toleo ${AppSettings.appVersion}",
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
-                ),
-
-                SizedBox(height: size.height * 0.05),
-
-                // App Version
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    "Toleo ${AppSettings.appVersion}",
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: FloatingActionButton(
+                      heroTag: "helpDeskBtn",
+                      backgroundColor: mainFontColor,
+                      onPressed: () {
+                        showSnackBar(context, "📞 Help Desk: 0659515042");
+                      },
+                      child: Icon(Icons.support_agent_rounded, color: Colors.white),
                     ),
                   ),
-                ),
-
-                SizedBox(height: 20),
-              ],
-            ),
+                ],
+              ),
+            ]),
           ),
         ),
       ),

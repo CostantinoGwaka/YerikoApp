@@ -1168,7 +1168,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
             ),
             SizedBox(height: screenSize.height * 0.02),
             Text(
-              "Inapakia...",
+              "Inatafuta...",
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: screenSize.width * 0.04,

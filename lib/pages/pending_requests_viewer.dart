@@ -226,7 +226,7 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
                         CircularProgressIndicator(color: mainFontColor.withValues(alpha: 0.3)),
                         const SizedBox(height: 16),
                         Text(
-                          "Inapakia maombi...",
+                          "Inatafuta maombi...",
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 16,

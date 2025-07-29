@@ -972,7 +972,7 @@ class _DailyPageState extends State<DailyPage> {
                             ),
                             SizedBox(height: 16),
                             Text(
-                              "Inapakia michango...",
+                              "Inatafuta michango...",
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 14,

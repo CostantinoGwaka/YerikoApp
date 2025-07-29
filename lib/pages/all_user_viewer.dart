@@ -463,7 +463,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                         CircularProgressIndicator(color: mainFontColor.withValues(alpha: 0.3)),
                         const SizedBox(height: 16),
                         Text(
-                          "Inapakia wanajumuiya...",
+                          "Inatafuta wanajumuiya...",
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 16,

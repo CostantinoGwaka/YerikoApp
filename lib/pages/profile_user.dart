@@ -478,10 +478,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                       child: CircleAvatar(
-                        radius: isSmallScreen ? 45 : 55,
+                        radius: isSmallScreen ? size.height / 8 : size.height / 20,
                         backgroundColor: Colors.white,
                         child: CircleAvatar(
-                          radius: isSmallScreen ? 42 : 52,
+                          radius: isSmallScreen ? size.height / 8 : size.height / 20,
                           backgroundColor: Colors.white,
                           backgroundImage: const AssetImage("assets/avatar.png"),
                         ),
@@ -494,7 +494,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Text(
                       userData?.user.userFullName ?? "Mtumiaji",
                       style: TextStyle(
-                        fontSize: isSmallScreen ? 20 : 24,
+                        fontSize: isSmallScreen ? size.height / 80 : size.height / 50,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),

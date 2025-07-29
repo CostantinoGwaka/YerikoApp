@@ -686,7 +686,7 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
             CircularProgressIndicator(color: mainFontColor),
             const SizedBox(height: 2),
             Text(
-              "Inapakia...",
+              "Inatafuta...",
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 10,

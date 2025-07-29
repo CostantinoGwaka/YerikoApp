@@ -176,6 +176,20 @@ class _ProfilePageState extends State<ProfilePage> {
         _isLoading = true;
       });
 
+      // Check if collectionName already exists
+      bool exists = collectionTypeResponse
+          .any((type) => type.collectionName.trim().toLowerCase() == collectionName.trim().toLowerCase());
+      if (exists) {
+        Navigator.pop(context);
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("⚠️ Aina ya mchango '$collectionName' tayari ipo.")),
+        );
+        return;
+      }
+
       if (collectionName == "") {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("⚠️ Tafadhali hakikisha aina ya mchango")),
@@ -200,10 +214,6 @@ class _ProfilePageState extends State<ProfilePage> {
           });
 
           setState(() {});
-
-          //end here
-          // ignore: use_build_context_synchronously
-          Navigator.pop(context);
 
           fetchCollectionTypes();
 
@@ -869,7 +879,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   trailing: IconButton(
                     icon: const Icon(Icons.edit),
                     onPressed: () {
-                      Navigator.pop(context);
                       _editCollectionType(context, type);
                     },
                   ),

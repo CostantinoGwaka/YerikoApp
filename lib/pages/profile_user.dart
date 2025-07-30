@@ -949,7 +949,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _contactSupport() async {
-    final Uri launchUri = Uri(scheme: 'tel', path: '0659515041');
+    final Uri launchUri = Uri(scheme: 'tel', path: '0659515042');
     if (await canLaunchUrl(launchUri)) {
       await launchUrl(launchUri);
     } else {

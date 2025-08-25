@@ -15,10 +15,12 @@ class AdminOtherAllUserCollections extends StatefulWidget {
   const AdminOtherAllUserCollections({super.key});
 
   @override
-  State<AdminOtherAllUserCollections> createState() => _AdminOtherAllUserCollectionsState();
+  State<AdminOtherAllUserCollections> createState() =>
+      _AdminOtherAllUserCollectionsState();
 }
 
-class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollections> {
+class _AdminOtherAllUserCollectionsState
+    extends State<AdminOtherAllUserCollections> {
   OtherCollectionResponse? collectionsOthers;
   UserMonthlyCollectionResponse? userMonthlyCollectionResponse;
   int selectedTabIndex = 0;
@@ -32,7 +34,12 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
   CollectionType? selectedCollectionType;
   String? selectedMonth;
 
-  List<String> filterOptions = ['TAARIFA ZOTE', 'TAARIFA KWA MWANAJUMUIYA', 'KWA MWEZI', 'KWA AINA YA MCHANGO'];
+  List<String> filterOptions = [
+    'TAARIFA ZOTE',
+    'TAARIFA KWA MWANAJUMUIYA',
+    'KWA MWEZI',
+    'KWA AINA YA MCHANGO'
+  ];
   List<User> users = []; // replace with real User objects
   List<CollectionType> collectionTypeResponse = [];
 
@@ -63,13 +70,15 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
   }
 
   Future<void> fetchUsers() async {
-    final response =
-        await http.get(Uri.parse('$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}'));
+    final response = await http.get(Uri.parse(
+        '$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        users = (data['data'] as List).map((u) => User.fromJson(u)).toList();
+        users = (data['data'] as List).map((u) => User.fromJson(u)).toList()
+          ..sort(
+              (a, b) => (a.userFullName ?? '').compareTo(b.userFullName ?? ''));
       });
     } else {
       // handle error
@@ -78,13 +87,15 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
 
   Future<void> fetchCollectionTypes() async {
     collectionTypeResponse = [];
-    final response = await http
-        .get(Uri.parse('$baseUrl/collectiontype/get_all_collection_type.php?jumuiya_id=${userData!.user.jumuiya_id}'));
+    final response = await http.get(Uri.parse(
+        '$baseUrl/collectiontype/get_all_collection_type.php?jumuiya_id=${userData!.user.jumuiya_id}'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        collectionTypeResponse = (data['data'] as List).map((u) => CollectionType.fromJson(u)).toList();
+        collectionTypeResponse = (data['data'] as List)
+            .map((u) => CollectionType.fromJson(u))
+            .toList();
       });
       setState(() {});
     } else {
@@ -96,11 +107,14 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
     setState(() {
       if (filterOption == 'TAARIFA ZOTE') {
         displayedData = allData;
-      } else if (filterOption == 'TAARIFA KWA MWANAJUMUIYA' && selectedUser != null) {
+      } else if (filterOption == 'TAARIFA KWA MWANAJUMUIYA' &&
+          selectedUser != null) {
         getUserYearCollections();
       } else if (filterOption == 'KWA MWEZI' && selectedMonth != null) {
-        displayedData = allData.where((item) => item.monthly == selectedMonth).toList();
-      } else if (filterOption == 'KWA AINA YA MCHANGO' && selectedMonth != null) {
+        displayedData =
+            allData.where((item) => item.monthly == selectedMonth).toList();
+      } else if (filterOption == 'KWA AINA YA MCHANGO' &&
+          selectedMonth != null) {
         getUserOtherByTypeCollections();
       }
     });
@@ -116,7 +130,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
+            const SnackBar(
+                content:
+                    Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
         }
         // setState(() => _isLoading = false);
@@ -125,7 +141,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
 
       final String myApi =
           "$baseUrl/monthly/get_all_other_collection_user_by_year.php?yearId=${currentYear!.data.id}&jumuiya_id=${userData!.user.jumuiya_id}";
-      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+      final response = await http
+          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -147,7 +164,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+          SnackBar(
+              content:
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
         );
       }
     }
@@ -161,7 +180,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
+            const SnackBar(
+                content:
+                    Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
         }
         // setState(() => _isLoading = false);
@@ -198,7 +219,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+          SnackBar(
+              content:
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
         );
       }
     }
@@ -212,7 +235,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
+            const SnackBar(
+                content:
+                    Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
         }
         // setState(() => _isLoading = false);
@@ -249,7 +274,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+          SnackBar(
+              content:
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
         );
       }
     }
@@ -263,7 +290,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
+            const SnackBar(
+                content:
+                    Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
         }
         return null;
@@ -272,7 +301,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       final String myApi =
           "$baseUrl/monthly/get_all_other_collection_by_user_id_year_id.php?user_id=${selectedUser!.id}&year_id=${currentYear!.data.id}&jumuiya_id${userData!.user.jumuiya_id}";
 
-      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+      final response = await http
+          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -292,7 +322,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+          SnackBar(
+              content:
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
         );
       }
     }
@@ -326,7 +358,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content:
+                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }
@@ -396,14 +430,21 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
               TextButton.icon(
                 style: TextButton.styleFrom(
                   foregroundColor: mainFontColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
                 icon: Icon(
-                  isLoading ? Icons.hourglass_top : (showUserCollections ? Icons.visibility_off : Icons.visibility),
+                  isLoading
+                      ? Icons.hourglass_top
+                      : (showUserCollections
+                          ? Icons.visibility_off
+                          : Icons.visibility),
                   size: 18,
                   color: mainFontColor,
                 ),
-                label: Text(showUserCollections ? "Onyesha Vichujio" : "Ficha Vichujio"),
+                label: Text(showUserCollections
+                    ? "Onyesha Vichujio"
+                    : "Ficha Vichujio"),
                 onPressed: () {
                   setState(() {
                     showUserCollections = !showUserCollections;
@@ -441,7 +482,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                         color: mainFontColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Icon(Icons.filter_list, color: mainFontColor, size: 20),
+                      child: Icon(Icons.filter_list,
+                          color: mainFontColor, size: 20),
                     ),
                     const SizedBox(width: 12),
                     const Text(
@@ -492,9 +534,12 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                 children: [
                                   CircleAvatar(
                                     radius: 12,
-                                    backgroundColor: mainFontColor.withValues(alpha: 0.1),
+                                    backgroundColor:
+                                        mainFontColor.withValues(alpha: 0.1),
                                     child: Text(
-                                      (user.userFullName ?? '').isNotEmpty ? user.userFullName![0].toUpperCase() : '?',
+                                      (user.userFullName ?? '').isNotEmpty
+                                          ? user.userFullName![0].toUpperCase()
+                                          : '?',
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
@@ -503,7 +548,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  Expanded(child: Text(user.userFullName ?? '')),
+                                  Expanded(
+                                      child: Text(user.userFullName ?? '')),
                                 ],
                               ),
                             ))
@@ -554,10 +600,12 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                   Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
-                                      color: mainFontColor.withValues(alpha: 0.1),
+                                      color:
+                                          mainFontColor.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
-                                    child: Icon(Icons.payments, color: mainFontColor, size: 16),
+                                    child: Icon(Icons.payments,
+                                        color: mainFontColor, size: 16),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(child: Text(type.collectionName)),
@@ -584,18 +632,22 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
           child: FutureBuilder(
             future: filterOption == 'TAARIFA ZOTE'
                 ? getUserCollections()
-                : (filterOption == 'TAARIFA KWA MWANAJUMUIYA' && selectedUser != null)
+                : (filterOption == 'TAARIFA KWA MWANAJUMUIYA' &&
+                        selectedUser != null)
                     ? getUserYearCollections()
                     : (filterOption == 'KWA MWEZI' && selectedMonth != null)
                         ? getUserMonthCollections()
-                        : (filterOption == 'KWA AINA YA MCHANGO' && selectedCollectionType != null)
+                        : (filterOption == 'KWA AINA YA MCHANGO' &&
+                                selectedCollectionType != null)
                             ? getUserOtherByTypeCollections()
                             : getUserCollections(),
-            builder: (context, AsyncSnapshot<OtherCollectionResponse?> snapshot) {
+            builder:
+                (context, AsyncSnapshot<OtherCollectionResponse?> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return _buildLoadingCard();
               } else if (snapshot.hasError) {
-                return _buildErrorCard("Imeshindikana kupakia data ya michango.");
+                return _buildErrorCard(
+                    "Imeshindikana kupakia data ya michango.");
               } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
                 String message = selectedUser != null
                     ? "Hakuna data ya michango iliyopatikana ya ${selectedUser!.userFullName}."
@@ -614,17 +666,21 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
           Expanded(
             child: FutureBuilder(
               future: getUserCollections(),
-              builder: (context, AsyncSnapshot<OtherCollectionResponse?> snapshot) {
+              builder:
+                  (context, AsyncSnapshot<OtherCollectionResponse?> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return _buildLoadingCard();
                 } else if (snapshot.hasError) {
-                  return _buildErrorCard("Imeshindikana kupakia data ya michango.");
+                  return _buildErrorCard(
+                      "Imeshindikana kupakia data ya michango.");
                 } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                  return _buildEmptyCard("Hakuna data ya michango iliyopatikana.");
+                  return _buildEmptyCard(
+                      "Hakuna data ya michango iliyopatikana.");
                 }
 
                 final collections = snapshot.data!.data;
-                return _buildCollectionsList(collections, size, isSecondary: true);
+                return _buildCollectionsList(collections, size,
+                    isSecondary: true);
               },
             ),
           ),
@@ -649,7 +705,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
         value: value,
         isExpanded: true,
         decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           border: InputBorder.none,
           hintText: hint,
           hintStyle: TextStyle(color: Colors.grey[600]),
@@ -764,7 +821,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
     );
   }
 
-  Widget _buildCollectionsList(List<dynamic> collections, Size size, {bool isSecondary = false}) {
+  Widget _buildCollectionsList(List<dynamic> collections, Size size,
+      {bool isSecondary = false}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: ListView.separated(
@@ -803,7 +861,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
               radius: 24,
               backgroundColor: mainFontColor.withValues(alpha: 0.1),
               child: Text(
-                item.user.userFullName.isNotEmpty ? item.user.userFullName[0].toUpperCase() : '?',
+                item.user.userFullName.isNotEmpty
+                    ? item.user.userFullName[0].toUpperCase()
+                    : '?',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -843,7 +903,9 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    isSecondary ? item.monthly : item.collectionType.collectionName,
+                    isSecondary
+                        ? item.monthly
+                        : item.collectionType.collectionName,
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[600],
@@ -853,7 +915,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today, size: 12, color: Colors.grey[500]),
+                      Icon(Icons.calendar_today,
+                          size: 12, color: Colors.grey[500]),
                       const SizedBox(width: 4),
                       Text(
                         item.registeredDate,
@@ -864,7 +927,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                       ),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: mainFontColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
@@ -896,7 +960,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
     );
   }
 
-  void _showCollectionDetails(BuildContext rootContext, OtherCollection dataItem) {
+  void _showCollectionDetails(
+      BuildContext rootContext, OtherCollection dataItem) {
     final user = dataItem.user;
     final year = dataItem.churchYearEntity;
 
@@ -942,7 +1007,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                           color: mainFontColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Icon(Icons.receipt_long, color: mainFontColor, size: 24),
+                        child: Icon(Icons.receipt_long,
+                            color: mainFontColor, size: 24),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -974,7 +1040,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
+                            icon: const Icon(Icons.edit,
+                                color: Colors.blue, size: 20),
                             tooltip: 'Hariri',
                             onPressed: () {
                               Navigator.pop(context);
@@ -985,7 +1052,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                 builder: (_) => Container(
                                   decoration: const BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                                    borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(25)),
                                   ),
                                   child: AddOtherMonthCollectionUserAdmin(
                                     rootContext: rootContext,
@@ -1006,7 +1074,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                            icon: const Icon(Icons.delete,
+                                color: Colors.red, size: 20),
                             tooltip: 'Futa',
                             onPressed: () async {
                               final confirm = await showDialog<bool>(
@@ -1017,26 +1086,33 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                   ),
                                   title: Row(
                                     children: [
-                                      Icon(Icons.warning, color: Colors.orange[600]),
+                                      Icon(Icons.warning,
+                                          color: Colors.orange[600]),
                                       const SizedBox(width: 8),
                                       const Text('Futa Mchango'),
                                     ],
                                   ),
-                                  content: const Text('Una uhakika unataka kufuta mchango huu?'),
+                                  content: const Text(
+                                      'Una uhakika unataka kufuta mchango huu?'),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.of(ctx).pop(false),
-                                      child: Text('Hapana', style: TextStyle(color: Colors.grey[600])),
+                                      onPressed: () =>
+                                          Navigator.of(ctx).pop(false),
+                                      child: Text('Hapana',
+                                          style: TextStyle(
+                                              color: Colors.grey[600])),
                                     ),
                                     ElevatedButton(
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.red,
                                         foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
                                       ),
-                                      onPressed: () => Navigator.of(ctx).pop(true),
+                                      onPressed: () =>
+                                          Navigator.of(ctx).pop(true),
                                       child: const Text('Ndiyo'),
                                     ),
                                   ],
@@ -1067,7 +1143,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                             decoration: BoxDecoration(
                               color: const Color(0xFFF8FAFF),
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: mainFontColor.withValues(alpha: 0.1)),
+                              border: Border.all(
+                                  color: mainFontColor.withValues(alpha: 0.1)),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1076,10 +1153,12 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                   children: [
                                     CircleAvatar(
                                       radius: 24,
-                                      backgroundColor: mainFontColor.withValues(alpha: 0.1),
+                                      backgroundColor:
+                                          mainFontColor.withValues(alpha: 0.1),
                                       child: Text(
                                         (user.userFullName?.isNotEmpty ?? false)
-                                            ? user.userFullName![0].toUpperCase()
+                                            ? user.userFullName![0]
+                                                .toUpperCase()
                                             : '?',
                                         style: TextStyle(
                                           fontSize: 18,
@@ -1091,7 +1170,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                     const SizedBox(width: 16),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             user.userFullName ?? '',
@@ -1115,8 +1195,10 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                   ],
                                 ),
                                 const SizedBox(height: 16),
-                                _buildDetailRow(Icons.phone, "Simu", user.phone ?? ''),
-                                _buildDetailRow(Icons.account_circle, "Jina la Mtumiaji", user.userName ?? ''),
+                                _buildDetailRow(
+                                    Icons.phone, "Simu", user.phone ?? ''),
+                                _buildDetailRow(Icons.account_circle,
+                                    "Jina la Mtumiaji", user.userName ?? ''),
                               ],
                             ),
                           ),
@@ -1136,7 +1218,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
+                              border: Border.all(
+                                  color: Colors.green.withValues(alpha: 0.2)),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1146,10 +1229,12 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.green.withValues(alpha: 0.2),
+                                        color:
+                                            Colors.green.withValues(alpha: 0.2),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: Icon(Icons.payments, color: Colors.green[700], size: 20),
+                                      child: Icon(Icons.payments,
+                                          color: Colors.green[700], size: 20),
                                     ),
                                     const SizedBox(width: 12),
                                     const Text(
@@ -1183,7 +1268,8 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+                              border: Border.all(
+                                  color: Colors.grey.withValues(alpha: 0.2)),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1193,10 +1279,12 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Colors.blue.withValues(alpha: 0.1),
+                                        color:
+                                            Colors.blue.withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
+                                      child: Icon(Icons.info_outline,
+                                          color: Colors.blue[700], size: 20),
                                     ),
                                     const SizedBox(width: 12),
                                     const Text(
@@ -1211,11 +1299,19 @@ class _AdminOtherAllUserCollectionsState extends State<AdminOtherAllUserCollecti
                                 ),
                                 const SizedBox(height: 16),
                                 _buildDetailRow(
-                                    Icons.category, "Aina ya Mchango", dataItem.collectionType.collectionName),
-                                _buildDetailRow(Icons.calendar_month, "Mwezi", dataItem.monthly),
-                                _buildDetailRow(Icons.calendar_today, "Tarehe ya Usajili", dataItem.registeredDate),
-                                _buildDetailRow(Icons.person_outline, "Aliyesajili", dataItem.registeredBy),
-                                _buildDetailRow(Icons.date_range, "Mwaka wa Kanisa", year.churchYear),
+                                    Icons.category,
+                                    "Aina ya Mchango",
+                                    dataItem.collectionType.collectionName),
+                                _buildDetailRow(Icons.calendar_month, "Mwezi",
+                                    dataItem.monthly),
+                                _buildDetailRow(
+                                    Icons.calendar_today,
+                                    "Tarehe ya Usajili",
+                                    dataItem.registeredDate),
+                                _buildDetailRow(Icons.person_outline,
+                                    "Aliyesajili", dataItem.registeredBy),
+                                _buildDetailRow(Icons.date_range,
+                                    "Mwaka wa Kanisa", year.churchYear),
                               ],
                             ),
                           ),

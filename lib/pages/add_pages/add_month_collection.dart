@@ -22,10 +22,12 @@ class AddMonthCollectionUserAdmin extends StatefulWidget {
   });
 
   @override
-  State<AddMonthCollectionUserAdmin> createState() => _AddMonthCollectionUserAdminState();
+  State<AddMonthCollectionUserAdmin> createState() =>
+      _AddMonthCollectionUserAdminState();
 }
 
-class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmin> {
+class _AddMonthCollectionUserAdminState
+    extends State<AddMonthCollectionUserAdmin> {
   final _formKey = GlobalKey<FormState>();
   List<User> users = [];
   User? selectedUser;
@@ -35,13 +37,15 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
   bool _isLoading = false;
 
   Future<void> fetchUsers() async {
-    final response =
-        await http.get(Uri.parse('$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}'));
+    final response = await http.get(Uri.parse(
+        '$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        users = (data['data'] as List).map((u) => User.fromJson(u)).toList();
+        users = (data['data'] as List).map((u) => User.fromJson(u)).toList()
+          ..sort(
+              (a, b) => (a.userFullName ?? '').compareTo(b.userFullName ?? ''));
       });
     } else {
       // handle error
@@ -128,12 +132,16 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
           if (widget.initialData != null) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("✅ Umefanikiwa! Kuhuisha mchango kwenye mfumo kwa mafanikio")),
+              SnackBar(
+                  content: Text(
+                      "✅ Umefanikiwa! Kuhuisha mchango kwenye mfumo kwa mafanikio")),
             );
           } else {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("✅ Umefanikiwa! Kusajili mchango mfumo kwa mafanikio")),
+              SnackBar(
+                  content: Text(
+                      "✅ Umefanikiwa! Kusajili mchango mfumo kwa mafanikio")),
             );
           }
         } else if (response.statusCode == 404) {
@@ -161,7 +169,9 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content:
+                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }
@@ -228,7 +238,9 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.initialData != null ? "Hariri Mchango" : "Ongeza Mchango wa Mwezi",
+                              widget.initialData != null
+                                  ? "Hariri Mchango"
+                                  : "Ongeza Mchango wa Mwezi",
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -266,7 +278,8 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
                           if (value == null || value.isEmpty) {
                             return "Tafadhali weka kiasi cha mchango";
                           }
-                          if (double.tryParse(value) == null || double.parse(value) <= 0) {
+                          if (double.tryParse(value) == null ||
+                              double.parse(value) <= 0) {
                             return "Kiasi cha mchango lazima kiwe namba kubwa kuliko sifuri";
                           }
                           return null;
@@ -284,8 +297,12 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
                     width: double.infinity,
                     child: ModernButton(
                       onPressed: _handleSubmit,
-                      text: widget.initialData != null ? "Hifadhi Mabadiliko" : "Hifadhi Mchango",
-                      icon: widget.initialData != null ? Icons.update_rounded : Icons.save_rounded,
+                      text: widget.initialData != null
+                          ? "Hifadhi Mabadiliko"
+                          : "Hifadhi Mchango",
+                      icon: widget.initialData != null
+                          ? Icons.update_rounded
+                          : Icons.save_rounded,
                       backgroundColor: successColor,
                       isLoading: _isLoading,
                     ),
@@ -359,7 +376,8 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
           ),
           filled: true,
           fillColor: cardColor,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
         items: months.map((month) {
           return DropdownMenuItem<String>(
@@ -398,7 +416,8 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
           ),
           filled: true,
           fillColor: cardColor,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
         items: users.map((user) {
           return DropdownMenuItem<User>(
@@ -433,7 +452,8 @@ class _AddMonthCollectionUserAdminState extends State<AddMonthCollectionUserAdmi
             });
           }
         },
-        validator: (value) => value == null ? "Tafadhali chagua mwanajumuiya" : null,
+        validator: (value) =>
+            value == null ? "Tafadhali chagua mwanajumuiya" : null,
         dropdownColor: cardColor,
         style: const TextStyle(color: textPrimary),
       ),

@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
-import 'package:jumuiya_yangu/models/other_collection_model.dart' show OtherCollection, CollectionType;
+import 'package:jumuiya_yangu/models/other_collection_model.dart'
+    show OtherCollection, CollectionType;
 import 'package:jumuiya_yangu/shared/components/modern_widgets.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
@@ -22,10 +23,12 @@ class AddOtherMonthCollectionUserAdmin extends StatefulWidget {
   });
 
   @override
-  State<AddOtherMonthCollectionUserAdmin> createState() => _AddOtherMonthCollectionUserAdminState();
+  State<AddOtherMonthCollectionUserAdmin> createState() =>
+      _AddOtherMonthCollectionUserAdminState();
 }
 
-class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollectionUserAdmin> {
+class _AddOtherMonthCollectionUserAdminState
+    extends State<AddOtherMonthCollectionUserAdmin> {
   final _formKey = GlobalKey<FormState>();
   List<User> users = [];
   List<CollectionType> collectionTypeResponse = [];
@@ -37,13 +40,15 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
   bool _isLoading = false;
 
   Future<void> fetchUsers() async {
-    final response =
-        await http.get(Uri.parse('$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}'));
+    final response = await http.get(Uri.parse(
+        '$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        users = (data['data'] as List).map((u) => User.fromJson(u)).toList();
+        users = (data['data'] as List).map((u) => User.fromJson(u)).toList()
+          ..sort(
+              (a, b) => (a.userFullName ?? '').compareTo(b.userFullName ?? ''));
       });
     } else {
       // handle error
@@ -51,13 +56,15 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
   }
 
   Future<void> fetchCollectionTypes() async {
-    final response = await http
-        .get(Uri.parse('$baseUrl/collectiontype/get_all_collection_type.php?jumuiya_id=${userData!.user.jumuiya_id}'));
+    final response = await http.get(Uri.parse(
+        '$baseUrl/collectiontype/get_all_collection_type.php?jumuiya_id=${userData!.user.jumuiya_id}'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        collectionTypeResponse = (data['data'] as List).map((u) => CollectionType.fromJson(u)).toList();
+        collectionTypeResponse = (data['data'] as List)
+            .map((u) => CollectionType.fromJson(u))
+            .toList();
       });
     } else {
       // handle error
@@ -124,7 +131,9 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
 
         var jsonResponse = json.decode(response.body);
 
-        if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == '200') {
+        if (response.statusCode == 200 &&
+            jsonResponse != null &&
+            jsonResponse['status'] == '200') {
           setState(() {
             _isLoading = false;
           });
@@ -145,12 +154,16 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
           if (widget.initialData != null) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("✅ Umefanikiwa! Kuhuisha mchango kwenye mfumo kwa mafanikio")),
+              SnackBar(
+                  content: Text(
+                      "✅ Umefanikiwa! Kuhuisha mchango kwenye mfumo kwa mafanikio")),
             );
           } else {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("✅ Umefanikiwa! Kusajili mchango mfumo kwa mafanikio")),
+              SnackBar(
+                  content: Text(
+                      "✅ Umefanikiwa! Kusajili mchango mfumo kwa mafanikio")),
             );
           }
         } else if (response.statusCode == 404) {
@@ -187,7 +200,9 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content:
+                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }
@@ -236,7 +251,9 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
 
                 // Header
                 Text(
-                  widget.initialData != null ? "Hariri Mchango wa Mwezi" : "Ongeza Mchango wa Mwezi",
+                  widget.initialData != null
+                      ? "Hariri Mchango wa Mwezi"
+                      : "Ongeza Mchango wa Mwezi",
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: primaryGradient[0],
@@ -258,17 +275,19 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                     children: [
                       Text(
                         "Mwezi wa Mchango",
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: textPrimary,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: textPrimary,
+                                ),
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
                         value: selectedMonth,
                         decoration: InputDecoration(
                           hintText: "Chagua mwezi...",
-                          prefixIcon: Icon(Icons.calendar_month, color: primaryGradient[0]),
+                          prefixIcon: Icon(Icons.calendar_month,
+                              color: primaryGradient[0]),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(color: borderColor),
@@ -279,7 +298,8 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: primaryGradient[0], width: 2),
+                            borderSide:
+                                BorderSide(color: primaryGradient[0], width: 2),
                           ),
                           filled: true,
                           fillColor: Colors.grey[50],
@@ -307,7 +327,8 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                         onChanged: (val) {
                           if (val != null) setState(() => selectedMonth = val);
                         },
-                        validator: (value) => value == null ? "Chagua mwezi" : null,
+                        validator: (value) =>
+                            value == null ? "Chagua mwezi" : null,
                       ),
                     ],
                   ),
@@ -321,10 +342,11 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                     children: [
                       Text(
                         "Kiasi cha Mchango",
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: textPrimary,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: textPrimary,
+                                ),
                       ),
                       const SizedBox(height: 12),
                       ModernTextField(
@@ -336,7 +358,8 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                           if (value == null || value.isEmpty) {
                             return "Weka kiasi cha mchango";
                           }
-                          if (double.tryParse(value) == null || double.parse(value) <= 0) {
+                          if (double.tryParse(value) == null ||
+                              double.parse(value) <= 0) {
                             return "Weka kiasi sahihi";
                           }
                           return null;
@@ -354,10 +377,11 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                     children: [
                       Text(
                         "Mwanajumuiya",
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: textPrimary,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: textPrimary,
+                                ),
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<User>(
@@ -365,7 +389,8 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                         isExpanded: true,
                         decoration: InputDecoration(
                           hintText: "Chagua mwanajumuiya...",
-                          prefixIcon: Icon(Icons.person, color: primaryGradient[0]),
+                          prefixIcon:
+                              Icon(Icons.person, color: primaryGradient[0]),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(color: borderColor),
@@ -376,7 +401,8 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: primaryGradient[0], width: 2),
+                            borderSide:
+                                BorderSide(color: primaryGradient[0], width: 2),
                           ),
                           filled: true,
                           fillColor: Colors.grey[50],
@@ -388,9 +414,13 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                               children: [
                                 CircleAvatar(
                                   radius: 16,
-                                  backgroundColor: primaryGradient[0].withValues(alpha: 0.1),
+                                  backgroundColor:
+                                      primaryGradient[0].withValues(alpha: 0.1),
                                   child: Text(
-                                    user.userFullName?.substring(0, 1).toUpperCase() ?? "?",
+                                    user.userFullName
+                                            ?.substring(0, 1)
+                                            .toUpperCase() ??
+                                        "?",
                                     style: TextStyle(
                                       color: primaryGradient[0],
                                       fontWeight: FontWeight.bold,
@@ -401,7 +431,8 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                                 Expanded(
                                   child: Text(
                                     user.userFullName!,
-                                    style: const TextStyle(fontWeight: FontWeight.w500),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
                                   ),
                                 ),
                               ],
@@ -415,7 +446,8 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                             });
                           }
                         },
-                        validator: (value) => value == null ? "Chagua mwanajumuiya" : null,
+                        validator: (value) =>
+                            value == null ? "Chagua mwanajumuiya" : null,
                       ),
                     ],
                   ),
@@ -429,10 +461,11 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                     children: [
                       Text(
                         "Aina ya Mchango",
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: textPrimary,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: textPrimary,
+                                ),
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<CollectionType>(
@@ -440,7 +473,8 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                         isExpanded: true,
                         decoration: InputDecoration(
                           hintText: "Chagua aina ya mchango...",
-                          prefixIcon: Icon(Icons.category, color: primaryGradient[0]),
+                          prefixIcon:
+                              Icon(Icons.category, color: primaryGradient[0]),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(color: borderColor),
@@ -451,7 +485,8 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: primaryGradient[0], width: 2),
+                            borderSide:
+                                BorderSide(color: primaryGradient[0], width: 2),
                           ),
                           filled: true,
                           fillColor: Colors.grey[50],
@@ -477,7 +512,8 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                                 Expanded(
                                   child: Text(
                                     type.collectionName,
-                                    style: const TextStyle(fontWeight: FontWeight.w500),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
                                   ),
                                 ),
                               ],
@@ -491,7 +527,8 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                             });
                           }
                         },
-                        validator: (value) => value == null ? "Chagua aina ya mchango" : null,
+                        validator: (value) =>
+                            value == null ? "Chagua aina ya mchango" : null,
                       ),
                     ],
                   ),
@@ -512,7 +549,9 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                     Expanded(
                       flex: 2,
                       child: ModernButton(
-                        text: widget.initialData != null ? "Sasisha Mchango" : "Hifadhi Mchango",
+                        text: widget.initialData != null
+                            ? "Sasisha Mchango"
+                            : "Hifadhi Mchango",
                         onPressed: _isLoading
                             ? null
                             : () {
@@ -522,16 +561,21 @@ class _AddOtherMonthCollectionUserAdminState extends State<AddOtherMonthCollecti
                                     "amount": amountController.text,
                                     "jumuiya_id": userData!.user.jumuiya_id,
                                     "user": {"id": selectedUser?.id ?? 0},
-                                    "churchYearEntity": {"id": currentYear!.data.id},
+                                    "churchYearEntity": {
+                                      "id": currentYear!.data.id
+                                    },
                                     "collection_type": {"id": selectedType!.id},
                                     "monthly": selectedMonth,
-                                    "registered_by": userData!.user.userFullName,
+                                    "registered_by":
+                                        userData!.user.userFullName,
                                   };
                                   saveOtherMonthlyContribution(data);
                                 }
                               },
                         isLoading: _isLoading,
-                        icon: widget.initialData != null ? Icons.update : Icons.save,
+                        icon: widget.initialData != null
+                            ? Icons.update
+                            : Icons.save,
                       ),
                     ),
                   ],

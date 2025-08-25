@@ -31,15 +31,19 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     setState(() {}); // Refresh UI after fetching data
   }
 
-  Future<TimeTableModel.ChurchTimeTableResponse?> getTimeTableCollections() async {
+  Future<TimeTableModel.ChurchTimeTableResponse?>
+      getTimeTableCollections() async {
     try {
-      final String myApi = "$baseUrl/church_timetable/get_all.php?jumuiya_id=${userData!.user.jumuiya_id}";
-      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+      final String myApi =
+          "$baseUrl/church_timetable/get_all.php?jumuiya_id=${userData!.user.jumuiya_id}";
+      final response = await http
+          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
-          collections = TimeTableModel.ChurchTimeTableResponse.fromJson(jsonResponse);
+          collections =
+              TimeTableModel.ChurchTimeTableResponse.fromJson(jsonResponse);
           return collections;
         }
       } else {
@@ -51,7 +55,9 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content:
+                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
 
@@ -61,7 +67,8 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
 
   Future<void> deleteTimeTable(dynamic id) async {
     try {
-      final String myApi = "$baseUrl/church_timetable/delete_time_table.php?id=$id";
+      final String myApi =
+          "$baseUrl/church_timetable/delete_time_table.php?id=$id";
       final response = await http.delete(
         Uri.parse(myApi),
         headers: {'Accept': 'application/json'},
@@ -87,7 +94,9 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content:
+                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }
@@ -98,6 +107,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
       backgroundColor: surfaceColor,
       appBar: ModernAppBar(
         title: "Ratiba za Jumuiya",
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),
@@ -146,7 +156,9 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
           children: [
             FutureBuilder(
               future: getTimeTableCollections(),
-              builder: (context, AsyncSnapshot<TimeTableModel.ChurchTimeTableResponse?> snapshot) {
+              builder: (context,
+                  AsyncSnapshot<TimeTableModel.ChurchTimeTableResponse?>
+                      snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                     child: Padding(
@@ -184,12 +196,14 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                       ],
                     ),
                   );
-                } else if (!snapshot.hasData || snapshot.data?.data?.isEmpty == true) {
+                } else if (!snapshot.hasData ||
+                    snapshot.data?.data?.isEmpty == true) {
                   return EmptyState(
                     icon: Icons.schedule_rounded,
                     title: "Hakuna Ratiba",
                     subtitle: "Hakuna ratiba za jumuiya zilizosajiliwa bado.",
-                    actionText: userData?.user.role == "ADMIN" ? "Ongeza Ratiba" : null,
+                    actionText:
+                        userData?.user.role == "ADMIN" ? "Ongeza Ratiba" : null,
                     onAction: userData?.user.role == "ADMIN"
                         ? () {
                             showModalBottomSheet(
@@ -366,7 +380,8 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     );
   }
 
-  void _showTimeTableDetails(BuildContext context, TimeTableModel.ChurchTimeTable item) {
+  void _showTimeTableDetails(
+      BuildContext context, TimeTableModel.ChurchTimeTable item) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -441,7 +456,8 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                       ),
                       if (userData?.user.role == "ADMIN")
                         PopupMenuButton<String>(
-                          icon: Icon(Icons.more_vert_rounded, color: textSecondary),
+                          icon: Icon(Icons.more_vert_rounded,
+                              color: textSecondary),
                           onSelected: (value) {
                             if (value == 'edit') {
                               Navigator.pop(context);
@@ -478,9 +494,11 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                               value: 'delete',
                               child: Row(
                                 children: [
-                                  Icon(Icons.delete_rounded, size: 20, color: errorColor),
+                                  Icon(Icons.delete_rounded,
+                                      size: 20, color: errorColor),
                                   SizedBox(width: 8),
-                                  Text('Futa', style: TextStyle(color: errorColor)),
+                                  Text('Futa',
+                                      style: TextStyle(color: errorColor)),
                                 ],
                               ),
                             ),
@@ -496,12 +514,21 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                     "Taarifa za Shughuli",
                     Icons.event_rounded,
                     [
-                      _buildDetailRow("Jina la Shughuli", item.eventName ?? "Ratiba ya Jumuiya"),
-                      _buildDetailRow("Tarehe", item.datePrayer ?? "Haijatolewa"),
-                      _buildDetailRow("Muda", item.time ?? "Haujatolewa"),
-                      _buildDetailRow("Mahali", item.location?.isNotEmpty == true ? item.location! : "Halijatolewa"),
+                      _buildDetailRow("Jina la Shughuli",
+                          item.eventName ?? "Ratiba ya Jumuiya"),
                       _buildDetailRow(
-                          "Maelezo", item.message?.isNotEmpty == true ? item.message! : "Hakuna maelezo zaidi"),
+                          "Tarehe", item.datePrayer ?? "Haijatolewa"),
+                      _buildDetailRow("Muda", item.time ?? "Haujatolewa"),
+                      _buildDetailRow(
+                          "Mahali",
+                          item.location?.isNotEmpty == true
+                              ? item.location!
+                              : "Halijatolewa"),
+                      _buildDetailRow(
+                          "Maelezo",
+                          item.message?.isNotEmpty == true
+                              ? item.message!
+                              : "Hakuna maelezo zaidi"),
                     ],
                   ),
 
@@ -529,7 +556,8 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                         text: "Onesha Mahali kwenye Ramani",
                         icon: Icons.map_rounded,
                         backgroundColor: infoColor,
-                        onPressed: () => _openMap(item.latId ?? "", item.longId ?? ""),
+                        onPressed: () =>
+                            _openMap(item.latId ?? "", item.longId ?? ""),
                       ),
                     ),
                 ],
@@ -541,7 +569,8 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     );
   }
 
-  Widget _buildDetailSection(String title, IconData icon, List<Widget> children) {
+  Widget _buildDetailSection(
+      String title, IconData icon, List<Widget> children) {
     return ModernCard(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -601,13 +630,15 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context, TimeTableModel.ChurchTimeTable item) {
+  void _showDeleteConfirmation(
+      BuildContext context, TimeTableModel.ChurchTimeTable item) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Futa Ratiba'),
-          content: Text('Je, una uhakika unataka kufuta ratiba ya "${item.eventName ?? "Hii"}"?'),
+          content: Text(
+              'Je, una uhakika unataka kufuta ratiba ya "${item.eventName ?? "Hii"}"?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -628,7 +659,8 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
   }
 
   void _openMap(String lat, String lng) async {
-    final Uri url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+    final Uri url =
+        Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {

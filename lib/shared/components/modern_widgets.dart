@@ -92,7 +92,8 @@ class ModernButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius ?? 16),
           ),
-          padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: padding ??
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
         icon: isLoading
             ? SizedBox(
@@ -100,7 +101,8 @@ class ModernButton extends StatelessWidget {
                 height: 16,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(backgroundColor ?? mainFontColor),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      backgroundColor ?? mainFontColor),
                 ),
               )
             : Icon(icon ?? Icons.check, size: 18),
@@ -122,7 +124,8 @@ class ModernButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius ?? 16),
         ),
-        padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding:
+            padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         elevation: 2,
         shadowColor: (backgroundColor ?? mainFontColor).withValues(alpha: 0.3),
       ),
@@ -132,7 +135,8 @@ class ModernButton extends StatelessWidget {
               height: 16,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(foregroundColor ?? Colors.white),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    foregroundColor ?? Colors.white),
               ),
             )
           : Icon(icon ?? Icons.check, size: 18),
@@ -262,6 +266,7 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Color? backgroundColor;
   final Color? foregroundColor;
   final double? elevation;
+  final bool automaticallyImplyLeading;
 
   const ModernAppBar({
     super.key,
@@ -272,6 +277,7 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor,
     this.foregroundColor,
     this.elevation,
+    this.automaticallyImplyLeading = true,
   });
 
   @override
@@ -289,7 +295,8 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: backgroundColor ?? Colors.white,
       foregroundColor: foregroundColor ?? mainFontColor,
       elevation: elevation ?? 0,
-      leading: leading,
+      leading: leading ?? (automaticallyImplyLeading ? null : const SizedBox()),
+      automaticallyImplyLeading: automaticallyImplyLeading,
       actions: actions,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(

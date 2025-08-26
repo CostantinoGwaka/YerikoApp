@@ -871,9 +871,12 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
           // Table content
           Expanded(
             child: isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
                 : UserMonthlyCollectionTable(
-                    data: userMonthlyCollectionResponse),
+                    data: userMonthlyCollectionResponse,
+                  ),
           ),
         ],
       ),

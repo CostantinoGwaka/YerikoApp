@@ -26,26 +26,34 @@ class UserMonthlyCollectionTable extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: (data != null && data!.data.isNotEmpty)
-          ? DataTable(
-              columns: [
-                const DataColumn(label: Text(' Mwanajumuiya')),
-                ...months.map((m) => DataColumn(label: Text(m.substring(0, 3)))),
-              ],
-              rows: data!.data.map((user) {
-                final List<String> collectedMonths = List<String>.from(user.monthsCollected);
-                int userIndex = data!.data.indexOf(user) + 1;
-                return DataRow(
-                  cells: [
-                    DataCell(Text('$userIndex. ${user.userFullName}')),
-                    ...months.map((month) {
-                      final hasCollection = collectedMonths.contains(month);
-                      return DataCell(
-                        hasCollection ? const Icon(Icons.check, color: Colors.green) : const SizedBox.shrink(),
-                      );
-                    }),
-                  ],
-                );
-              }).toList(),
+          ? SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: DataTable(
+                columns: [
+                  DataColumn(
+                      label: Text(' Mwanajumuiya - (${data!.data.length})')),
+                  ...months
+                      .map((m) => DataColumn(label: Text(m.substring(0, 3)))),
+                ],
+                rows: data!.data.map((user) {
+                  final List<String> collectedMonths =
+                      List<String>.from(user.monthsCollected);
+                  int userIndex = data!.data.indexOf(user) + 1;
+                  return DataRow(
+                    cells: [
+                      DataCell(Text('$userIndex. ${user.userFullName}')),
+                      ...months.take(12).map((month) {
+                        final hasCollection = collectedMonths.contains(month);
+                        return DataCell(
+                          hasCollection
+                              ? const Icon(Icons.check, color: Colors.green)
+                              : const SizedBox.shrink(),
+                        );
+                      }),
+                    ],
+                  );
+                }).toList(),
+              ),
             )
           : const Center(child: Text('No data available')),
     );

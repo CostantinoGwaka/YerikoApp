@@ -55,7 +55,11 @@ class UserMonthlyCollectionTable extends StatelessWidget {
                 }).toList(),
               ),
             )
-          : const Center(child: Text('No data available')),
+          : const Center(
+              child: Text(
+                'No data available',
+              ),
+            ),
     );
   }
 }

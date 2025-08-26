@@ -1,3 +1,5 @@
+// ignore_for_file: strict_top_level_inference
+
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -34,13 +36,15 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> fetchCollectionTypes() async {
     collectionTypeResponse = [];
-    final response = await http
-        .get(Uri.parse('$baseUrl/collectiontype/get_all_collection_type.php?jumuiya_id=${userData!.user.jumuiya_id}'));
+    final response = await http.get(Uri.parse(
+        '$baseUrl/collectiontype/get_all_collection_type.php?jumuiya_id=${userData!.user.jumuiya_id}'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        collectionTypeResponse = (data['data'] as List).map((u) => CollectionType.fromJson(u)).toList();
+        collectionTypeResponse = (data['data'] as List)
+            .map((u) => CollectionType.fromJson(u))
+            .toList();
       });
       setState(() {});
     } else {
@@ -153,7 +157,8 @@ class _ProfilePageState extends State<ProfilePage> {
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("✅ Umefanikiwa kubadilisha jumuiya: $jumuiyaName")),
+          SnackBar(
+              content: Text("✅ Umefanikiwa kubadilisha jumuiya: $jumuiyaName")),
         );
       }
     } catch (e) {
@@ -163,29 +168,34 @@ class _ProfilePageState extends State<ProfilePage> {
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+          SnackBar(
+              content:
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
         );
       }
     }
   }
 
-  Future<dynamic> registerCollectionType(
-      BuildContext rootContext, String collectionName, CollectionType? collection) async {
+  Future<dynamic> registerCollectionType(BuildContext rootContext,
+      String collectionName, CollectionType? collection) async {
     try {
       setState(() {
         _isLoading = true;
       });
 
       // Check if collectionName already exists
-      bool exists = collectionTypeResponse
-          .any((type) => type.collectionName.trim().toLowerCase() == collectionName.trim().toLowerCase());
+      bool exists = collectionTypeResponse.any((type) =>
+          type.collectionName.trim().toLowerCase() ==
+          collectionName.trim().toLowerCase());
       if (exists) {
         Navigator.pop(context);
         setState(() {
           _isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Aina ya mchango '$collectionName' tayari ipo.")),
+          SnackBar(
+              content:
+                  Text("⚠️ Aina ya mchango '$collectionName' tayari ipo.")),
         );
         return;
       }
@@ -208,7 +218,9 @@ class _ProfilePageState extends State<ProfilePage> {
         );
 
         var jsonResponse = json.decode(response.body);
-        if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == "200") {
+        if (response.statusCode == 200 &&
+            jsonResponse != null &&
+            jsonResponse['status'] == "200") {
           setState(() {
             _isLoading = false;
           });
@@ -224,7 +236,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(rootContext).showSnackBar(
-            SnackBar(content: Text("✅ Umefanikiwa! kuongeza aina ya mchango lako kwenye mfumo kwa mafanikio")),
+            SnackBar(
+                content: Text(
+                    "✅ Umefanikiwa! kuongeza aina ya mchango lako kwenye mfumo kwa mafanikio")),
           );
         } else {
           setState(() {
@@ -234,7 +248,9 @@ class _ProfilePageState extends State<ProfilePage> {
           Navigator.pop(rootContext);
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(rootContext).showSnackBar(
-            SnackBar(content: Text(jsonResponse['message'] ?? "❎ Imegoma kubadili nenosiri kwenye mfumo wetu")),
+            SnackBar(
+                content: Text(jsonResponse['message'] ??
+                    "❎ Imegoma kubadili nenosiri kwenye mfumo wetu")),
           );
         }
       }
@@ -246,7 +262,9 @@ class _ProfilePageState extends State<ProfilePage> {
       Navigator.pop(rootContext);
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content:
+                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }
@@ -255,7 +273,8 @@ class _ProfilePageState extends State<ProfilePage> {
     return text.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '_');
   }
 
-  Future<dynamic> updateUserName(BuildContext rootContext, String newname) async {
+  Future<dynamic> updateUserName(
+      BuildContext rootContext, String newname) async {
     try {
       setState(() {
         _isLoading = true;
@@ -263,7 +282,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (newname == "") {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeweka namba ya jina lako")),
+          SnackBar(
+              content:
+                  Text("⚠️ Tafadhali hakikisha umeweka namba ya jina lako")),
         );
       } else {
         String myApi = "$baseUrl/auth/update_profile_name_only.php";
@@ -279,7 +300,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
         var jsonResponse = json.decode(response.body);
 
-        if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == "200") {
+        if (response.statusCode == 200 &&
+            jsonResponse != null &&
+            jsonResponse['status'] == "200") {
           setState(() {
             _isLoading = false;
           });
@@ -300,7 +323,9 @@ class _ProfilePageState extends State<ProfilePage> {
           Navigator.pop(rootContext);
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(rootContext).showSnackBar(
-            SnackBar(content: Text(jsonResponse['message'] ?? "❎ Imegoma kubadili nenosiri kwenye mfumo wetu")),
+            SnackBar(
+                content: Text(jsonResponse['message'] ??
+                    "❎ Imegoma kubadili nenosiri kwenye mfumo wetu")),
           );
         }
       }
@@ -312,12 +337,15 @@ class _ProfilePageState extends State<ProfilePage> {
       Navigator.pop(rootContext);
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content:
+                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }
 
-  Future<dynamic> updatePassword(BuildContext rootContext, String oldpassword, String newpassword) async {
+  Future<dynamic> updatePassword(
+      BuildContext rootContext, String oldpassword, String newpassword) async {
     try {
       setState(() {
         _isLoading = true;
@@ -325,7 +353,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (oldpassword == "" || newpassword == "") {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeweka namba ya simu na nenosiri")),
+          SnackBar(
+              content: Text(
+                  "⚠️ Tafadhali hakikisha umeweka namba ya simu na nenosiri")),
         );
       } else {
         String myApi = "$baseUrl/auth/update_password.php";
@@ -341,7 +371,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
         var jsonResponse = json.decode(response.body);
 
-        if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == "200") {
+        if (response.statusCode == 200 &&
+            jsonResponse != null &&
+            jsonResponse['status'] == "200") {
           setState(() {
             _isLoading = false;
           });
@@ -354,7 +386,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(rootContext).showSnackBar(
-            SnackBar(content: Text("✅ Umefanikiwa! Kubadili nenosiri lako kwenye mfumo kwa mafanikio")),
+            SnackBar(
+                content: Text(
+                    "✅ Umefanikiwa! Kubadili nenosiri lako kwenye mfumo kwa mafanikio")),
           );
         } else {
           setState(() {
@@ -364,7 +398,9 @@ class _ProfilePageState extends State<ProfilePage> {
           Navigator.pop(rootContext);
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(rootContext).showSnackBar(
-            SnackBar(content: Text(jsonResponse['message'] ?? "❎ Imegoma kubadili nenosiri kwenye mfumo wetu")),
+            SnackBar(
+                content: Text(jsonResponse['message'] ??
+                    "❎ Imegoma kubadili nenosiri kwenye mfumo wetu")),
           );
         }
       }
@@ -376,7 +412,9 @@ class _ProfilePageState extends State<ProfilePage> {
       Navigator.pop(rootContext);
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content:
+                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }
@@ -391,7 +429,8 @@ class _ProfilePageState extends State<ProfilePage> {
   void _showJumuiyaSwitchDialog(jumuiyaId, jumuiyaName) {
     if (jumuiyaData.length < 2) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("⚠️ Huna jumuiya zaidi ya moja za kubadilishia")),
+        const SnackBar(
+            content: Text("⚠️ Huna jumuiya zaidi ya moja za kubadilishia")),
       );
       return;
     }
@@ -410,7 +449,8 @@ class _ProfilePageState extends State<ProfilePage> {
               Text('Thibitisha'),
             ],
           ),
-          content: Text('Una uhakika unataka kubadilisha hadi jumuiya "$jumuiyaName"?'),
+          content: Text(
+              'Una uhakika unataka kubadilisha hadi jumuiya "$jumuiyaName"?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(confirmContext).pop(),
@@ -488,12 +528,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                       child: CircleAvatar(
-                        radius: isSmallScreen ? size.height / 8 : size.height / 20,
+                        radius:
+                            isSmallScreen ? size.height / 8 : size.height / 20,
                         backgroundColor: Colors.white,
                         child: CircleAvatar(
-                          radius: isSmallScreen ? size.height / 8 : size.height / 20,
+                          radius: isSmallScreen
+                              ? size.height / 8
+                              : size.height / 20,
                           backgroundColor: Colors.white,
-                          backgroundImage: const AssetImage("assets/avatar.png"),
+                          backgroundImage:
+                              const AssetImage("assets/avatar.png"),
                         ),
                       ),
                     ),
@@ -504,7 +548,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     Text(
                       userData?.user.userFullName ?? "Mtumiaji",
                       style: TextStyle(
-                        fontSize: isSmallScreen ? size.height / 80 : size.height / 50,
+                        fontSize:
+                            isSmallScreen ? size.height / 80 : size.height / 50,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -515,7 +560,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     // Phone Number
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
@@ -591,7 +637,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             else
                               Wrap(
@@ -600,7 +647,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: jumuiyaData.map((jumuiyaItem) {
                                   final name = jumuiyaItem['name'] as String;
                                   final id = jumuiyaItem['id'];
-                                  final isActive = userData?.user.jumuiya_id.toString() == id.toString();
+                                  final isActive =
+                                      userData?.user.jumuiya_id.toString() ==
+                                          id.toString();
 
                                   return GestureDetector(
                                     onTap: () {
@@ -609,16 +658,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                       }
                                     },
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 6),
                                       decoration: BoxDecoration(
                                         color: isActive
-                                            ? Colors.white.withValues(alpha: 0.3)
-                                            : Colors.white.withValues(alpha: 0.2),
+                                            ? Colors.white
+                                                .withValues(alpha: 0.3)
+                                            : Colors.white
+                                                .withValues(alpha: 0.2),
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
                                           color: isActive
-                                              ? Colors.white.withValues(alpha: 0.8)
-                                              : Colors.white.withValues(alpha: 0.4),
+                                              ? Colors.white
+                                                  .withValues(alpha: 0.8)
+                                              : Colors.white
+                                                  .withValues(alpha: 0.4),
                                           width: isActive ? 2 : 1,
                                         ),
                                       ),
@@ -638,7 +692,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.white,
-                                              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                                              fontWeight: isActive
+                                                  ? FontWeight.bold
+                                                  : FontWeight.w500,
                                             ),
                                           ),
                                         ],
@@ -692,7 +748,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               icon: Icons.category_rounded,
                               title: "Ongeza Aina ya Mchango",
                               subtitle: "Tengeneza mchango mpya",
-                              onTap: () => _showAddCollectionTypeDialog(context),
+                              onTap: () =>
+                                  _showAddCollectionTypeDialog(context),
                               color: green,
                             ),
                           ],
@@ -817,7 +874,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // Helper methods
   void _showEditProfileDialog(BuildContext context) {
-    final TextEditingController controller = TextEditingController(text: userData?.user.userFullName ?? "");
+    final TextEditingController controller =
+        TextEditingController(text: userData?.user.userFullName ?? "");
 
     showDialog(
       context: context,
@@ -906,7 +964,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _editCollectionType(BuildContext context, CollectionType type) {
-    final TextEditingController controller = TextEditingController(text: type.collectionName);
+    final TextEditingController controller =
+        TextEditingController(text: type.collectionName);
 
     showDialog(
       context: context,
@@ -938,8 +997,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _shareApp() {
-    const String androidLink = "https://play.google.com/store/apps/details?id=com.isoftzt.jumuiya_yangu";
-    const String iosLink = "https://apps.apple.com/tz/app/jumuiya-yangu/id6748091565";
+    const String androidLink =
+        "https://play.google.com/store/apps/details?id=com.isoftzt.jumuiya_yangu";
+    const String iosLink =
+        "https://apps.apple.com/tz/app/jumuiya-yangu/id6748091565";
     const String appName = "Jumuiya Yangu";
     const String message =
         "Habari! Jaribu $appName - mfumo bora wa usimamizi wa Jumuiya yako. Pakua sasa:\n\nAndroid: $androidLink\niOS: $iosLink\n\nUngana nasi kuboresha usimamizi wa Jumuiya yako!";
@@ -985,7 +1046,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 } else {
                   // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Imeshindikana kufungua barua pepe.")),
+                    const SnackBar(
+                        content: Text("Imeshindikana kufungua barua pepe.")),
                   );
                 }
               },
@@ -1001,7 +1063,8 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         TextButton(
           onPressed: () async {
-            final Uri url = Uri.parse('https://www.instagram.com/isofttz_/?hl=en');
+            final Uri url =
+                Uri.parse('https://www.instagram.com/isofttz_/?hl=en');
             if (await canLaunchUrl(url)) {
               await launchUrl(url);
             } else {
@@ -1067,15 +1130,23 @@ class _ProfilePageState extends State<ProfilePage> {
               builder: (context, setState) => Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Badilisha Nenosiri', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text('Badilisha Nenosiri',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 20),
                   buildPasswordField(
-                      'Nenosiri la Zamani', oldPasswordController, oldVisible, (v) => setState(() => oldVisible = v)),
+                      'Nenosiri la Zamani',
+                      oldPasswordController,
+                      oldVisible,
+                      (v) => setState(() => oldVisible = v)),
+                  const SizedBox(height: 12),
+                  buildPasswordField('Nenosiri Jipya', newPasswordController,
+                      newVisible, (v) => setState(() => newVisible = v)),
                   const SizedBox(height: 12),
                   buildPasswordField(
-                      'Nenosiri Jipya', newPasswordController, newVisible, (v) => setState(() => newVisible = v)),
-                  const SizedBox(height: 12),
-                  buildPasswordField('Rudia Nenosiri', confirmPasswordController, confirmVisible,
+                      'Rudia Nenosiri',
+                      confirmPasswordController,
+                      confirmVisible,
                       (v) => setState(() => confirmVisible = v)),
                   const SizedBox(height: 20),
                   _isLoading
@@ -1102,7 +1173,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget buildPasswordField(String label, TextEditingController controller, bool isVisible, Function(bool) toggle) {
+  Widget buildPasswordField(String label, TextEditingController controller,
+      bool isVisible, Function(bool) toggle) {
     return TextFormField(
       controller: controller,
       obscureText: !isVisible,
@@ -1122,7 +1194,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 }
 

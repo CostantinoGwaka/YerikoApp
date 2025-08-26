@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -36,7 +38,8 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<dynamic> login(BuildContext context, String username, String password) async {
+  Future<dynamic> login(
+      BuildContext context, String username, String password) async {
     try {
       setState(() {
         _isLoading = true;
@@ -44,7 +47,9 @@ class _LoginPageState extends State<LoginPage> {
 
       if (username == "" || password == "") {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeweka namba ya simu na nenosiri")),
+          SnackBar(
+              content: Text(
+                  "⚠️ Tafadhali hakikisha umeweka namba ya simu na nenosiri")),
         );
       } else {
         String myApi = "$baseUrl/auth/login.php";
@@ -62,7 +67,9 @@ class _LoginPageState extends State<LoginPage> {
 
         var jsonResponse = json.decode(response.body);
 
-        if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == '200') {
+        if (response.statusCode == 200 &&
+            jsonResponse != null &&
+            jsonResponse['status'] == '200') {
           setState(() {
             _isLoading = false;
           });
@@ -92,15 +99,19 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.push(
             // ignore: use_build_context_synchronously
             context,
-            PageTransition(type: PageTransitionType.fade, child: const HomePage()),
+            PageTransition(
+                type: PageTransitionType.fade, child: const HomePage()),
           );
 
           //end here
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("✅ Umefanikiwa! Umeingia kwenye mfumo kwa mafanikio")),
+            SnackBar(
+                content:
+                    Text("✅ Umefanikiwa! Umeingia kwenye mfumo kwa mafanikio")),
           );
-        } else if (jsonResponse['status'] == '300' || jsonResponse['status'] == '403') {
+        } else if (jsonResponse['status'] == '300' ||
+            jsonResponse['status'] == '403') {
           //end here
           setState(() {
             _isLoading = false;
@@ -115,7 +126,9 @@ class _LoginPageState extends State<LoginPage> {
           });
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(jsonResponse['message'] ?? "ℹ️ Mtumiaji hakupatikana kwenye mfumo wetu")),
+            SnackBar(
+                content: Text(jsonResponse['message'] ??
+                    "ℹ️ Mtumiaji hakupatikana kwenye mfumo wetu")),
           );
         }
       }
@@ -125,7 +138,9 @@ class _LoginPageState extends State<LoginPage> {
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content:
+                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
       );
     }
   }
@@ -326,7 +341,9 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              isPasswordVisible ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                              isPasswordVisible
+                                  ? Icons.visibility_off_rounded
+                                  : Icons.visibility_rounded,
                               color: Colors.grey[500],
                               size: 22,
                             ),
@@ -359,7 +376,8 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: _isLoading
                             ? null
                             : () async {
-                                if (_phone.text.length == 10 && _password.text.isNotEmpty) {
+                                if (_phone.text.length == 10 &&
+                                    _password.text.isNotEmpty) {
                                   setState(() {
                                     _isLoading = true;
                                   });
@@ -367,7 +385,8 @@ class _LoginPageState extends State<LoginPage> {
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: const Text("⚠️ Tafadhali weka namba sahihi ya simu na nenosiri."),
+                                      content: const Text(
+                                          "⚠️ Tafadhali weka namba sahihi ya simu na nenosiri."),
                                       backgroundColor: Colors.orange[400],
                                       behavior: SnackBarBehavior.floating,
                                       shape: RoundedRectangleBorder(
@@ -378,7 +397,9 @@ class _LoginPageState extends State<LoginPage> {
                                 }
                               },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _isLoading ? mainFontColor.withOpacity(0.7) : mainFontColor,
+                          backgroundColor: _isLoading
+                              ? mainFontColor.withOpacity(0.7)
+                              : mainFontColor,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
@@ -393,7 +414,8 @@ class _LoginPageState extends State<LoginPage> {
                                 width: 24,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.5,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
                                 ),
                               )
                             : Row(
@@ -425,7 +447,8 @@ class _LoginPageState extends State<LoginPage> {
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: mainFontColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 ),
                 child: Text(
                   "Umesahau nenosiri?",
@@ -445,7 +468,8 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
                       borderRadius: BorderRadius.circular(20),
@@ -467,7 +491,8 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: () {
                         showSnackBar(context, "📞 Help Desk: 0659515042");
                       },
-                      child: Icon(Icons.support_agent_rounded, color: Colors.white),
+                      child: Icon(Icons.support_agent_rounded,
+                          color: Colors.white),
                     ),
                   ),
                 ],
@@ -480,6 +505,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 }

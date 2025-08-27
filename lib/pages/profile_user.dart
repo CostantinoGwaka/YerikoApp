@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/other_collection_model.dart';
 import 'package:jumuiya_yangu/pages/login_page.dart';
+import 'package:jumuiya_yangu/pages/sms_bando/sms_bando_list_page.dart';
 import 'package:jumuiya_yangu/shared/localstorage/index.dart';
 import 'package:jumuiya_yangu/shared/components/modern_widgets.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
@@ -743,6 +744,20 @@ class _ProfilePageState extends State<ProfilePage> {
                             color: orange,
                           ),
                           if (userData?.user.role == "ADMIN") ...[
+                            Divider(height: 1, color: Colors.grey[200]),
+                            _buildModernMenuItem(
+                              icon: Icons.message_rounded,
+                              title: "Jumbe",
+                              subtitle: "Tazama na tuma jumbe",
+                              onTap: () => Navigator.push(
+                                context,
+                                PageTransition(
+                                  type: PageTransitionType.rightToLeft,
+                                  child: const SmsBandoListPage(),
+                                ),
+                              ),
+                              color: green,
+                            ),
                             Divider(height: 1, color: Colors.grey[200]),
                             _buildModernMenuItem(
                               icon: Icons.category_rounded,

@@ -184,16 +184,18 @@ class _SmsBandoFormPageState extends State<SmsBandoFormPage> {
                       const SizedBox(height: 24),
                       _buildFormSection(),
                       const SizedBox(height: 24),
-                      ModernButton(
-                        text: widget.subscription != null
-                            ? 'Hifadhi Mabadiliko'
-                            : 'Ongeza SMS',
-                        icon: Icons.save,
-                        backgroundColor: mainFontColor,
-                        onPressed: _saveSubscription,
-                        isLoading: _isLoading,
-                        padding: const EdgeInsets.all(12),
-                      ),
+                      Visibility(
+                          visible: _tshController.text != "0",
+                          child: ModernButton(
+                            text: widget.subscription != null
+                                ? 'Hifadhi Mabadiliko'
+                                : 'Ongeza SMS',
+                            icon: Icons.save,
+                            backgroundColor: mainFontColor,
+                            onPressed: _saveSubscription,
+                            isLoading: _isLoading,
+                            padding: const EdgeInsets.all(12),
+                          ))
                     ],
                   ),
                 ),

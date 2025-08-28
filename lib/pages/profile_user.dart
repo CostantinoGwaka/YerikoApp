@@ -1,4 +1,4 @@
-// ignore_for_file: strict_top_level_inference
+// ignore_for_file: strict_top_level_inference, deprecated_member_use
 
 import 'dart:convert';
 
@@ -32,8 +32,10 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isLoadingJumuiya = false;
   bool confirmPasswordVisible = false;
   bool _isLoading = false;
+  bool _isLoadingSmsSummary = false;
   List<CollectionType> collectionTypeResponse = [];
   List<Map<String, dynamic>> jumuiyaData = [];
+  Map<String, dynamic>? smsBandoSummary;
 
   Future<void> fetchCollectionTypes() async {
     collectionTypeResponse = [];
@@ -80,6 +82,42 @@ class _ProfilePageState extends State<ProfilePage> {
       if (kDebugMode) {
         print('Error fetching jumuiya data: $e');
       }
+    }
+  }
+
+  Future<void> fetchSmsBandoSummary() async {
+    if (userData?.user.jumuiya_id == null) return;
+
+    setState(() {
+      _isLoadingSmsSummary = true;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/sms_bando/get_sms_bando_summary.php'),
+        headers: {'Accept': 'application/json'},
+        body: jsonEncode({
+          "jumuiya_id": userData!.user.jumuiya_id.toString(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == "200") {
+          setState(() {
+            smsBandoSummary = data['data'];
+          });
+        }
+      }
+    } catch (e) {
+      // Handle error silently
+      if (kDebugMode) {
+        print('Error fetching SMS bando summary: $e');
+      }
+    } finally {
+      setState(() {
+        _isLoadingSmsSummary = false;
+      });
     }
   }
 
@@ -425,6 +463,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     fetchCollectionTypes();
     fetchJumuiyaNames();
+    fetchSmsBandoSummary();
   }
 
   void _showJumuiyaSwitchDialog(jumuiyaId, jumuiyaName) {
@@ -708,6 +747,131 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ],
+                    // SMS Bando Summary Section
+                    if (userData?.user.role == "ADMIN") ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.message_rounded,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  "Muhtasari wa SMS",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            _isLoadingSmsSummary
+                                ? const Center(
+                                    child: SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : smsBandoSummary == null
+                                    ? const Text(
+                                        "Hakuna taarifa za SMS",
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 13,
+                                        ),
+                                      )
+                                    : Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          _buildSmsStatItem(
+                                            "Jumla ya SMS",
+                                            smsBandoSummary?['total_sms'] ??
+                                                "0",
+                                            Colors.white,
+                                          ),
+                                          _buildSmsStatItem(
+                                            "SMS Zilizobaki",
+                                            smsBandoSummary?['remaining_sms'] ??
+                                                "0",
+                                            Colors.green[100]!,
+                                          ),
+                                          _buildSmsStatItem(
+                                            "SMS Zilizotumika",
+                                            smsBandoSummary?['used_sms'] ?? "0",
+                                            Colors.orange[100]!,
+                                          ),
+                                        ],
+                                      ),
+                            if (smsBandoSummary != null) ...[
+                              const SizedBox(height: 12),
+                              GestureDetector(
+                                onTap: () => Navigator.push(
+                                  context,
+                                  PageTransition(
+                                    type: PageTransitionType.rightToLeft,
+                                    child: const SmsBandoListPage(),
+                                  ),
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Text(
+                                        "Angalia Zaidi",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      SizedBox(width: 4),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: Colors.white,
+                                        size: 12,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 12),
                   ],
                 ),
               ),
@@ -1013,7 +1177,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _shareApp() {
     const String androidLink =
-        "https://play.google.com/store/apps/details?id=com.isoftzt.jumuiya_yangu";
+        "https://play.google.com/store/apps/details?id=com.isofttz.jumuiya_yangu";
     const String iosLink =
         "https://apps.apple.com/tz/app/jumuiya-yangu/id6748091565";
     const String appName = "Jumuiya Yangu";
@@ -1211,6 +1375,36 @@ class _ProfilePageState extends State<ProfilePage> {
   void showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Widget _buildSmsStatItem(String label, String value, Color color) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: Text(
+            value,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 12,
+          ),
+        ),
+      ],
+    );
   }
 }
 

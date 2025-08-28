@@ -11,6 +11,7 @@ import 'package:jumuiya_yangu/shared/components/modern_widgets.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SmsBandoListPage extends StatefulWidget {
   const SmsBandoListPage({super.key});
@@ -305,22 +306,48 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.orange.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Row(
+                        child: Column(
                           children: [
-                            const Icon(Icons.info, color: Colors.orange),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Tafadhali piga simu namba 0659515042 kufanya malipo ya SMS',
-                                style: TextStyle(
-                                  color: Colors.orange[800],
-                                  fontSize: 13,
+                            Row(
+                              children: [
+                                const Icon(Icons.info, color: Colors.orange),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Tafadhali piga simu namba kufanya malipo ya SMS',
+                                    style: TextStyle(
+                                      color: Colors.orange[800],
+                                      fontSize: 13,
+                                    ),
+                                  ),
                                 ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                final Uri telLaunchUri = Uri(
+                                  scheme: 'tel',
+                                  path: '0659515042',
+                                );
+                                try {
+                                  await launchUrl(telLaunchUri);
+                                } catch (e) {
+                                  _showSnackBar('Imeshindwa kufungua simu');
+                                }
+                              },
+                              icon: const Icon(Icons.phone),
+                              label: const Text('Piga 0659515042'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                minimumSize: const Size(double.infinity, 40),
                               ),
                             ),
                           ],

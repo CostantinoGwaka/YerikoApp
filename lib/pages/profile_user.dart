@@ -790,24 +790,23 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   ],
                                 ),
-                                if (smsBandoSummaryList.isNotEmpty) ...[
-                                  const SizedBox(height: 12),
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.refresh,
-                                          color: Colors.white,
-                                        ),
-                                        onPressed: fetchSmsBandoSummary,
+                                // if (smsBandoSummaryList.isNotEmpty) ...[
+                                const SizedBox(height: 12),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.refresh,
+                                        color: Colors.white,
                                       ),
-                                    ],
-                                  ),
-                                ],
+                                      onPressed: fetchSmsBandoSummary,
+                                    ),
+                                  ],
+                                ),
+                                // ],
                               ],
                             ),
                             const SizedBox(height: 12),

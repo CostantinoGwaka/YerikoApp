@@ -306,7 +306,7 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
                   Row(
                     children: [
                       _buildInfoItem(
-                        'SMS Zilizonunuliwa',
+                        'SMS ${subscription.paymentStatus == 'Inasubiri' ? "Zilizoombwa" : "Zilizonunuliwa"}',
                         subscription.smsNumber.toString(),
                         Icons.sms,
                         blue,

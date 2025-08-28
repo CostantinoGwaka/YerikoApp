@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
+import 'package:jumuiya_yangu/models/sms_bando_summary_model.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:share_plus/share_plus.dart';
@@ -35,7 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isLoadingSmsSummary = false;
   List<CollectionType> collectionTypeResponse = [];
   List<Map<String, dynamic>> jumuiyaData = [];
-  Map<String, dynamic>? smsBandoSummary;
+  List<SmsBandoSummaryModel> smsBandoSummaryList = [];
 
   Future<void> fetchCollectionTypes() async {
     collectionTypeResponse = [];
@@ -95,7 +96,10 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/sms_bando/get_sms_bando_summary.php'),
-        headers: {'Accept': 'application/json'},
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
         body: jsonEncode({
           "jumuiya_id": userData!.user.jumuiya_id.toString(),
         }),
@@ -103,9 +107,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        if (data['status'] == "200") {
+        if (data['status'].toString() == "200" && data['data'] != null) {
           setState(() {
-            smsBandoSummary = data['data'];
+            smsBandoSummaryList = (data['data'] as List)
+                .map((item) => SmsBandoSummaryModel.fromJson(item))
+                .toList();
           });
         }
       }
@@ -794,7 +800,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                     ),
                                   )
-                                : smsBandoSummary == null
+                                : smsBandoSummaryList.isEmpty
                                     ? const Text(
                                         "Hakuna taarifa za SMS",
                                         style: TextStyle(
@@ -808,24 +814,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                         children: [
                                           _buildSmsStatItem(
                                             "Jumla ya SMS",
-                                            smsBandoSummary?['total_sms'] ??
-                                                "0",
+                                            smsBandoSummaryList[0]
+                                                .smsTotal
+                                                .toString(),
                                             Colors.white,
                                           ),
                                           _buildSmsStatItem(
-                                            "SMS Zilizobaki",
-                                            smsBandoSummary?['remaining_sms'] ??
-                                                "0",
+                                            "Tarehe",
+                                            smsBandoSummaryList[0].tarehe,
                                             Colors.green[100]!,
-                                          ),
-                                          _buildSmsStatItem(
-                                            "SMS Zilizotumika",
-                                            smsBandoSummary?['used_sms'] ?? "0",
-                                            Colors.orange[100]!,
                                           ),
                                         ],
                                       ),
-                            if (smsBandoSummary != null) ...[
+                            if (smsBandoSummaryList.isNotEmpty) ...[
                               const SizedBox(height: 12),
                               GestureDetector(
                                 onTap: () => Navigator.push(
@@ -1184,7 +1185,6 @@ class _ProfilePageState extends State<ProfilePage> {
     const String message =
         "Habari! Jaribu $appName - mfumo bora wa usimamizi wa Jumuiya yako. Pakua sasa:\n\nAndroid: $androidLink\niOS: $iosLink\n\nUngana nasi kuboresha usimamizi wa Jumuiya yako!";
 
-    // ignore: deprecated_member_use
     Share.share(message);
   }
 

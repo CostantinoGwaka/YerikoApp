@@ -37,7 +37,7 @@ class _SmsBandoFormPageState extends State<SmsBandoFormPage> {
     if (widget.subscription != null) {
       _smsNumberController.text = widget.subscription!.smsNumber.toString();
       _tshController.text = widget.subscription!.tsh.toString();
-      _dateController.text = widget.subscription!.dates;
+      _dateController.text = widget.subscription!.tarehe;
       // _selectedPaymentStatus = widget.subscription!.paymentStatus;
     } else {
       _dateController.text = _dateFormat.format(DateTime.now());

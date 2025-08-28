@@ -355,7 +355,7 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        subscription.dates,
+                        subscription.tarehe,
                         style: TextStyle(
                           color: textSecondary,
                           fontSize: 14,

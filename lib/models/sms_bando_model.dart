@@ -5,7 +5,7 @@ class SmsBandoSubscription {
   final double tsh;
   final int smsNumber;
   final String paymentStatus;
-  final String dates;
+  final String tarehe;
 
   SmsBandoSubscription({
     this.id,
@@ -14,7 +14,7 @@ class SmsBandoSubscription {
     required this.tsh,
     required this.smsNumber,
     required this.paymentStatus,
-    required this.dates,
+    required this.tarehe,
   });
 
   factory SmsBandoSubscription.fromJson(Map<String, dynamic> json) {
@@ -25,7 +25,7 @@ class SmsBandoSubscription {
       tsh: double.parse(json['tsh'].toString()),
       smsNumber: int.parse(json['sms_number'].toString()),
       paymentStatus: json['payment_status'].toString(),
-      dates: json['dates'].toString(),
+      tarehe: json['tarehe'].toString(),
     );
   }
 
@@ -37,7 +37,7 @@ class SmsBandoSubscription {
       'tsh': tsh.toString(),
       'sms_number': smsNumber.toString(),
       'payment_status': paymentStatus,
-      'dates': dates,
+      'tarehe': tarehe,
     };
   }
 
@@ -57,7 +57,7 @@ class SmsBandoSubscription {
       tsh: tsh ?? this.tsh,
       smsNumber: smsNumber ?? this.smsNumber,
       paymentStatus: paymentStatus ?? this.paymentStatus,
-      dates: dates ?? this.dates,
+      tarehe: tarehe,
     );
   }
 }

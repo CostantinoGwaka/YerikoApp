@@ -39,12 +39,14 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
     try {
       final response = await http.get(
         Uri.parse(
-            '$baseUrl/sms_bando/get_all.php?jumuiya_id=${userData!.user.jumuiya_id}'),
+            '$baseUrl/sms_bando/get_sms_bando_history.php?jumuiya_id=${userData!.user.jumuiya_id}'),
         headers: {'Accept': 'application/json'},
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print("data $data");
+
         if (data['status'] == "200") {
           setState(() {
             subscriptions = (data['data'] as List)
@@ -163,7 +165,12 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
         backgroundColor: mainFontColor,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
-        label: const Text('Ongeza SMS'),
+        label: const Text(
+          'Ongeza SMS',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -45,7 +47,6 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("data $data");
 
         if (data['status'] == "200") {
           setState(() {
@@ -76,7 +77,7 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
       });
 
       final response = await http.post(
-        Uri.parse('$baseUrl/sms_bando/delete.php'),
+        Uri.parse('$baseUrl/sms_bando/delete_sms_bando.php'),
         headers: {'Accept': 'application/json'},
         body: jsonEncode({
           'id': id.toString(),
@@ -209,8 +210,16 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            icon: const Icon(Icons.add),
-            label: const Text('Ongeza SMS'),
+            icon: const Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+            label: const Text(
+              'Ongeza SMS',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: mainFontColor,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -266,34 +275,63 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
                           ),
                         ),
                       ),
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                PageTransition(
-                                  type: PageTransitionType.rightToLeft,
-                                  child: SmsBandoFormPage(
-                                      subscription: subscription),
-                                ),
-                              ).then((_) => _fetchSubscriptions());
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: errorColor),
-                            onPressed: () => _confirmDelete(subscription),
-                          ),
-                        ],
-                      ),
+                      Visibility(
+                        visible: subscription.paymentStatus == 'Inasubiri',
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  PageTransition(
+                                    type: PageTransitionType.rightToLeft,
+                                    child: SmsBandoFormPage(
+                                        subscription: subscription),
+                                  ),
+                                ).then((_) => _fetchSubscriptions());
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: errorColor),
+                              onPressed: () => _confirmDelete(subscription),
+                            ),
+                          ],
+                        ),
+                      )
                     ],
                   ),
+                  if (subscription.paymentStatus == 'Inasubiri')
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.info, color: Colors.orange),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Tafadhali piga simu namba 0659515042 kufanya malipo ya SMS',
+                                style: TextStyle(
+                                  color: Colors.orange[800],
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       _buildInfoItem(
-                        'SMS Zilizobaki',
+                        'SMS Zilizonunuliwa',
                         subscription.smsNumber.toString(),
                         Icons.sms,
                         blue,
@@ -325,6 +363,7 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 8),
                 ],
               ),
             ),

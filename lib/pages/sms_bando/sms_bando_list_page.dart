@@ -302,6 +302,43 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
                       )
                     ],
                   ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      _buildInfoItem(
+                        'SMS Zilizonunuliwa',
+                        subscription.smsNumber.toString(),
+                        Icons.sms,
+                        blue,
+                      ),
+                      const SizedBox(width: 16),
+                      _buildInfoItem(
+                        'Kiasi',
+                        currencyFormat.format(subscription.tsh),
+                        Icons.payments,
+                        green,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 16,
+                        color: textSecondary,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        subscription.tarehe,
+                        style: TextStyle(
+                          color: textSecondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
                   if (subscription.paymentStatus == 'Inasubiri')
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -354,43 +391,6 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
                         ),
                       ),
                     ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      _buildInfoItem(
-                        'SMS Zilizonunuliwa',
-                        subscription.smsNumber.toString(),
-                        Icons.sms,
-                        blue,
-                      ),
-                      const SizedBox(width: 16),
-                      _buildInfoItem(
-                        'Kiasi',
-                        currencyFormat.format(subscription.tsh),
-                        Icons.payments,
-                        green,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
-                        size: 16,
-                        color: textSecondary,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        subscription.tarehe,
-                        style: TextStyle(
-                          color: textSecondary,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
                 ],
               ),
             ),

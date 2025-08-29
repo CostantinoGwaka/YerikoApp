@@ -7,8 +7,10 @@ import 'package:http/http.dart' as http;
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/sms_bando_summary_model.dart';
 import 'package:jumuiya_yangu/models/sms_bando_used_model.dart';
+import 'package:jumuiya_yangu/pages/sms_sent_list_page.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
+import 'package:page_transition/page_transition.dart';
 
 class SendMessagePage extends StatefulWidget {
   const SendMessagePage({Key? key}) : super(key: key);
@@ -287,7 +289,16 @@ class _SendMessagePageState extends State<SendMessagePage> {
                                               fontSize: isSmallScreen ? 12 : 14,
                                             ),
                                           ),
-                                          onPressed: () => {},
+                                          onPressed: () => {
+                                            Navigator.push(
+                                              context,
+                                              PageTransition(
+                                                type: PageTransitionType
+                                                    .rightToLeft,
+                                                child: const SmsSentListPage(),
+                                              ),
+                                            )
+                                          },
                                         ),
                                       ],
                                     ),

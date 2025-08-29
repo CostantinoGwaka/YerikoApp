@@ -188,6 +188,9 @@ class _SendMessagePageState extends State<SendMessagePage> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: mainFontColor,
@@ -223,31 +226,68 @@ class _SendMessagePageState extends State<SendMessagePage> {
                                 child: Column(
                                   children: [
                                     Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: const Icon(
-                                            Icons.message_rounded,
-                                            color: Colors.black,
-                                            size: 20,
-                                          ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: const Icon(
+                                                Icons.message_rounded,
+                                                color: Colors.black,
+                                                size: 20,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 2),
+                                            const Text(
+                                              "Muhtasari wa SMS",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(width: 12),
-                                        const Text(
-                                          "Muhtasari wa SMS",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black87,
+                                        const SizedBox(width: 2),
+                                        ElevatedButton.icon(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: mainFontColor,
+                                            foregroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal:
+                                                  isSmallScreen ? 12 : 16,
+                                              vertical: isSmallScreen ? 8 : 10,
+                                            ),
+                                            elevation: 3,
                                           ),
+                                          icon: Icon(
+                                            Icons.visibility_rounded,
+                                            size: isSmallScreen ? 14 : 16,
+                                          ),
+                                          label: Text(
+                                            "Tazama",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: isSmallScreen ? 12 : 14,
+                                            ),
+                                          ),
+                                          onPressed: () => {},
                                         ),
                                       ],
                                     ),

@@ -500,13 +500,6 @@ class _ProfilePageState extends State<ProfilePage> {
         if (data['status'].toString() == "200") {
           // Use the new model for used SMS
           usedSummary = SmsBandoUsedModel.fromJson(data);
-          // You can now use usedSummary.totalWaliotumiwa and usedSummary.count as needed
-          // For example, you might want to store them in state variables or use them in the UI
-          // Example:
-          if (kDebugMode) {
-            print(
-                'Used SMS: ${usedSummary.totalWaliotumiwa}, Count: ${usedSummary.count}');
-          }
         }
       }
     } catch (e) {
@@ -903,9 +896,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 ),
                                                 _buildSmsStatItem(
                                                   "Zilizotumiwa",
-                                                  smsBandoSummaryList.isNotEmpty
-                                                      ? smsBandoSummaryList[0]
-                                                          .smsTotal
+                                                  usedSummary != null
+                                                      ? usedSummary
+                                                          .totalWaliotumiwa
                                                           .toString()
                                                       : "0",
                                                   Colors.green,

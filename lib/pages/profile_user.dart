@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/sms_bando_summary_model.dart';
+import 'package:jumuiya_yangu/models/sms_bando_used_model.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:share_plus/share_plus.dart';
@@ -36,6 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isLoading = false;
   bool _isLoadingSmsSummary = false;
   List<CollectionType> collectionTypeResponse = [];
+  dynamic usedSummary;
   List<Map<String, dynamic>> jumuiyaData = [];
   List<SmsBandoSummaryModel> smsBandoSummaryList = [];
 
@@ -471,6 +473,52 @@ class _ProfilePageState extends State<ProfilePage> {
     fetchCollectionTypes();
     fetchJumuiyaNames();
     fetchSmsBandoSummary();
+    fetchSmsBandoSummaryUsed();
+  }
+
+  Future<void> fetchSmsBandoSummaryUsed() async {
+    if (userData?.user.jumuiya_id == null) return;
+
+    setState(() {
+      _isLoadingSmsSummary = true;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/sms_bando/get_summary_used_sms.php'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "jumuiya_id": userData!.user.jumuiya_id.toString(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'].toString() == "200") {
+          // Use the new model for used SMS
+          usedSummary = SmsBandoUsedModel.fromJson(data);
+          // You can now use usedSummary.totalWaliotumiwa and usedSummary.count as needed
+          // For example, you might want to store them in state variables or use them in the UI
+          // Example:
+          if (kDebugMode) {
+            print(
+                'Used SMS: ${usedSummary.totalWaliotumiwa}, Count: ${usedSummary.count}');
+          }
+        }
+      }
+    } catch (e) {
+      // Handle error silently
+      if (kDebugMode) {
+        print('Error fetching used SMS summary: $e');
+      }
+    } finally {
+      setState(() {
+        _isLoadingSmsSummary = false;
+      });
+    }
   }
 
   void _showJumuiyaSwitchDialog(jumuiyaId, jumuiyaName) {
@@ -830,16 +878,43 @@ class _ProfilePageState extends State<ProfilePage> {
                                           fontSize: 13,
                                         ),
                                       )
-                                    : Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                    : Column(
                                         children: [
-                                          _buildSmsStatItem(
-                                            "Jumla ya SMS",
-                                            smsBandoSummaryList[0]
-                                                .smsTotal
-                                                .toString(),
-                                            Colors.white,
+                                          Container(
+                                            padding: const EdgeInsets.all(16),
+                                            decoration: BoxDecoration(
+                                              color: Colors.black
+                                                  .withOpacity(0.05),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                _buildSmsStatItem(
+                                                  "SMS Zilizopo",
+                                                  smsBandoSummaryList.isNotEmpty
+                                                      ? smsBandoSummaryList[0]
+                                                          .smsTotal
+                                                          .toString()
+                                                      : "0",
+                                                  Colors.blue,
+                                                ),
+                                                _buildSmsStatItem(
+                                                  "Zilizotumiwa",
+                                                  smsBandoSummaryList.isNotEmpty
+                                                      ? smsBandoSummaryList[0]
+                                                          .smsTotal
+                                                          .toString()
+                                                      : "0",
+                                                  Colors.green,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 4,
                                           ),
                                           if (smsBandoSummaryList
                                               .isNotEmpty) ...[
@@ -943,6 +1018,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 context,
                                 PageTransition(
                                   type: PageTransitionType.rightToLeft,
+                                  child: const SmsBandoListPage(),
                                 ),
                               ),
                               color: green,

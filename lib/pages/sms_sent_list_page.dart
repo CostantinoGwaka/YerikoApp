@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, deprecated_member_use, unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -6,7 +8,7 @@ import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:jumuiya_yangu/main.dart';
 
 class SmsSentListPage extends StatefulWidget {
-  const SmsSentListPage({Key? key}) : super(key: key);
+  const SmsSentListPage({super.key});
 
   @override
   State<SmsSentListPage> createState() => _SmsSentListPageState();
@@ -25,7 +27,6 @@ class _SmsSentListPageState extends State<SmsSentListPage> {
   Future<void> _fetchSmsSent() async {
     if (userData?.user.jumuiya_id == null) return;
     setState(() => _isLoading = true);
-    print("id :${userData!.user.jumuiya_id.toString()}");
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/sms_bando/get_all_sms_sent.php'),

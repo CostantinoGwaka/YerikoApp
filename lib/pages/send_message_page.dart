@@ -13,7 +13,7 @@ import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:page_transition/page_transition.dart';
 
 class SendMessagePage extends StatefulWidget {
-  const SendMessagePage({Key? key}) : super(key: key);
+  const SendMessagePage({super.key});
 
   @override
   State<SendMessagePage> createState() => _SendMessagePageState();
@@ -23,7 +23,7 @@ class _SendMessagePageState extends State<SendMessagePage> {
   final TextEditingController _messageController = TextEditingController();
   bool _sendToAll = true;
   List<dynamic> _members = [];
-  List<String> _selectedPhones = [];
+  final List<String> _selectedPhones = [];
   bool _isLoadingSmsSummary = false;
   dynamic usedSummary;
   List<SmsBandoSummaryModel> smsBandoSummaryList = [];
@@ -170,7 +170,6 @@ class _SendMessagePageState extends State<SendMessagePage> {
     setState(() => _isLoading = false);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print(data);
       if (data['status'].toString() == '200') {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Ujumbe umetumwa!')),

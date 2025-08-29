@@ -60,35 +60,6 @@ class _SmsBandoFormPageState extends State<SmsBandoFormPage> {
     }
   }
 
-  // Future<void> _selectDate(BuildContext context) async {
-  //   final DateTime? picked = await showDatePicker(
-  //     context: context,
-  //     initialDate: _dateController.text.isEmpty
-  //         ? DateTime.now()
-  //         : DateTime.parse(_dateController.text),
-  //     firstDate: DateTime(2020),
-  //     lastDate: DateTime(2100),
-  //     builder: (context, child) {
-  //       return Theme(
-  //         data: Theme.of(context).copyWith(
-  //           colorScheme: ColorScheme.light(
-  //             primary: mainFontColor,
-  //             onPrimary: Colors.white,
-  //             onSurface: textPrimary,
-  //           ),
-  //         ),
-  //         child: child!,
-  //       );
-  //     },
-  //   );
-
-  //   if (picked != null) {
-  //     setState(() {
-  //       _dateController.text = _dateFormat.format(picked);
-  //     });
-  //   }
-  // }
-
   Future<void> _saveSubscription() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -282,10 +253,6 @@ class _SmsBandoFormPageState extends State<SmsBandoFormPage> {
             prefixIcon: Icons.payments,
             readOnly: true, // Added this line
           ),
-          // const SizedBox(height: 20),
-          // _buildDateField(),
-          // const SizedBox(height: 20),
-          // _buildStatusDropdown(),
         ],
       ),
     );
@@ -343,139 +310,6 @@ class _SmsBandoFormPageState extends State<SmsBandoFormPage> {
       ],
     );
   }
-
-  // Widget _buildDateField() {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       const Text(
-  //         'Tarehe',
-  //         style: TextStyle(
-  //           fontSize: 14,
-  //           fontWeight: FontWeight.w600,
-  //           color: textPrimary,
-  //         ),
-  //       ),
-  //       const SizedBox(height: 8),
-  //       GestureDetector(
-  //         onTap: () => _selectDate(context),
-  //         child: AbsorbPointer(
-  //           child: TextFormField(
-  //             controller: _dateController,
-  //             validator: (value) {
-  //               if (value == null || value.isEmpty) {
-  //                 return 'Tafadhali chagua tarehe';
-  //               }
-  //               return null;
-  //             },
-  //             decoration: InputDecoration(
-  //               hintText: 'Chagua tarehe',
-  //               prefixIcon: Icon(Icons.calendar_today, color: mainFontColor),
-  //               suffixIcon: Icon(Icons.arrow_drop_down, color: mainFontColor),
-  //               border: OutlineInputBorder(
-  //                 borderRadius: BorderRadius.circular(12),
-  //                 borderSide: BorderSide(color: Colors.grey[300]!),
-  //               ),
-  //               enabledBorder: OutlineInputBorder(
-  //                 borderRadius: BorderRadius.circular(12),
-  //                 borderSide: BorderSide(color: Colors.grey[300]!),
-  //               ),
-  //               focusedBorder: OutlineInputBorder(
-  //                 borderRadius: BorderRadius.circular(12),
-  //                 borderSide: BorderSide(color: mainFontColor, width: 2),
-  //               ),
-  //               contentPadding:
-  //                   const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  // Widget _buildStatusDropdown() {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       const Text(
-  //         'Hali ya Malipo',
-  //         style: TextStyle(
-  //           fontSize: 14,
-  //           fontWeight: FontWeight.w600,
-  //           color: textPrimary,
-  //         ),
-  //       ),
-  //       const SizedBox(height: 8),
-  //       Container(
-  //         decoration: BoxDecoration(
-  //           borderRadius: BorderRadius.circular(12),
-  //           border: Border.all(color: Colors.grey[300]!),
-  //         ),
-  //         child: DropdownButtonFormField<String>(
-  //           value: _selectedPaymentStatus,
-  //           decoration: InputDecoration(
-  //             prefixIcon: Icon(Icons.payment, color: mainFontColor),
-  //             border: InputBorder.none,
-  //             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-  //           ),
-  //           items: _paymentStatuses.map((String status) {
-  //             String displayText;
-  //             Color statusColor;
-
-  //             switch (status) {
-  //               case 'paid':
-  //                 displayText = 'Imelipwa';
-  //                 statusColor = green;
-  //                 break;
-  //               case 'pending':
-  //                 displayText = 'Inasubiri';
-  //                 statusColor = orange;
-  //                 break;
-  //               case 'cancelled':
-  //                 displayText = 'Imeghairiwa';
-  //                 statusColor = errorColor;
-  //                 break;
-  //               default:
-  //                 displayText = status;
-  //                 statusColor = Colors.grey;
-  //             }
-
-  //             return DropdownMenuItem<String>(
-  //               value: status,
-  //               child: Row(
-  //                 children: [
-  //                   Container(
-  //                     width: 12,
-  //                     height: 12,
-  //                     decoration: BoxDecoration(
-  //                       color: statusColor,
-  //                       shape: BoxShape.circle,
-  //                     ),
-  //                   ),
-  //                   const SizedBox(width: 8),
-  //                   Text(
-  //                     displayText,
-  //                     style: TextStyle(color: textPrimary),
-  //                   ),
-  //                 ],
-  //               ),
-  //             );
-  //           }).toList(),
-  //           onChanged: (String? newValue) {
-  //             if (newValue != null) {
-  //               setState(() {
-  //                 _selectedPaymentStatus = newValue;
-  //               });
-  //             }
-  //           },
-  //           dropdownColor: Colors.white,
-  //           borderRadius: BorderRadius.circular(12),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
 
   @override
   void dispose() {

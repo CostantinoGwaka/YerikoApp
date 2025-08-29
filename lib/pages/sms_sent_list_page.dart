@@ -69,19 +69,50 @@ class _SmsSentListPageState extends State<SmsSentListPage> {
                   itemCount: _smsList.length,
                   itemBuilder: (context, i) {
                     final sms = _smsList[i];
+                    int waliopokeaCount = 0;
+                    // waliopokea can be a comma separated string or a list
+                    if (sms['waliopokea'] != null &&
+                        sms['waliopokea'].toString().isNotEmpty) {
+                      if (sms['waliopokea'] is List) {
+                        waliopokeaCount = sms['waliopokea'].length;
+                      } else if (sms['waliopokea'] is String) {
+                        waliopokeaCount = sms['waliopokea']
+                            .toString()
+                            .split(',')
+                            .where((e) => e.trim().isNotEmpty)
+                            .length;
+                      }
+                    }
+                    String packageType = 'NORMAL PACKAGE';
+                    Color packageColor = Colors.blue;
+                    if (waliopokeaCount >= 1 && waliopokeaCount <= 1000) {
+                      packageType = 'NORMAL PACKAGE';
+                      packageColor = Colors.blue;
+                    } else if (waliopokeaCount >= 1001 &&
+                        waliopokeaCount <= 5000) {
+                      packageType = 'PREMIUM PACKAGE';
+                      packageColor = Colors.orange;
+                    } else if (waliopokeaCount >= 5001 &&
+                        waliopokeaCount <= 10000) {
+                      packageType = 'GOLD PACKAGE';
+                      packageColor = Colors.amber;
+                    }
                     return Container(
                       margin: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Colors.blue.shade50, Colors.white],
+                          colors: [
+                            packageColor.withOpacity(0.12),
+                            Colors.white
+                          ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(14),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
+                            color: packageColor.withOpacity(0.08),
                             spreadRadius: 1,
                             blurRadius: 8,
                             offset: const Offset(0, 2),
@@ -89,19 +120,42 @@ class _SmsSentListPageState extends State<SmsSentListPage> {
                         ],
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(18),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              sms['jumbe'] ?? '',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: packageColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    packageType,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    sms['jumbe'] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 10),
                             Row(
                               children: [
                                 const Icon(Icons.group,
@@ -126,7 +180,7 @@ class _SmsSentListPageState extends State<SmsSentListPage> {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      'Waliopokea: ${sms['waliopokea']}',
+                                      'Waliopokea (${waliopokeaCount}): ${sms['waliopokea']}',
                                       style: const TextStyle(
                                           color: Colors.black54),
                                     ),

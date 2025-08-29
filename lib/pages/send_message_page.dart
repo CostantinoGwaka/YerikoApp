@@ -102,10 +102,19 @@ class _SendMessagePageState extends State<SendMessagePage> {
             TextField(
               controller: _messageController,
               maxLines: 3,
+              maxLength: 250,
               decoration: const InputDecoration(
                 labelText: 'Ujumbe',
                 border: OutlineInputBorder(),
+                counterText: '', // Hides the built-in counter
               ),
+              onChanged: (value) {
+                if (value.length <= 250) {
+                  setState(() {
+                    _messageController.text = value;
+                  }); // Trigger rebuild to update button visibility
+                }
+              },
             ),
             const SizedBox(height: 16),
             Row(
@@ -119,7 +128,9 @@ class _SendMessagePageState extends State<SendMessagePage> {
                     });
                   },
                 ),
-                Text(_sendToAll ? 'Tuma kwa Wote' : 'Chagua Wapokeaji'),
+                Text(_sendToAll
+                    ? 'Tuma kwa Wote (${_members.length})'
+                    : 'Chagua Wapokeaji  (${_selectedPhones.length})'),
               ],
             ),
             if (!_sendToAll)
@@ -142,14 +153,19 @@ class _SendMessagePageState extends State<SendMessagePage> {
                       ),
               ),
             const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.send),
-                label: Text(_isLoading ? 'Inatuma...' : 'Tuma Ujumbe'),
-                onPressed: _isLoading ? null : _sendMessage,
+            Visibility(
+              visible: (_sendToAll && _members.isNotEmpty ||
+                      !_sendToAll && _selectedPhones.isNotEmpty) &&
+                  _messageController.text.trim().isNotEmpty,
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.send),
+                  label: Text(_isLoading ? 'Inatuma...' : 'Tuma Ujumbe'),
+                  onPressed: _isLoading ? null : _sendMessage,
+                ),
               ),
-            ),
+            )
           ],
         ),
       ),

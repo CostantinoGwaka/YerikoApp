@@ -126,22 +126,22 @@ class _SmsSentListPageState extends State<SmsSentListPage> {
                           children: [
                             Row(
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: packageColor,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    packageType,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
+                                // Container(
+                                //   padding: const EdgeInsets.symmetric(
+                                //       horizontal: 10, vertical: 4),
+                                //   decoration: BoxDecoration(
+                                //     color: packageColor,
+                                //     borderRadius: BorderRadius.circular(8),
+                                //   ),
+                                //   child: Text(
+                                //     packageType,
+                                //     style: const TextStyle(
+                                //       color: Colors.white,
+                                //       fontWeight: FontWeight.bold,
+                                //       fontSize: 12,
+                                //     ),
+                                //   ),
+                                // ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(

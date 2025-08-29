@@ -5,6 +5,7 @@ class SmsBandoSubscription {
   final double tsh;
   final int smsNumber;
   final String paymentStatus;
+  final String packageName;
   final String tarehe;
 
   SmsBandoSubscription({
@@ -13,6 +14,7 @@ class SmsBandoSubscription {
     required this.userId,
     required this.tsh,
     required this.smsNumber,
+    required this.packageName,
     required this.paymentStatus,
     required this.tarehe,
   });
@@ -24,6 +26,7 @@ class SmsBandoSubscription {
       userId: json['user_id'].toString(),
       tsh: double.parse(json['tsh'].toString()),
       smsNumber: int.parse(json['sms_number'].toString()),
+      packageName: json['package_name'].toString(),
       paymentStatus: json['payment_status'].toString(),
       tarehe: json['tarehe'].toString(),
     );
@@ -36,6 +39,7 @@ class SmsBandoSubscription {
       'user_id': userId,
       'tsh': tsh.toString(),
       'sms_number': smsNumber.toString(),
+      'package_name': packageName,
       'payment_status': paymentStatus,
       'tarehe': tarehe,
     };
@@ -56,6 +60,7 @@ class SmsBandoSubscription {
       userId: userId ?? this.userId,
       tsh: tsh ?? this.tsh,
       smsNumber: smsNumber ?? this.smsNumber,
+      packageName: packageName,
       paymentStatus: paymentStatus ?? this.paymentStatus,
       tarehe: tarehe,
     );

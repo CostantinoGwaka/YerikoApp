@@ -267,13 +267,38 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
                               .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          _getStatusText(subscription.paymentStatus),
-                          style: TextStyle(
-                            color: _getStatusColor(subscription.paymentStatus),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
+                        child: Row(
+                          children: [
+                            Text(
+                              _getStatusText(subscription.paymentStatus),
+                              style: TextStyle(
+                                color:
+                                    _getStatusColor(subscription.paymentStatus),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              subscription.packageName,
+                              style: TextStyle(
+                                color:
+                                    subscription.packageName == 'NORMAL PACKAGE'
+                                        ? Colors.blue
+                                        : subscription.packageName ==
+                                                'PREMIUM PACKAGE'
+                                            ? Colors.purple
+                                            : subscription.packageName ==
+                                                    'GOLD PACKAGE'
+                                                ? Colors.amber[700]
+                                                : Colors.grey,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            )
+                          ],
                         ),
                       ),
                       Visibility(

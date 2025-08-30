@@ -21,6 +21,9 @@ class SendMessagePage extends StatefulWidget {
 
 class _SendMessagePageState extends State<SendMessagePage> {
   final TextEditingController _messageController = TextEditingController();
+  final TextEditingController _searchController =
+      TextEditingController(); // Add search controller
+  String _searchQuery = ""; // Add search query state
   bool _sendToAll = true;
   List<dynamic> _members = [];
   final List<String> _selectedPhones = [];
@@ -35,6 +38,20 @@ class _SendMessagePageState extends State<SendMessagePage> {
     _fetchMembers();
     fetchSmsBandoSummary();
     fetchSmsBandoSummaryUsed();
+
+    // Add listener for search controller
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text.toLowerCase();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose(); // Dispose search controller
+    _messageController.dispose();
+    super.dispose();
   }
 
   Future<void> fetchSmsBandoSummary() async {
@@ -102,12 +119,12 @@ class _SendMessagePageState extends State<SendMessagePage> {
         if (data['status'].toString() == "200") {
           // Use the new model for used SMS
           usedSummary = SmsBandoUsedModel.fromJson(data);
-          // You can now use usedSummary.totalWaliotumiwa and usedSummary.count as needed
+          // You can now use usedSummary.totalWaliotumia and usedSummary.count as needed
           // For example, you might want to store them in state variables or use them in the UI
           // Example:
           if (kDebugMode) {
             print(
-                'Used SMS: ${usedSummary.totalWaliotumiwa}, Count: ${usedSummary.count}');
+                'Used SMS: ${usedSummary.totalWaliotumia}, Count: ${usedSummary.count}');
           }
         }
       }
@@ -159,7 +176,7 @@ class _SendMessagePageState extends State<SendMessagePage> {
     final body = jsonEncode({
       'jumuiya_id': userData!.user.jumuiya_id.toString(),
       'jumbe': _messageController.text.trim(),
-      'waliotumiwa': _sendToAll ? 'ALL' : 'SELECTED',
+      'waliotumia': _sendToAll ? 'ALL' : 'SELECTED',
       'waliopokea': waliopokea,
     });
     final response = await http.post(
@@ -191,6 +208,13 @@ class _SendMessagePageState extends State<SendMessagePage> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     final isSmallScreen = size.width < 360;
+
+    // Filter members based on search query
+    List<dynamic> filteredMembers = _members.where((member) {
+      final name = (member['userFullName'] ?? '').toString().toLowerCase();
+      final phone = (member['phone'] ?? '').toString().toLowerCase();
+      return name.contains(_searchQuery) || phone.contains(_searchQuery);
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -465,21 +489,58 @@ class _SendMessagePageState extends State<SendMessagePage> {
                         height: 250, // Fixed height for the list
                         child: _isLoading
                             ? const Center(child: CircularProgressIndicator())
-                            : ListView.builder(
-                                shrinkWrap: true,
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                itemCount: _members.length,
-                                itemBuilder: (context, i) {
-                                  final member = _members[i];
-                                  final phone = member['phone'].toString();
-                                  final name = member['userFullName'] ?? '';
-                                  return CheckboxListTile(
-                                    value: _selectedPhones.contains(phone),
-                                    onChanged: (_) => _togglePhone(phone),
-                                    title: Text(name),
-                                    subtitle: Text(phone),
-                                  );
-                                },
+                            : Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0, vertical: 8.0),
+                                    child: TextField(
+                                      controller: _searchController,
+                                      decoration: InputDecoration(
+                                        hintText: 'Tafuta mpokeaji...',
+                                        prefixIcon: const Icon(Icons.search),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey[300]!),
+                                        ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 0),
+                                        suffixIcon: _searchQuery.isNotEmpty
+                                            ? IconButton(
+                                                icon: const Icon(Icons.clear),
+                                                onPressed: () =>
+                                                    _searchController.clear(),
+                                              )
+                                            : null,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const AlwaysScrollableScrollPhysics(),
+                                      itemCount: filteredMembers.length,
+                                      itemBuilder: (context, i) {
+                                        final member = filteredMembers[i];
+                                        final phone =
+                                            member['phone'].toString();
+                                        final name =
+                                            member['userFullName'] ?? '';
+                                        return CheckboxListTile(
+                                          value:
+                                              _selectedPhones.contains(phone),
+                                          onChanged: (_) => _togglePhone(phone),
+                                          title: Text(name),
+                                          subtitle: Text(phone),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
                       ),
                     const SizedBox(height: 16),

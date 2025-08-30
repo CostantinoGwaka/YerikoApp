@@ -176,8 +176,8 @@ class _SendMessagePageState extends State<SendMessagePage> {
     final body = jsonEncode({
       'jumuiya_id': userData!.user.jumuiya_id.toString(),
       'jumbe': _messageController.text.trim(),
-      'waliotumia': _sendToAll ? 'ALL' : 'SELECTED',
-      'waliotumiwa': waliopokea,
+      'waliotumiwa': _sendToAll ? 'ALL' : 'SELECTED',
+      'waliopokea': waliopokea,
     });
 
     final response = await http.post(

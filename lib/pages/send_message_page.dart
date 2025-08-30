@@ -177,8 +177,9 @@ class _SendMessagePageState extends State<SendMessagePage> {
       'jumuiya_id': userData!.user.jumuiya_id.toString(),
       'jumbe': _messageController.text.trim(),
       'waliotumia': _sendToAll ? 'ALL' : 'SELECTED',
-      'waliopokea': waliopokea,
+      'waliotumiwa': waliopokea,
     });
+
     final response = await http.post(
       Uri.parse('$baseUrl/sms_bando/send_jumbe_kwa_member.php'),
       headers: {'Content-Type': 'application/json'},

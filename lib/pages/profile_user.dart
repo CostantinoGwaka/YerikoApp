@@ -1004,7 +1004,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           if (userData?.user.role == "ADMIN") ...[
                             Divider(height: 1, color: Colors.grey[200]),
                             _buildModernMenuItem(
-                              icon: Icons.message_rounded,
+                              icon: Icons.money,
                               title: "Nunua Jumbe",
                               subtitle: "Nunua na Angalia jumbe ulizonunua",
                               onTap: () => Navigator.push(
@@ -1020,7 +1020,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             _buildModernMenuItem(
                               icon: Icons.message_rounded,
                               title: "Tuma Jumbe",
-                              subtitle: "Tuma jumbe ulizotuma",
+                              subtitle: "Tuma na tazama jumbe ulizotuma",
                               onTap: () => Navigator.push(
                                 context,
                                 PageTransition(

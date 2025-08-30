@@ -17,11 +17,43 @@ class SmsSentListPage extends StatefulWidget {
 class _SmsSentListPageState extends State<SmsSentListPage> {
   bool _isLoading = false;
   List<dynamic> _smsList = [];
+  List<dynamic> _filteredSmsList = [];
+  TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
 
   @override
   void initState() {
     super.initState();
     _fetchSmsSent();
+    _searchController.addListener(_filterSmsList);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterSmsList() {
+    if (_searchController.text.isEmpty) {
+      setState(() {
+        _filteredSmsList = List.from(_smsList);
+      });
+      return;
+    }
+
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredSmsList = _smsList.where((sms) {
+        final message = (sms['jumbe'] ?? '').toString().toLowerCase();
+        final recipients = (sms['waliotumiwa'] ?? '').toString().toLowerCase();
+        final date = (sms['tarehe'] ?? '').toString().toLowerCase();
+
+        return message.contains(query) ||
+            recipients.contains(query) ||
+            date.contains(query);
+      }).toList();
+    });
   }
 
   Future<void> _fetchSmsSent() async {
@@ -43,6 +75,7 @@ class _SmsSentListPageState extends State<SmsSentListPage> {
         if (data['status'].toString() == '200' && data['data'] != null) {
           setState(() {
             _smsList = data['data'] as List;
+            _filteredSmsList = List.from(_smsList);
           });
         }
       }
@@ -59,17 +92,43 @@ class _SmsSentListPageState extends State<SmsSentListPage> {
       appBar: AppBar(
         backgroundColor: mainFontColor,
         foregroundColor: Colors.white,
-        title: const Text('SMS Zilizotumwa'),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: 'Tafuta SMS...',
+                  hintStyle: TextStyle(color: Colors.white70),
+                  border: InputBorder.none,
+                ),
+              )
+            : const Text('SMS Zilizotumwa'),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                if (_isSearching) {
+                  _isSearching = false;
+                  _searchController.clear();
+                } else {
+                  _isSearching = true;
+                }
+              });
+            },
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _smsList.isEmpty
+          : _filteredSmsList.isEmpty
               ? const Center(child: Text('Hakuna SMS zilizotumwa.'))
               : ListView.builder(
-                  itemCount: _smsList.length,
+                  itemCount: _filteredSmsList.length,
                   itemBuilder: (context, i) {
-                    final sms = _smsList[i];
+                    final sms = _filteredSmsList[i];
                     int waliopokeaCount = 0;
                     // waliopokea can be a comma separated string or a list
                     if (sms['waliopokea'] != null &&

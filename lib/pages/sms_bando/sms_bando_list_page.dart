@@ -23,6 +23,9 @@ class SmsBandoListPage extends StatefulWidget {
 class _SmsBandoListPageState extends State<SmsBandoListPage> {
   bool _isLoading = false;
   List<SmsBandoSubscription> subscriptions = [];
+  List<SmsBandoSubscription> filteredSubscriptions = [];
+  String searchTerm = '';
+  final TextEditingController _searchController = TextEditingController();
   final NumberFormat currencyFormat = NumberFormat.currency(
     symbol: 'Tsh ',
     decimalDigits: 0,
@@ -32,6 +35,43 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
   void initState() {
     super.initState();
     _fetchSubscriptions();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterSubscriptions() {
+    if (searchTerm.isEmpty) {
+      setState(() {
+        filteredSubscriptions = List.from(subscriptions);
+      });
+      return;
+    }
+
+    setState(() {
+      filteredSubscriptions = subscriptions.where((subscription) {
+        return subscription.smsNumber
+                .toString()
+                .toLowerCase()
+                .contains(searchTerm.toLowerCase()) ||
+            subscription.packageName
+                .toLowerCase()
+                .contains(searchTerm.toLowerCase()) ||
+            subscription.paymentStatus
+                .toLowerCase()
+                .contains(searchTerm.toLowerCase()) ||
+            subscription.tarehe
+                .toLowerCase()
+                .contains(searchTerm.toLowerCase()) ||
+            currencyFormat
+                .format(subscription.tsh)
+                .toLowerCase()
+                .contains(searchTerm.toLowerCase());
+      }).toList();
+    });
   }
 
   Future<void> _fetchSubscriptions() async {
@@ -54,6 +94,7 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
             subscriptions = (data['data'] as List)
                 .map((item) => SmsBandoSubscription.fromJson(item))
                 .toList();
+            filteredSubscriptions = List.from(subscriptions);
           });
         } else {
           // Handle error response
@@ -178,7 +219,7 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
           ? const Center(child: CircularProgressIndicator())
           : subscriptions.isEmpty
               ? _buildEmptyState()
-              : _buildSubscriptionsList(),
+              : _buildSubscriptionsListWithSearch(),
     );
   }
 
@@ -240,14 +281,120 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
     );
   }
 
+  Widget _buildSubscriptionsListWithSearch() {
+    return Column(
+      children: [
+        // Search Bar
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Tafuta...',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: searchTerm.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {
+                          searchTerm = '';
+                          _filterSubscriptions();
+                        });
+                      },
+                    )
+                  : null,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: mainFontColor),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+            onChanged: (value) {
+              setState(() {
+                searchTerm = value;
+                _filterSubscriptions();
+              });
+            },
+          ),
+        ),
+
+        // Results count
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Text(
+                'Matokeo: ${filteredSubscriptions.length} kati ya ${subscriptions.length}',
+                style: TextStyle(
+                  color: textSecondary,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // List of subscriptions
+        Expanded(
+          child: filteredSubscriptions.isEmpty
+              ? _buildNoResultsFound()
+              : _buildSubscriptionsList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNoResultsFound() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search_off,
+            size: 64,
+            color: Colors.grey[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Hakuna matokeo yaliyopatikana',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Jaribu kutafuta kitu kingine',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[500],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSubscriptionsList() {
     return RefreshIndicator(
       onRefresh: _fetchSubscriptions,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: subscriptions.length,
+        itemCount: filteredSubscriptions.length,
         itemBuilder: (context, index) {
-          final subscription = subscriptions[index];
+          final subscription = filteredSubscriptions[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: ModernCard(

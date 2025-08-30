@@ -201,341 +201,365 @@ class _SendMessagePageState extends State<SendMessagePage> {
         actions: [],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8.0),
         child: !_isLoadingSmsSummary
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // SMS Bando Summary Section
-                  !_isLoadingSmsSummary
-                      ? Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              width: 1,
+            ? SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // SMS Bando Summary Section
+                    !_isLoadingSmsSummary
+                        ? Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.3),
+                                width: 1,
+                              ),
                             ),
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                color: Colors.black
-                                                    .withOpacity(0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              child: const Icon(
-                                                Icons.message_rounded,
-                                                color: Colors.black,
-                                                size: 20,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 2),
-                                            const Text(
-                                              "Muhtasari wa SMS",
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black87,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(width: 2),
-                                        ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: mainFontColor,
-                                            foregroundColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                            ),
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal:
-                                                  isSmallScreen ? 12 : 16,
-                                              vertical: isSmallScreen ? 8 : 10,
-                                            ),
-                                            elevation: 3,
-                                          ),
-                                          icon: Icon(
-                                            Icons.visibility_rounded,
-                                            size: isSmallScreen ? 14 : 16,
-                                          ),
-                                          label: Text(
-                                            "Tazama",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: isSmallScreen ? 12 : 14,
-                                            ),
-                                          ),
-                                          onPressed: () => {
-                                            Navigator.push(
-                                              context,
-                                              PageTransition(
-                                                type: PageTransitionType
-                                                    .rightToLeft,
-                                                child: const SmsSentListPage(),
-                                              ),
-                                            )
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Container(
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.05),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Row(
+                            child: Column(
+                              children: [
+                                Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          _buildSmsStatItem(
-                                            "SMS Zilizopo",
-                                            smsBandoSummaryList.isNotEmpty
-                                                ? smsBandoSummaryList[0]
-                                                    .smsTotal
-                                                    .toString()
-                                                : "0",
-                                            Colors.blue,
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black
+                                                      .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: const Icon(
+                                                  Icons.message_rounded,
+                                                  color: Colors.black,
+                                                  size: 20,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 2),
+                                              const Text(
+                                                "Muhtasari wa SMS",
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          _buildSmsStatItem(
-                                            "Zilizotumiwa",
-                                            usedSummary != null
-                                                ? usedSummary.totalWaliotumiwa
-                                                    .toString()
-                                                : "0",
-                                            Colors.green,
+                                          const SizedBox(width: 2),
+                                          ElevatedButton.icon(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: mainFontColor,
+                                              foregroundColor: Colors.white,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal:
+                                                    isSmallScreen ? 12 : 16,
+                                                vertical:
+                                                    isSmallScreen ? 8 : 10,
+                                              ),
+                                              elevation: 3,
+                                            ),
+                                            icon: Icon(
+                                              Icons.visibility_rounded,
+                                              size: isSmallScreen ? 14 : 16,
+                                            ),
+                                            label: Text(
+                                              "Tazama",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize:
+                                                    isSmallScreen ? 12 : 14,
+                                              ),
+                                            ),
+                                            onPressed: () => {
+                                              Navigator.push(
+                                                context,
+                                                PageTransition(
+                                                  type: PageTransitionType
+                                                      .rightToLeft,
+                                                  child:
+                                                      const SmsSentListPage(),
+                                                ),
+                                              )
+                                            },
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              _isLoadingSmsSummary
-                                  ? const Center(
-                                      child: SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.black,
+                                      const SizedBox(height: 16),
+                                      Container(
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.05),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
-                                      ),
-                                    )
-                                  : smsBandoSummaryList.isEmpty
-                                      ? const Text(
-                                          "Hakuna taarifa za SMS",
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 13,
-                                          ),
-                                        )
-                                      : SizedBox.shrink(),
-                            ],
-                          ),
-                        )
-                      : SizedBox.shrink(),
-                  const SizedBox(height: 2),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          child: Text(
-                            'Andika Ujumbe Wako',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                        ),
-                        TextField(
-                          controller: _messageController,
-                          maxLines: 5,
-                          maxLength: 250,
-                          style: const TextStyle(fontSize: 16),
-                          decoration: InputDecoration(
-                            hintText: 'Andika ujumbe hapa...',
-                            hintStyle: TextStyle(color: Colors.grey[400]),
-                            contentPadding: const EdgeInsets.all(16),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[200]!),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[200]!),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: mainFontColor),
-                            ),
-                            counterText:
-                                '${_messageController.text.length}/250',
-                            counterStyle: TextStyle(color: Colors.grey[600]),
-                          ),
-                          onChanged: (value) {
-                            if (value.length <= 250) {
-                              setState(() => _messageController.text = value);
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Switch(
-                        value: _sendToAll,
-                        onChanged: (v) {
-                          setState(() {
-                            _sendToAll = v;
-                            _selectedPhones.clear();
-                          });
-                        },
-                      ),
-                      Text(_sendToAll
-                          ? 'Tuma kwa Wote (${_members.length})'
-                          : 'Chagua Wapokeaji  (${_selectedPhones.length})'),
-                    ],
-                  ),
-                  if (!_sendToAll)
-                    Expanded(
-                      child: _isLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : ListView.builder(
-                              itemCount: _members.length,
-                              itemBuilder: (context, i) {
-                                final member = _members[i];
-                                final phone = member['phone'].toString();
-                                final name = member['userFullName'] ?? '';
-                                return CheckboxListTile(
-                                  value: _selectedPhones.contains(phone),
-                                  onChanged: (_) => _togglePhone(phone),
-                                  title: Text(name),
-                                  subtitle: Text(phone),
-                                );
-                              },
-                            ),
-                    ),
-                  const SizedBox(height: 16),
-                  Visibility(
-                    visible: (!_isLoadingSmsSummary &&
-                                _sendToAll &&
-                                _members.isNotEmpty ||
-                            !_sendToAll && _selectedPhones.isNotEmpty) &&
-                        _messageController.text.trim().isNotEmpty,
-                    child: Column(
-                      children: [
-                        if (smsBandoSummaryList.isNotEmpty) ...[
-                          int.parse(smsBandoSummaryList[0]
-                                      .smsTotal
-                                      .toString()) <
-                                  (_sendToAll
-                                      ? _members.length
-                                      : _selectedPhones.length)
-                              ? Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(12),
-                                  margin: const EdgeInsets.only(bottom: 16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red.withOpacity(0.1),
-                                    border: Border.all(color: Colors.red),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.warning,
-                                          color: Colors.red, size: 20),
-                                      SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          'Salio la SMS (${smsBandoSummaryList[0].smsTotal}) ni dogo kuliko idadi ya wapokeaji (${_sendToAll ? _members.length : _selectedPhones.length}). Tafadhali ongeza salio au punguza wapokeaji.',
-                                          style: TextStyle(color: Colors.red),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            _buildSmsStatItem(
+                                              "SMS Zilizopo",
+                                              smsBandoSummaryList.isNotEmpty
+                                                  ? smsBandoSummaryList[0]
+                                                      .smsTotal
+                                                      .toString()
+                                                  : "0",
+                                              Colors.blue,
+                                            ),
+                                            _buildSmsStatItem(
+                                              "Zilizotumiwa",
+                                              usedSummary != null
+                                                  ? usedSummary.totalWaliotumiwa
+                                                      .toString()
+                                                  : "0",
+                                              Colors.green,
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
-                                )
-                              : const SizedBox.shrink(),
+                                ),
+                                _isLoadingSmsSummary
+                                    ? const Center(
+                                        child: SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      )
+                                    : smsBandoSummaryList.isEmpty
+                                        ? const Text(
+                                            "Hakuna taarifa za SMS",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 13,
+                                            ),
+                                          )
+                                        : SizedBox.shrink(),
+                              ],
+                            ),
+                          )
+                        : SizedBox.shrink(),
+                    const SizedBox(height: 2),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
                         ],
-                        if (smsBandoSummaryList.isNotEmpty) ...[
-                          int.parse(smsBandoSummaryList[0]
-                                      .smsTotal
-                                      .toString()) <
-                                  (_sendToAll
-                                      ? _members.length
-                                      : _selectedPhones.length)
-                              ? SizedBox.shrink()
-                              : SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton.icon(
-                                    icon: const Icon(Icons.send),
-                                    label: Text(_isLoading
-                                        ? 'Inatuma...'
-                                        : 'Tuma Ujumbe'),
-                                    onPressed: _isLoading
-                                        ? null
-                                        : () {
-                                            if (smsBandoSummaryList
-                                                    .isNotEmpty &&
-                                                int.parse(smsBandoSummaryList[0]
-                                                        .smsTotal
-                                                        .toString()) >=
-                                                    (_sendToAll
-                                                        ? _members.length
-                                                        : _selectedPhones
-                                                            .length)) {
-                                              _sendMessage();
-                                            }
-                                          },
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                child: Text(
+                                  'Andika Ujumbe Wako',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey[700],
                                   ),
                                 ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  setState(() {
+                                    _messageController.clear();
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          TextField(
+                            controller: _messageController,
+                            maxLines: 5,
+                            maxLength: 250,
+                            style: const TextStyle(fontSize: 16),
+                            decoration: InputDecoration(
+                              hintText: 'Andika ujumbe hapa...',
+                              hintStyle: TextStyle(color: Colors.grey[400]),
+                              contentPadding: const EdgeInsets.all(16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[200]!),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[200]!),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: mainFontColor),
+                              ),
+                              counterText:
+                                  '${_messageController.text.length}/250',
+                              counterStyle: TextStyle(color: Colors.grey[600]),
+                            ),
+                            onChanged: (value) {
+                              if (value.length <= 250) {
+                                setState(() => _messageController.text = value);
+                              }
+                            },
+                          ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Switch(
+                          value: _sendToAll,
+                          onChanged: (v) {
+                            setState(() {
+                              _sendToAll = v;
+                              _selectedPhones.clear();
+                            });
+                          },
+                        ),
+                        Text(_sendToAll
+                            ? 'Tuma kwa Wote (${_members.length})'
+                            : 'Chagua Wapokeaji  (${_selectedPhones.length})'),
                       ],
                     ),
-                  )
-                ],
+                    if (!_sendToAll)
+                      Expanded(
+                        child: _isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : ListView.builder(
+                                itemCount: _members.length,
+                                itemBuilder: (context, i) {
+                                  final member = _members[i];
+                                  final phone = member['phone'].toString();
+                                  final name = member['userFullName'] ?? '';
+                                  return CheckboxListTile(
+                                    value: _selectedPhones.contains(phone),
+                                    onChanged: (_) => _togglePhone(phone),
+                                    title: Text(name),
+                                    subtitle: Text(phone),
+                                  );
+                                },
+                              ),
+                      ),
+                    const SizedBox(height: 16),
+                    Visibility(
+                      visible: (!_isLoadingSmsSummary &&
+                                  _sendToAll &&
+                                  _members.isNotEmpty ||
+                              !_sendToAll && _selectedPhones.isNotEmpty) &&
+                          _messageController.text.trim().isNotEmpty,
+                      child: Column(
+                        children: [
+                          if (smsBandoSummaryList.isNotEmpty) ...[
+                            int.parse(smsBandoSummaryList[0]
+                                        .smsTotal
+                                        .toString()) <
+                                    (_sendToAll
+                                        ? _members.length
+                                        : _selectedPhones.length)
+                                ? Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(12),
+                                    margin: const EdgeInsets.only(bottom: 16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.withOpacity(0.1),
+                                      border: Border.all(color: Colors.red),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.warning,
+                                            color: Colors.red, size: 20),
+                                        SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            'Salio la SMS (${smsBandoSummaryList[0].smsTotal}) ni dogo kuliko idadi ya wapokeaji (${_sendToAll ? _members.length : _selectedPhones.length}). Tafadhali ongeza salio au punguza wapokeaji.',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : const SizedBox.shrink(),
+                          ],
+                          if (smsBandoSummaryList.isNotEmpty) ...[
+                            int.parse(smsBandoSummaryList[0]
+                                        .smsTotal
+                                        .toString()) <
+                                    (_sendToAll
+                                        ? _members.length
+                                        : _selectedPhones.length)
+                                ? SizedBox.shrink()
+                                : SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton.icon(
+                                      icon: const Icon(Icons.send),
+                                      label: Text(_isLoading
+                                          ? 'Inatuma...'
+                                          : 'Tuma Ujumbe'),
+                                      onPressed: _isLoading
+                                          ? null
+                                          : () {
+                                              if (smsBandoSummaryList
+                                                      .isNotEmpty &&
+                                                  int.parse(
+                                                          smsBandoSummaryList[0]
+                                                              .smsTotal
+                                                              .toString()) >=
+                                                      (_sendToAll
+                                                          ? _members.length
+                                                          : _selectedPhones
+                                                              .length)) {
+                                                _sendMessage();
+                                              }
+                                            },
+                                    ),
+                                  ),
+                          ],
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               )
             : Center(child: CircularProgressIndicator()),
       ),

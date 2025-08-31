@@ -122,10 +122,10 @@ class _SendMessagePageState extends State<SendMessagePage> {
           // You can now use usedSummary.totalWaliotumia and usedSummary.count as needed
           // For example, you might want to store them in state variables or use them in the UI
           // Example:
-          if (kDebugMode) {
-            print(
-                'Used SMS: ${usedSummary.totalWaliotumia}, Count: ${usedSummary.count}');
-          }
+          // if (kDebugMode) {
+          //   print(
+          //       'Used SMS: ${usedSummary.totalWaliotumia}, Count: ${usedSummary.count}');
+          // }
         }
       }
     } catch (e) {
@@ -553,38 +553,40 @@ class _SendMessagePageState extends State<SendMessagePage> {
                           _messageController.text.trim().isNotEmpty,
                       child: Column(
                         children: [
-                          if (smsBandoSummaryList.isNotEmpty) ...[
-                            int.parse(smsBandoSummaryList[0]
-                                        .smsTotal
-                                        .toString()) <
-                                    (_sendToAll
-                                        ? _members.length
-                                        : _selectedPhones.length)
-                                ? Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(12),
-                                    margin: const EdgeInsets.only(bottom: 16),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red.withOpacity(0.1),
-                                      border: Border.all(color: Colors.red),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.warning,
-                                            color: Colors.red, size: 20),
-                                        SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            'Salio la SMS (${smsBandoSummaryList[0].smsTotal}) ni dogo kuliko idadi ya wapokeaji (${_sendToAll ? _members.length : _selectedPhones.length}). Tafadhali ongeza salio au punguza wapokeaji.',
-                                            style: TextStyle(color: Colors.red),
-                                          ),
+                          // if (smsBandoSummaryList.isNotEmpty) ...[
+                          smsBandoSummaryList.isEmpty ||
+                                  (smsBandoSummaryList.isNotEmpty &&
+                                      (int.parse(smsBandoSummaryList[0]
+                                              .smsTotal
+                                              .toString()) <
+                                          (_sendToAll
+                                              ? _members.length
+                                              : _selectedPhones.length)))
+                              ? Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(12),
+                                  margin: const EdgeInsets.only(bottom: 16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.withOpacity(0.1),
+                                    border: Border.all(color: Colors.red),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.warning,
+                                          color: Colors.red, size: 20),
+                                      SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          'Salio la SMS (${smsBandoSummaryList.isEmpty ? 0 : smsBandoSummaryList[0].smsTotal}) ni dogo kuliko idadi ya wapokeaji (${_sendToAll ? _members.length : _selectedPhones.length}). Tafadhali ongeza salio au punguza wapokeaji.',
+                                          style: TextStyle(color: Colors.red),
                                         ),
-                                      ],
-                                    ),
-                                  )
-                                : const SizedBox.shrink(),
-                          ],
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                          // ],
                           if (smsBandoSummaryList.isNotEmpty) ...[
                             int.parse(smsBandoSummaryList[0]
                                         .smsTotal

@@ -1,6 +1,7 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/pages/admin_all_collection_users.dart';
 import 'package:jumuiya_yangu/pages/all_collection_users.dart';
@@ -65,7 +66,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
 
     _fabAnimation = Tween<double>(begin: 0, end: 1).animate(_fabCurve);
-    borderRadiusAnimation = Tween<double>(begin: 0, end: 1).animate(borderRadiusCurve);
+    borderRadiusAnimation =
+        Tween<double>(begin: 0, end: 1).animate(borderRadiusCurve);
 
     Future.delayed(
       const Duration(seconds: 1),
@@ -219,7 +221,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   duration: const Duration(milliseconds: 300),
                   padding: EdgeInsets.all(isCurrentActive ? 8 : 6),
                   decoration: BoxDecoration(
-                    color: isCurrentActive ? mainFontColor.withValues(alpha: 0.1) : Colors.transparent,
+                    color: isCurrentActive
+                        ? mainFontColor.withValues(alpha: 0.1)
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -233,7 +237,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   duration: const Duration(milliseconds: 300),
                   style: TextStyle(
                     fontSize: isCurrentActive ? 12 : 11,
-                    fontWeight: isCurrentActive ? FontWeight.w600 : FontWeight.w500,
+                    fontWeight:
+                        isCurrentActive ? FontWeight.w600 : FontWeight.w500,
                     color: isCurrentActive ? mainFontColor : Colors.grey[500],
                   ),
                   child: Text(labels[index]),

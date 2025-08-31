@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/sms_bando_summary_model.dart';
 import 'package:jumuiya_yangu/models/sms_bando_used_model.dart';
@@ -573,7 +574,14 @@ class _ProfilePageState extends State<ProfilePage> {
     final isSmallScreen = size.width < 360;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.deepPurple,
+      //   systemOverlayStyle: const SystemUiOverlayStyle(
+      //     statusBarColor: Colors.deepPurple,
+      //     statusBarIconBrightness: Brightness.light,
+      //     statusBarBrightness: Brightness.dark,
+      //   ),
+      // ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(

@@ -1292,13 +1292,13 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _shareApp() {
-    const String androidLink =
-        "https://play.google.com/store/apps/details?id=com.isofttz.jumuiya_yangu";
-    const String iosLink =
-        "https://apps.apple.com/tz/app/jumuiya-yangu/id6748091565";
+    const String androidLink = "https://bit.ly/4225L5Z";
+    // "https://play.google.com/store/apps/details?id=com.isofttz.jumuiya_yangu";
+    const String iosLink = "https://apple.co/47mNeVQ";
+    // "https://apps.apple.com/tz/app/jumuiya-yangu/id6748091565";
     const String appName = "Jumuiya Yangu";
     const String message =
-        "Habari! Jaribu $appName - mfumo bora wa usimamizi wa Jumuiya yako. Pakua sasa:\n\nAndroid: $androidLink\niOS: $iosLink\n\nUngana nasi kuboresha usimamizi wa Jumuiya yako!";
+        "Habari! Jaribu $appName - App bora wa usimamizi wa Jumuiya yako. Pakua sasa:\n\nAndroid: $androidLink\niOS: $iosLink\n\nUngana nasi kuboresha usimamizi wa Jumuiya yako!";
 
     Share.share(message);
   }

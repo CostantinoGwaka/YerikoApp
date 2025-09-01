@@ -306,7 +306,8 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Tarehe ya kuzaliwa si sahihi.")),
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti.")),
       );
     }
   }

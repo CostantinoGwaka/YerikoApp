@@ -160,7 +160,7 @@ class _SmsBandoFormPageState extends State<SmsBandoFormPage> {
         _showSnackBar("Failed to connect to server");
       }
     } catch (e) {
-      _showSnackBar("Error: $e");
+      _showSnackBar("⚠️ Tafadhali hakikisha umeunganishwa na intaneti.");
     } finally {
       if (mounted) {
         setState(() {

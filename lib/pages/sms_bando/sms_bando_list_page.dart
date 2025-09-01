@@ -104,7 +104,7 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
         _showSnackBar("Failed to connect to server");
       }
     } catch (e) {
-      _showSnackBar("Error: $e");
+      _showSnackBar("⚠️ Tafadhali hakikisha umeunganishwa na intaneti.");
     } finally {
       setState(() {
         _isLoading = false;
@@ -138,7 +138,7 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
         _showSnackBar("Failed to connect to server");
       }
     } catch (e) {
-      _showSnackBar("Error: $e");
+      _showSnackBar("⚠️ Tafadhali hakikisha umeunganishwa na intaneti.");
     } finally {
       setState(() {
         _isLoading = false;

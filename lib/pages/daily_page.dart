@@ -105,7 +105,7 @@ class _DailyPageState extends State<DailyPage> {
     } catch (e) {
       // Handle error silently or show message
       if (kDebugMode) {
-        print('Error fetching jumuiya data: $e');
+        print('Error fetching jumuiya data');
       }
     }
   }
@@ -168,7 +168,9 @@ class _DailyPageState extends State<DailyPage> {
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+          SnackBar(
+              content:
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
       }
     }
@@ -177,7 +179,8 @@ class _DailyPageState extends State<DailyPage> {
   void _showJumuiyaSwitchDialog() {
     if (jumuiyaData.length < 2) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("⚠️ Huna jumuiya zaidi ya moja za kubadilishia")),
+        const SnackBar(
+            content: Text("⚠️ Huna jumuiya zaidi ya moja za kubadilishia")),
       );
       return;
     }
@@ -206,7 +209,8 @@ class _DailyPageState extends State<DailyPage> {
                 (jumuiyaItem) {
                   final jumuiyaName = jumuiyaItem['name'] as String;
                   final jumuiyaId = jumuiyaItem['id'];
-                  final isCurrentJumuiya = userData!.user.jina_jumuiya == jumuiyaName;
+                  final isCurrentJumuiya =
+                      userData!.user.jina_jumuiya == jumuiyaName;
 
                   return Card(
                     margin: EdgeInsets.only(bottom: 8),
@@ -218,11 +222,16 @@ class _DailyPageState extends State<DailyPage> {
                       title: Text(
                         jumuiyaName,
                         style: TextStyle(
-                          fontWeight: isCurrentJumuiya ? FontWeight.bold : FontWeight.normal,
-                          color: isCurrentJumuiya ? mainFontColor : Colors.black87,
+                          fontWeight: isCurrentJumuiya
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color:
+                              isCurrentJumuiya ? mainFontColor : Colors.black87,
                         ),
                       ),
-                      trailing: isCurrentJumuiya ? Icon(Icons.check_circle, color: mainFontColor) : null,
+                      trailing: isCurrentJumuiya
+                          ? Icon(Icons.check_circle, color: mainFontColor)
+                          : null,
                       onTap: isCurrentJumuiya
                           ? null
                           : () {
@@ -237,18 +246,22 @@ class _DailyPageState extends State<DailyPage> {
                                     ),
                                     title: Row(
                                       children: [
-                                        Icon(Icons.warning_rounded, color: Colors.orange[400]),
+                                        Icon(Icons.warning_rounded,
+                                            color: Colors.orange[400]),
                                         SizedBox(width: 8),
                                         Text('Thibitisha'),
                                       ],
                                     ),
-                                    content: Text('Una uhakika unataka kubadilisha hadi jumuiya "$jumuiyaName"?'),
+                                    content: Text(
+                                        'Una uhakika unataka kubadilisha hadi jumuiya "$jumuiyaName"?'),
                                     actions: [
                                       TextButton(
-                                        onPressed: () => Navigator.of(confirmContext).pop(),
+                                        onPressed: () =>
+                                            Navigator.of(confirmContext).pop(),
                                         child: Text(
                                           'Hapana',
-                                          style: TextStyle(color: Colors.grey[600]),
+                                          style: TextStyle(
+                                              color: Colors.grey[600]),
                                         ),
                                       ),
                                       ElevatedButton(
@@ -256,7 +269,8 @@ class _DailyPageState extends State<DailyPage> {
                                           backgroundColor: mainFontColor,
                                           foregroundColor: Colors.white,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                           ),
                                         ),
                                         onPressed: () {
@@ -298,7 +312,8 @@ class _DailyPageState extends State<DailyPage> {
 
       if (userId.toString().isEmpty || year == "" || year.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeweka User ID na mwaka")),
+          SnackBar(
+              content: Text("⚠️ Tafadhali hakikisha umeweka User ID na mwaka")),
         );
         setState(() {
           _isLoading = false;
@@ -341,7 +356,8 @@ class _DailyPageState extends State<DailyPage> {
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }
@@ -351,7 +367,9 @@ class _DailyPageState extends State<DailyPage> {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
+            const SnackBar(
+                content:
+                    Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
         }
         // setState(() => _isLoading = false);
@@ -360,7 +378,8 @@ class _DailyPageState extends State<DailyPage> {
 
       final String myApi =
           "$baseUrl/monthly/get_collection_by_user_id.php?user_id=${userData!.user.id}&jumuiya_id=${userData!.user.jumuiya_id}";
-      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+      final response = await http
+          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -381,7 +400,9 @@ class _DailyPageState extends State<DailyPage> {
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+          SnackBar(
+              content:
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
       }
     }
@@ -395,7 +416,9 @@ class _DailyPageState extends State<DailyPage> {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
+            const SnackBar(
+                content:
+                    Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
         }
         // setState(() => _isLoading = false);
@@ -404,13 +427,15 @@ class _DailyPageState extends State<DailyPage> {
 
       final String myApi =
           "$baseUrl/monthly/get_all_other_collection_by_user.php?userId=${userData!.user.id}&jumuiyaId=${userData!.user.jumuiya_id}";
-      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+      final response = await http
+          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
           // setState(() => _isLoading = false);
-          otherCollectionResponse = OtherCollectionResponse.fromJson(jsonResponse);
+          otherCollectionResponse =
+              OtherCollectionResponse.fromJson(jsonResponse);
           return otherCollectionResponse;
         }
       } else {
@@ -425,7 +450,9 @@ class _DailyPageState extends State<DailyPage> {
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+          SnackBar(
+              content:
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
       }
     }
@@ -439,7 +466,8 @@ class _DailyPageState extends State<DailyPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => CollectionsTablePage(collections: collections != null ? collections!.data : []),
+        builder: (_) => CollectionsTablePage(
+            collections: collections != null ? collections!.data : []),
       ),
     );
   }
@@ -449,7 +477,9 @@ class _DailyPageState extends State<DailyPage> {
       context,
       MaterialPageRoute(
         builder: (_) => OtherCollectionsTablePage(
-          otherCollections: otherCollectionResponse != null ? otherCollectionResponse!.data : [],
+          otherCollections: otherCollectionResponse != null
+              ? otherCollectionResponse!.data
+              : [],
         ),
       ),
     );
@@ -572,7 +602,8 @@ class _DailyPageState extends State<DailyPage> {
                             ),
                             SizedBox(width: 6),
                             Text(
-                              DateFormat('EEEE, MMM d, yyyy').format(DateTime.now()),
+                              DateFormat('EEEE, MMM d, yyyy')
+                                  .format(DateTime.now()),
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: isSmallScreen ? 12 : 14,
@@ -617,18 +648,22 @@ class _DailyPageState extends State<DailyPage> {
                                   ),
                                   title: Row(
                                     children: [
-                                      Icon(Icons.logout_rounded, color: Colors.red[400]),
+                                      Icon(Icons.logout_rounded,
+                                          color: Colors.red[400]),
                                       SizedBox(width: 8),
                                       Text('Toka'),
                                     ],
                                   ),
-                                  content: const Text('Una uhakika unataka kutoka?'),
+                                  content:
+                                      const Text('Una uhakika unataka kutoka?'),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.of(context).pop(),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
                                       child: Text(
                                         'Hapana',
-                                        style: TextStyle(color: Colors.grey[600]),
+                                        style:
+                                            TextStyle(color: Colors.grey[600]),
                                       ),
                                     ),
                                     ElevatedButton(
@@ -636,7 +671,8 @@ class _DailyPageState extends State<DailyPage> {
                                         backgroundColor: Colors.red[400],
                                         foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                       ),
                                       onPressed: () {
@@ -664,7 +700,8 @@ class _DailyPageState extends State<DailyPage> {
                                     SizedBox(
                                       width: 16,
                                       height: 16,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
                                     )
                                   else
                                     Icon(
@@ -691,7 +728,8 @@ class _DailyPageState extends State<DailyPage> {
                                   SizedBox(
                                     width: 16,
                                     height: 16,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
                                   )
                                 else
                                   Icon(
@@ -748,7 +786,8 @@ class _DailyPageState extends State<DailyPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
@@ -763,7 +802,9 @@ class _DailyPageState extends State<DailyPage> {
                                 ),
                                 SizedBox(width: 6),
                                 Text(
-                                  currentYear != null ? currentYear!.data.churchYear : "Hakuna Mwaka",
+                                  currentYear != null
+                                      ? currentYear!.data.churchYear
+                                      : "Hakuna Mwaka",
                                   style: TextStyle(
                                     fontSize: isSmallScreen ? 12 : 14,
                                     fontWeight: FontWeight.w600,
@@ -795,7 +836,9 @@ class _DailyPageState extends State<DailyPage> {
                         children: [
                           SizedBox(height: 2),
                           Text(
-                            userData != null ? userData!.user.userFullName! : "Mtumiaji",
+                            userData != null
+                                ? userData!.user.userFullName!
+                                : "Mtumiaji",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: isSmallScreen ? 18 : 22,
@@ -805,7 +848,8 @@ class _DailyPageState extends State<DailyPage> {
                           ),
                           SizedBox(height: 2),
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 4),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
@@ -820,7 +864,9 @@ class _DailyPageState extends State<DailyPage> {
                                 ),
                                 SizedBox(width: 6),
                                 Text(
-                                  userData != null ? "+${userData!.user.phone}" : "",
+                                  userData != null
+                                      ? "+${userData!.user.phone}"
+                                      : "",
                                   style: TextStyle(
                                     fontSize: isSmallScreen ? 12 : 14,
                                     fontWeight: FontWeight.w500,
@@ -845,7 +891,10 @@ class _DailyPageState extends State<DailyPage> {
                               label: "Jumla Yote",
                               value: _isLoading
                                   ? null
-                                  : (userTotalData != null && userTotalData!.overallTotal.toString().isNotEmpty)
+                                  : (userTotalData != null &&
+                                          userTotalData!.overallTotal
+                                              .toString()
+                                              .isNotEmpty)
                                       ? "${NumberFormat("#,##0", "en_US").format(userTotalData!.overallTotal)}/="
                                       : "0.00",
                               onTap: () => _navigateToCollections(),
@@ -860,7 +909,10 @@ class _DailyPageState extends State<DailyPage> {
                               label: "Mwaka Huu",
                               value: _isLoading
                                   ? null
-                                  : (userTotalData != null && userTotalData!.currentYearTotal.toString().isNotEmpty)
+                                  : (userTotalData != null &&
+                                          userTotalData!.currentYearTotal
+                                              .toString()
+                                              .isNotEmpty)
                                       ? "${NumberFormat("#,##0", "en_US").format(userTotalData!.currentYearTotal)}/="
                                       : "0.00",
                               onTap: () => _navigateToCollections(),
@@ -875,7 +927,10 @@ class _DailyPageState extends State<DailyPage> {
                               label: "Mengine",
                               value: _isLoading
                                   ? null
-                                  : (userTotalData != null && userTotalData!.otherTotal.toString().isNotEmpty)
+                                  : (userTotalData != null &&
+                                          userTotalData!.otherTotal
+                                              .toString()
+                                              .isNotEmpty)
                                       ? "${NumberFormat("#,##0", "en_US").format(userTotalData!.otherTotal)}/="
                                       : "0.00",
                               onTap: () => _navigateToOtherCollections(),
@@ -958,17 +1013,20 @@ class _DailyPageState extends State<DailyPage> {
               // Collections List
               FutureBuilder(
                 future: getUserCollections(),
-                builder: (context, AsyncSnapshot<CollectionResponse?> snapshot) {
+                builder:
+                    (context, AsyncSnapshot<CollectionResponse?> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Container(
-                      margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                      margin:
+                          EdgeInsets.symmetric(horizontal: size.width * 0.05),
                       height: 200,
                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(mainFontColor),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(mainFontColor),
                             ),
                             SizedBox(height: 16),
                             Text(
@@ -984,7 +1042,8 @@ class _DailyPageState extends State<DailyPage> {
                     );
                   } else if (snapshot.hasError) {
                     return Container(
-                      margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                      margin:
+                          EdgeInsets.symmetric(horizontal: size.width * 0.05),
                       padding: EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.red[50],
@@ -1012,7 +1071,8 @@ class _DailyPageState extends State<DailyPage> {
                     );
                   } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
                     return Container(
-                      margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                      margin:
+                          EdgeInsets.symmetric(horizontal: size.width * 0.05),
                       padding: EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.grey[50],
@@ -1051,7 +1111,8 @@ class _DailyPageState extends State<DailyPage> {
                   }
 
                   final collections = snapshot.data!.data;
-                  final displayCount = collections.length > 4 ? 4 : collections.length;
+                  final displayCount =
+                      collections.length > 4 ? 4 : collections.length;
 
                   return Column(
                     children: [
@@ -1062,19 +1123,24 @@ class _DailyPageState extends State<DailyPage> {
                         physics: const NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = collections[index];
-                          return _buildCollectionCard(context, item, index, collections, isSmallScreen);
+                          return _buildCollectionCard(
+                              context, item, index, collections, isSmallScreen);
                         },
                       ),
                       if (collections.length > 4)
                         Container(
-                          margin: EdgeInsets.symmetric(horizontal: size.width * 0.05, vertical: 16),
+                          margin: EdgeInsets.symmetric(
+                              horizontal: size.width * 0.05, vertical: 16),
                           child: TextButton.icon(
                             style: TextButton.styleFrom(
                               foregroundColor: mainFontColor,
-                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                side: BorderSide(color: mainFontColor.withValues(alpha: 0.3)),
+                                side: BorderSide(
+                                    color:
+                                        mainFontColor.withValues(alpha: 0.3)),
                               ),
                             ),
                             icon: Icon(Icons.expand_more_rounded),
@@ -1098,8 +1164,8 @@ class _DailyPageState extends State<DailyPage> {
     );
   }
 
-  Widget _buildCollectionCard(
-      BuildContext context, CollectionItem item, int index, List<CollectionItem> collections, bool isSmallScreen) {
+  Widget _buildCollectionCard(BuildContext context, CollectionItem item,
+      int index, List<CollectionItem> collections, bool isSmallScreen) {
     return GestureDetector(
       onTap: () => _showCollectionDetails(context, item),
       child: Container(
@@ -1176,7 +1242,8 @@ class _DailyPageState extends State<DailyPage> {
                           ),
                         ),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: mainFontColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -1234,7 +1301,8 @@ class _DailyPageState extends State<DailyPage> {
     );
   }
 
-  List<Color> _getTrendColors(CollectionItem item, int index, List<CollectionItem> collections) {
+  List<Color> _getTrendColors(
+      CollectionItem item, int index, List<CollectionItem> collections) {
     int currentAmount = int.tryParse(item.amount) ?? 0;
     int? prevAmount;
     if (index > 0) {
@@ -1248,7 +1316,8 @@ class _DailyPageState extends State<DailyPage> {
     }
   }
 
-  Widget _getTrendIcon(CollectionItem item, int index, List<CollectionItem> collections) {
+  Widget _getTrendIcon(
+      CollectionItem item, int index, List<CollectionItem> collections) {
     int currentAmount = int.tryParse(item.amount) ?? 0;
     int? prevAmount;
     if (index > 0) {
@@ -1339,7 +1408,10 @@ void _showCollectionDetails(BuildContext context, CollectionItem item) {
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [mainFontColor.withValues(alpha: 0.1), mainFontColor.withValues(alpha: 0.05)],
+                      colors: [
+                        mainFontColor.withValues(alpha: 0.1),
+                        mainFontColor.withValues(alpha: 0.05)
+                      ],
                     ),
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -1385,10 +1457,13 @@ void _showCollectionDetails(BuildContext context, CollectionItem item) {
                         icon: Icons.person_rounded,
                         title: "Taarifa za Mtumiaji",
                         items: [
-                          _buildDetailItem("Jina Kamili", user.userFullName ?? "Hakijapatikana"),
+                          _buildDetailItem("Jina Kamili",
+                              user.userFullName ?? "Hakijapatikana"),
                           _buildDetailItem("Namba ya Simu", "+${user.phone}"),
-                          _buildDetailItem("Jina la Mtumiaji", user.userName ?? "Hakijapatikana"),
-                          _buildDetailItem("Nafasi", user.role ?? "Hakijapatikana"),
+                          _buildDetailItem("Jina la Mtumiaji",
+                              user.userName ?? "Hakijapatikana"),
+                          _buildDetailItem(
+                              "Nafasi", user.role ?? "Hakijapatikana"),
                         ],
                       ),
                       SizedBox(height: 20),
@@ -1397,7 +1472,8 @@ void _showCollectionDetails(BuildContext context, CollectionItem item) {
                         title: "Taarifa za Mwaka",
                         items: [
                           _buildDetailItem("Mwaka wa Kanisa", year.churchYear),
-                          _buildDetailItem("Hali ya Mwaka", year.isActive ? 'Hai' : 'Hauhai'),
+                          _buildDetailItem("Hali ya Mwaka",
+                              year.isActive ? 'Hai' : 'Hauhai'),
                         ],
                       ),
                       SizedBox(height: 20),
@@ -1405,7 +1481,8 @@ void _showCollectionDetails(BuildContext context, CollectionItem item) {
                         icon: Icons.info_rounded,
                         title: "Maelezo ya Usajili",
                         items: [
-                          _buildDetailItem("Tarehe ya Usajili", item.registeredDate),
+                          _buildDetailItem(
+                              "Tarehe ya Usajili", item.registeredDate),
                           _buildDetailItem("Alisajiliwa na", item.registeredBy),
                         ],
                       ),

@@ -34,7 +34,9 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
+            const SnackBar(
+                content:
+                    Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
         }
         // setState(() => _isLoading = false);
@@ -43,7 +45,8 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
 
       final String myApi =
           "$baseUrl/monthly/get_collection_by_user_id.php?user_id=${userData!.user.id}&jumuiya_id=${userData!.user.jumuiya_id}";
-      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+      final response = await http
+          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -64,7 +67,9 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+          SnackBar(
+              content:
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
       }
     }
@@ -75,7 +80,8 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
 
   Future<void> deleteTimeTable(dynamic id) async {
     try {
-      final String myApi = "$baseUrl/church_timetable/delete_time_table.php?id=$id";
+      final String myApi =
+          "$baseUrl/church_timetable/delete_time_table.php?id=$id";
       final response = await http.delete(
         Uri.parse(myApi),
         headers: {'Accept': 'application/json'},
@@ -101,7 +107,8 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }
@@ -213,7 +220,8 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
           (sum, item) => sum + (int.tryParse(item.amount) ?? 0),
         );
         final thisMonthCount = collections.where((item) {
-          final currentMonth = DateFormat('MMMM').format(DateTime.now()).toUpperCase();
+          final currentMonth =
+              DateFormat('MMMM').format(DateTime.now()).toUpperCase();
           return item.monthly == currentMonth;
         }).length;
 
@@ -596,7 +604,8 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
                     Icons.info_rounded,
                     [
                       _buildDetailRow("Mwaka wa Kanisa", year.churchYear),
-                      _buildDetailRow("Tarehe ya Usajili", _formatDate(item.registeredDate)),
+                      _buildDetailRow("Tarehe ya Usajili",
+                          _formatDate(item.registeredDate)),
                       _buildDetailRow("Aliyesajili", item.registeredBy),
                     ],
                   ),
@@ -609,7 +618,8 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
     );
   }
 
-  Widget _buildDetailSection(String title, IconData icon, List<Widget> children) {
+  Widget _buildDetailSection(
+      String title, IconData icon, List<Widget> children) {
     return ModernCard(
       padding: const EdgeInsets.all(20),
       child: Column(

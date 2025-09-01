@@ -47,7 +47,15 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
   User? _searchedUser;
   final roles = ["USER", "ADMIN"];
   final listGenders = ["MWANAUME", "MWANAMKE"];
-  final listStatus = ["AMEOLEWA", "AMEOA", "HAJAOA", "HAJAOLEWA", "WALIOACHANA", "MJANE", "MGANE"];
+  final listStatus = [
+    "AMEOLEWA",
+    "AMEOA",
+    "HAJAOA",
+    "HAJAOLEWA",
+    "WALIOACHANA",
+    "MJANE",
+    "MGANE"
+  ];
 
   @override
   void initState() {
@@ -58,7 +66,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
       fullNameController.text = data.userFullName ?? '';
       userNameController.text = data.userName ?? '';
       phoneController.text =
-          (data.phone != null && data.phone!.startsWith('255')) ? '0${data.phone!.substring(3)}' : (data.phone ?? '');
+          (data.phone != null && data.phone!.startsWith('255'))
+              ? '0${data.phone!.substring(3)}'
+              : (data.phone ?? '');
       locationController.text = data.location ?? '';
       genderController.text = data.gender ?? '';
       dobController.text = data.dobdate ?? '';
@@ -96,7 +106,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
 
         var jsonResponse = json.decode(response.body);
 
-        if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == '200') {
+        if (response.statusCode == 200 &&
+            jsonResponse != null &&
+            jsonResponse['status'] == '200') {
           setState(() {
             _isLoading = false;
           });
@@ -120,12 +132,16 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
           if (widget.initialData != null) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("✅ Umefanikiwa! Kuhuisha taarifa za mwanajumuiya katika mfumo kwa mafanikio")),
+              SnackBar(
+                  content: Text(
+                      "✅ Umefanikiwa! Kuhuisha taarifa za mwanajumuiya katika mfumo kwa mafanikio")),
             );
           } else {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("✅ Umefanikiwa! Kusajili taarifa za mwanajumuiya katika mfumo kwa mafanikio")),
+              SnackBar(
+                  content: Text(
+                      "✅ Umefanikiwa! Kusajili taarifa za mwanajumuiya katika mfumo kwa mafanikio")),
             );
           }
         } else if (response.statusCode == 404) {
@@ -157,7 +173,8 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }
@@ -184,7 +201,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
 
       var jsonResponse = json.decode(response.body);
 
-      if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == '200') {
+      if (response.statusCode == 200 &&
+          jsonResponse != null &&
+          jsonResponse['status'] == '200') {
         setState(() {
           _searchedUser = User.fromJson(jsonResponse['data']);
           _isSearching = false;
@@ -199,7 +218,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
         FocusScope.of(context).unfocus(); // Dismiss keyboard after getting data
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(jsonResponse['message'] ?? "Mtumiaji hajapatikana")),
+          SnackBar(
+              content:
+                  Text(jsonResponse['message'] ?? "Mtumiaji hajapatikana")),
         );
       }
     } catch (e) {
@@ -210,7 +231,8 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
       FocusScope.of(context).unfocus(); // Dismiss keyboard after getting data
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Kosa katika kutafuta mtumiaji: $e")),
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }
@@ -238,7 +260,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
 
       var jsonResponse = json.decode(response.body);
 
-      if (response.statusCode == 200 && jsonResponse != null && jsonResponse['status'] == '200') {
+      if (response.statusCode == 200 &&
+          jsonResponse != null &&
+          jsonResponse['status'] == '200') {
         setState(() {
           _isLoading = false;
         });
@@ -255,7 +279,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
 
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-          SnackBar(content: Text("✅ Umefanikiwa! ${user.userFullName} ameunganishwa na jumuiya hii")),
+          SnackBar(
+              content: Text(
+                  "✅ Umefanikiwa! ${user.userFullName} ameunganishwa na jumuiya hii")),
         );
       } else {
         // ignore: use_build_context_synchronously
@@ -266,7 +292,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
         });
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(jsonResponse['message'] ?? "Imeshindwa kuunganisha mtumiaji")),
+          SnackBar(
+              content: Text(jsonResponse['message'] ??
+                  "Imeshindwa kuunganisha mtumiaji")),
         );
       }
     } catch (e) {
@@ -278,7 +306,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Kosa: $e")),
+        SnackBar(content: Text("Tarehe ya kuzaliwa si sahihi.")),
       );
     }
   }
@@ -328,7 +356,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
-                        _isSearchMode ? Icons.search_rounded : Icons.person_add_rounded,
+                        _isSearchMode
+                            ? Icons.search_rounded
+                            : Icons.person_add_rounded,
                         color: primaryGradient[0],
                         size: 24,
                       ),
@@ -341,7 +371,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                           Text(
                             _isSearchMode
                                 ? "Unganisha Mtumiaji"
-                                : (widget.initialData != null ? "Hariri Mwanajumuiya" : "Ongeza Mwanajumuiya"),
+                                : (widget.initialData != null
+                                    ? "Hariri Mwanajumuiya"
+                                    : "Ongeza Mwanajumuiya"),
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -349,7 +381,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                             ),
                           ),
                           Text(
-                            _isSearchMode ? "Tafuta na kuunganisha mtumiaji" : "Jaza taarifa za mwanajumuiya mpya",
+                            _isSearchMode
+                                ? "Tafuta na kuunganisha mtumiaji"
+                                : "Jaza taarifa za mwanajumuiya mpya",
                             style: TextStyle(
                               fontSize: 14,
                               color: textSecondary,
@@ -383,7 +417,9 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
     return text
         .trim()
         .split(' ')
-        .map((word) => word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}' : '')
+        .map((word) => word.isNotEmpty
+            ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+            : '')
         .join(' ');
   }
 
@@ -401,11 +437,15 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
         final today = DateTime.now();
         final age = today.year -
             dob.year -
-            ((today.month < dob.month || (today.month == dob.month && today.day < dob.day)) ? 1 : 0);
+            ((today.month < dob.month ||
+                    (today.month == dob.month && today.day < dob.day))
+                ? 1
+                : 0);
         if (age < 18) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Umri wa mtumiaji lazima uwe angalau miaka 18.")),
+            const SnackBar(
+                content: Text("Umri wa mtumiaji lazima uwe angalau miaka 18.")),
           );
           return;
         }
@@ -423,7 +463,8 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
         final user = {
           "fname": capitalizeEachWord(fullNameController.text.trim()),
           "uname": toUnderscore(fullNameController.text.trim()),
-          "phone": phoneController.text.trim().replaceFirst(RegExp(r'^0'), '255'),
+          "phone":
+              phoneController.text.trim().replaceFirst(RegExp(r'^0'), '255'),
           "password": phoneController.text.trim(),
           "location": locationController.text.trim(),
           "gender": selectedGender,
@@ -442,7 +483,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
     } catch (e) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Kosa: $e")),
+        SnackBar(content: Text("Tarehe ya kuzaliwa si sahihi.")),
       );
     }
   }
@@ -507,7 +548,8 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
           ),
           filled: true,
           fillColor: cardColor,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
         dropdownColor: cardColor,
         style: const TextStyle(color: textPrimary),
@@ -552,7 +594,8 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
             Icons.arrow_drop_down_rounded,
             color: primaryGradient[0],
           ),
-          validator: (value) => value == null || value.isEmpty ? "Tafadhali chagua tarehe" : null,
+          validator: (value) =>
+              value == null || value.isEmpty ? "Tafadhali chagua tarehe" : null,
         ),
       ),
     );
@@ -567,9 +610,11 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
             child: GestureDetector(
               onTap: () => setState(() => _isSearchMode = false),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: !_isSearchMode ? primaryGradient[0] : Colors.transparent,
+                  color:
+                      !_isSearchMode ? primaryGradient[0] : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -599,9 +644,11 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
             child: GestureDetector(
               onTap: () => setState(() => _isSearchMode = true),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: _isSearchMode ? primaryGradient[0] : Colors.transparent,
+                  color:
+                      _isSearchMode ? primaryGradient[0] : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -689,7 +736,8 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                   Expanded(
                     child: Text(
                       "Mtumiaji huyu ni ADMIN na hawezi kuunganishwa na jumuiya hii.",
-                      style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
@@ -780,14 +828,18 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
                 controller: fullNameController,
                 labelText: "Jina Kamili",
                 prefixIcon: Icons.person_rounded,
-                validator: (value) => value == null || value.isEmpty ? "Tafadhali jaza sehemu hii" : null,
+                validator: (value) => value == null || value.isEmpty
+                    ? "Tafadhali jaza sehemu hii"
+                    : null,
               ),
               const SizedBox(height: 16),
               ModernTextField(
                 controller: locationController,
                 labelText: "Mahali anapoishi",
                 prefixIcon: Icons.location_on_rounded,
-                validator: (value) => value == null || value.isEmpty ? "Tafadhali jaza sehemu hii" : null,
+                validator: (value) => value == null || value.isEmpty
+                    ? "Tafadhali jaza sehemu hii"
+                    : null,
               ),
               const SizedBox(height: 16),
               _buildModernDropdown(
@@ -858,8 +910,12 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
             width: double.infinity,
             child: ModernButton(
               onPressed: _handleSubmit,
-              text: widget.initialData != null ? "Hifadhi Mabadiliko" : "Hifadhi Mtumiaji",
-              icon: widget.initialData != null ? Icons.update_rounded : Icons.save_rounded,
+              text: widget.initialData != null
+                  ? "Hifadhi Mabadiliko"
+                  : "Hifadhi Mtumiaji",
+              icon: widget.initialData != null
+                  ? Icons.update_rounded
+                  : Icons.save_rounded,
               isLoading: _isLoading,
             ),
           ),

@@ -29,8 +29,10 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
   List<User> users = [];
   User? selectedUser;
   late TextEditingController datePrayerController = TextEditingController();
-  late TextEditingController latIdController = TextEditingController(text: "N/A");
-  late TextEditingController longIdController = TextEditingController(text: "N/A");
+  late TextEditingController latIdController =
+      TextEditingController(text: "N/A");
+  late TextEditingController longIdController =
+      TextEditingController(text: "N/A");
   late TextEditingController locationController = TextEditingController();
   late TextEditingController messageController = TextEditingController();
   late TextEditingController userNameController = TextEditingController();
@@ -41,8 +43,8 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
   bool _isLoading = false;
 
   Future<void> fetchUsers() async {
-    final response =
-        await http.get(Uri.parse('$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}'));
+    final response = await http.get(Uri.parse(
+        '$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -68,17 +70,21 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
       locationController = TextEditingController(text: data.location ?? '');
       messageController = TextEditingController(text: data.message ?? '');
 
-      userFullNameController = TextEditingController(text: data.user?.userFullName ?? '');
-      userNameController = TextEditingController(text: data.user?.userName ?? '');
+      userFullNameController =
+          TextEditingController(text: data.user?.userFullName ?? '');
+      userNameController =
+          TextEditingController(text: data.user?.userName ?? '');
       userPhoneController = TextEditingController(text: data.user?.phone ?? '');
       userRoleController = TextEditingController(text: data.user?.role ?? '');
-      yearRegisteredController = TextEditingController(text: data.user?.yearRegistered ?? '');
+      yearRegisteredController =
+          TextEditingController(text: data.user?.yearRegistered ?? '');
 
       setState(() {
         selectedUser = data.user;
       });
 
-      isActive = (data.churchYearEntity?.isActive?.toString() == '1' || data.churchYearEntity?.isActive == true);
+      isActive = (data.churchYearEntity?.isActive?.toString() == '1' ||
+          data.churchYearEntity?.isActive == true);
     }
   }
 
@@ -137,12 +143,16 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
           if (widget.initialData != null) {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("✅ Umefanikiwa! Kuhuisha ratiba mfumo kwa mafanikio")),
+              SnackBar(
+                  content: Text(
+                      "✅ Umefanikiwa! Kuhuisha ratiba mfumo kwa mafanikio")),
             );
           } else {
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-              SnackBar(content: Text("✅ Umefanikiwa! Kusajili ratiba mfumo kwa mafanikio")),
+              SnackBar(
+                  content: Text(
+                      "✅ Umefanikiwa! Kusajili ratiba mfumo kwa mafanikio")),
             );
           }
         } else if (response.statusCode == 404) {
@@ -170,7 +180,8 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }
@@ -210,9 +221,12 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                     ),
                   ),
                 ),
-                const Text("➕ Ongeza Ratiba ya Kukutana", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text("➕ Ongeza Ratiba ya Kukutana",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
-                _buildDatePickerField("📅 Tarehe ya Kukutana", datePrayerController),
+                _buildDatePickerField(
+                    "📅 Tarehe ya Kukutana", datePrayerController),
                 _buildTextField("📍 Mahali", locationController),
                 // _buildTextField("🛰 LatId", latIdController),
                 // _buildTextField("🛰 LongId", longIdController),
@@ -220,7 +234,8 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                 // _buildTextField("🖊 Aliyesajili", registeredByController),
                 const SizedBox(height: 12),
                 const Divider(),
-                const Text("👤 Taarifa za Mtumiaji", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text("👤 Taarifa za Mtumiaji",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -236,7 +251,8 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                         value: user,
                         child: Row(
                           children: [
-                            const Icon(Icons.person, color: Colors.blueGrey, size: 20),
+                            const Icon(Icons.person,
+                                color: Colors.blueGrey, size: 20),
                             const SizedBox(width: 8),
                             Text(user.userFullName!),
                           ],
@@ -259,7 +275,8 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                 ),
                 const SizedBox(height: 12),
                 const Divider(),
-                const Text("📆 Mwaka", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text("📆 Mwaka",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 _buildChurchYearInfo(
                   churchYear: currentYear!.data.churchYear,
@@ -272,7 +289,8 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                       final data = {
                         "id": widget.initialData?.id,
                         "datePrayer": datePrayerController.text,
-                        "jumuiya_id": userData!.user.jumuiya_id, // Ensure this is set correctly
+                        "jumuiya_id": userData!
+                            .user.jumuiya_id, // Ensure this is set correctly
                         "latId": "N/A", //latIdController.text,
                         "longId": "N/A",
                         "location": locationController.text.toUpperCase(),
@@ -307,7 +325,8 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
     );
   }
 
-  Widget _buildChurchYearInfo({required String churchYear, required bool isActive}) {
+  Widget _buildChurchYearInfo(
+      {required String churchYear, required bool isActive}) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -370,7 +389,8 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
           labelText: label,
           border: const OutlineInputBorder(),
         ),
-        validator: (value) => value == null || value.isEmpty ? "Tafadhali jaza sehemu hii" : null,
+        validator: (value) =>
+            value == null || value.isEmpty ? "Tafadhali jaza sehemu hii" : null,
       ),
     );
   }
@@ -386,7 +406,8 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
           border: const OutlineInputBorder(),
           suffixIcon: const Icon(Icons.calendar_today),
         ),
-        validator: (value) => value == null || value.isEmpty ? "Tafadhali chagua tarehe" : null,
+        validator: (value) =>
+            value == null || value.isEmpty ? "Tafadhali chagua tarehe" : null,
         onTap: () async {
           DateTime? pickedDate = await showDatePicker(
             context: widget.rootContext,

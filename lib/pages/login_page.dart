@@ -139,8 +139,7 @@ class _LoginPageState extends State<LoginPage> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }

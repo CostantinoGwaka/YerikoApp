@@ -107,6 +107,11 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       }
     } catch (e) {
       // Handle error silently
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+      );
     }
   }
 
@@ -220,7 +225,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
-                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
       }
     }
@@ -283,7 +288,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
-                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
       }
     }
@@ -346,7 +351,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e",
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
             ),
           ),
         );
@@ -397,7 +402,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
-                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
       }
     }
@@ -446,7 +451,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
-                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
       }
     }
@@ -485,8 +490,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }

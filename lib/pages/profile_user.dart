@@ -85,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
     } catch (e) {
       // Handle error silently or show message
       if (kDebugMode) {
-        print('Error fetching jumuiya data: $e');
+        print('Error fetching jumuiya data');
       }
     }
   }
@@ -122,7 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
     } catch (e) {
       // Handle error silently
       if (kDebugMode) {
-        print('Error fetching SMS bando summary: $e');
+        print('Error fetching SMS bando summary');
       }
     } finally {
       setState(() {
@@ -219,7 +219,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
-                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
       }
     }
@@ -312,8 +312,7 @@ class _ProfilePageState extends State<ProfilePage> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }
@@ -387,8 +386,7 @@ class _ProfilePageState extends State<ProfilePage> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }
@@ -462,8 +460,7 @@ class _ProfilePageState extends State<ProfilePage> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }
@@ -506,7 +503,7 @@ class _ProfilePageState extends State<ProfilePage> {
     } catch (e) {
       // Handle error silently
       if (kDebugMode) {
-        print('Error fetching used SMS summary: $e');
+        print('Error fetching used SMS summary');
       }
     } finally {
       setState(() {

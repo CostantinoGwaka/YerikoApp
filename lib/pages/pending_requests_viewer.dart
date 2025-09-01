@@ -49,7 +49,8 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
     });
 
     try {
-      final String myApi = "$baseUrl/auth/get_all_user_associated_by_jumuiya_id.php";
+      final String myApi =
+          "$baseUrl/auth/get_all_user_associated_by_jumuiya_id.php";
       final response = await http.post(Uri.parse(myApi),
           headers: {'Content-type': 'application/json'},
           body: json.encode({
@@ -80,7 +81,8 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
 
@@ -147,12 +149,14 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
                               Text(
                                 "Maombi Yanayosubiri",
                                 style: TextStyle(
-                                  color: const Color.fromARGB(255, 32, 21, 234).withValues(alpha: 0.8),
+                                  color: const Color.fromARGB(255, 32, 21, 234)
+                                      .withValues(alpha: 0.8),
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                   shadows: [
                                     Shadow(
-                                      color: Colors.black.withValues(alpha: 0.3),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.3),
                                       offset: Offset(0, 2),
                                       blurRadius: 4,
                                     ),
@@ -162,12 +166,14 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
                               Text(
                                 "${pendingRequests?.data.length ?? 0} maombi${_searchQuery.isNotEmpty ? ' (${_filterRequests(pendingRequests?.data ?? []).length} yamepatikana)' : ''}",
                                 style: TextStyle(
-                                  color: const Color.fromARGB(255, 32, 21, 234).withValues(alpha: 0.7),
+                                  color: const Color.fromARGB(255, 32, 21, 234)
+                                      .withValues(alpha: 0.7),
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                   shadows: [
                                     Shadow(
-                                      color: Colors.black.withValues(alpha: 0.2),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.2),
                                       offset: Offset(0, 1),
                                       blurRadius: 2,
                                     ),
@@ -199,7 +205,8 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: "Tafuta ombi...",
-                  prefixIcon: Icon(CupertinoIcons.search, color: Colors.grey[600]),
+                  prefixIcon:
+                      Icon(CupertinoIcons.search, color: Colors.grey[600]),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
                           icon: Icon(Icons.clear, color: Colors.grey[600]),
@@ -209,7 +216,8 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
                         )
                       : null,
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
               ),
             ),
@@ -223,7 +231,8 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircularProgressIndicator(color: mainFontColor.withValues(alpha: 0.3)),
+                        CircularProgressIndicator(
+                            color: mainFontColor.withValues(alpha: 0.3)),
                         const SizedBox(height: 16),
                         Text(
                           "Inatafuta maombi...",
@@ -306,7 +315,8 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.orange.withValues(alpha: 0.3), width: 2),
+            border: Border.all(
+                color: Colors.orange.withValues(alpha: 0.3), width: 2),
             boxShadow: [
               BoxShadow(
                 color: Colors.orange.withValues(alpha: 0.1),
@@ -333,7 +343,8 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(CupertinoIcons.clock_fill, color: Colors.white, size: 16),
+                    const Icon(CupertinoIcons.clock_fill,
+                        color: Colors.white, size: 16),
                     const SizedBox(width: 8),
                     Text(
                       "INASUBIRI IDHINI",
@@ -380,7 +391,8 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: request.role == "ADMIN"
@@ -483,7 +495,9 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
                             } else {
                               // ignore: use_build_context_synchronously
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Imeshindikana kupiga simu.")),
+                                const SnackBar(
+                                    content:
+                                        Text("Imeshindikana kupiga simu.")),
                               );
                             }
                           }

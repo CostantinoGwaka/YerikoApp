@@ -29,7 +29,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
   void initState() {
     super.initState();
     getUsersCollections();
-    if (userData != null && (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
+    if (userData != null &&
+        (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
       checkUserPendingRequests();
     }
     _searchController.addListener(() {
@@ -47,7 +48,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
 
   Future<void> _reloadData() async {
     await getUsersCollections();
-    if (userData != null && (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
+    if (userData != null &&
+        (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
       await checkUserPendingRequests();
     }
     setState(() {}); // Refresh UI after fetching data
@@ -55,7 +57,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
 
   Future<void> checkUserPendingRequests() async {
     try {
-      final String myApi = "$baseUrl/auth/get_all_user_associated_by_user_id.php";
+      final String myApi =
+          "$baseUrl/auth/get_all_user_associated_by_user_id.php";
       final response = await http.post(
         Uri.parse(myApi),
         headers: {'Content-type': 'application/json'},
@@ -87,8 +90,10 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
 
   Future<AllUsersResponse?> getUsersCollections() async {
     try {
-      final String myApi = "$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}";
-      final response = await http.get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+      final String myApi =
+          "$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}";
+      final response = await http
+          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -105,7 +110,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
 
@@ -115,7 +121,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
 
   Future<void> deleteTimeTable(dynamic id) async {
     try {
-      final String myApi = "$baseUrl/church_timetable/delete_time_table.php?id=$id";
+      final String myApi =
+          "$baseUrl/church_timetable/delete_time_table.php?id=$id";
       final response = await http.delete(
         Uri.parse(myApi),
         headers: {'Accept': 'application/json'},
@@ -141,7 +148,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }
@@ -191,12 +199,14 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                               Text(
                                 "Wanajumuiya",
                                 style: TextStyle(
-                                  color: const Color.fromARGB(255, 32, 21, 234).withValues(alpha: 0.8),
+                                  color: const Color.fromARGB(255, 32, 21, 234)
+                                      .withValues(alpha: 0.8),
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                   shadows: [
                                     Shadow(
-                                      color: Colors.black.withValues(alpha: 0.3),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.3),
                                       offset: Offset(0, 2),
                                       blurRadius: 4,
                                     ),
@@ -206,12 +216,14 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                               Text(
                                 "${collections?.data.length ?? 0} wanachama${_searchQuery.isNotEmpty ? ' (${_filterUsers(collections?.data ?? []).length} wamepatikana)' : ''}",
                                 style: TextStyle(
-                                  color: const Color.fromARGB(255, 32, 21, 234).withValues(alpha: 0.7),
+                                  color: const Color.fromARGB(255, 32, 21, 234)
+                                      .withValues(alpha: 0.7),
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                   shadows: [
                                     Shadow(
-                                      color: Colors.black.withValues(alpha: 0.2),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.2),
                                       offset: Offset(0, 1),
                                       blurRadius: 2,
                                     ),
@@ -222,7 +234,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                           ),
                           Row(
                             children: [
-                              if (userData != null && userData!.user.role == "ADMIN") ...[
+                              if (userData != null &&
+                                  userData!.user.role == "ADMIN") ...[
                                 Container(
                                   decoration: BoxDecoration(
                                     color: Colors.orange.withValues(alpha: 0.2),
@@ -234,7 +247,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => const PendingRequestsViewer(),
+                                          builder: (context) =>
+                                              const PendingRequestsViewer(),
                                         ),
                                       );
                                     },
@@ -248,14 +262,16 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                               ],
                               const SizedBox(width: 5),
                               if (userData != null &&
-                                  (userData!.user.role == "USER" || userData!.user.role == "ADMIN") &&
+                                  (userData!.user.role == "USER" ||
+                                      userData!.user.role == "ADMIN") &&
                                   _hasUserPendingRequests) ...[
                                 GestureDetector(
                                   onTap: () async {
                                     await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const UserPendingRequestsViewer(),
+                                        builder: (context) =>
+                                            const UserPendingRequestsViewer(),
                                       ),
                                     );
                                   },
@@ -263,8 +279,10 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                     children: [
                                       Container(
                                         decoration: BoxDecoration(
-                                          color: Colors.orange.withValues(alpha: 0.2),
-                                          borderRadius: BorderRadius.circular(12),
+                                          color: Colors.orange
+                                              .withValues(alpha: 0.2),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                         padding: const EdgeInsets.all(8),
                                         child: InkWell(
@@ -272,12 +290,16 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                             await Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => const UserPendingRequestsViewer(),
+                                                builder: (context) =>
+                                                    const UserPendingRequestsViewer(),
                                               ),
                                             );
                                             // Refresh the count when user returns
                                             if (userData != null &&
-                                                (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
+                                                (userData!.user.role ==
+                                                        "USER" ||
+                                                    userData!.user.role ==
+                                                        "ADMIN")) {
                                               checkUserPendingRequests();
                                             }
                                           },
@@ -292,16 +314,23 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                         right: 0,
                                         top: 0,
                                         child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 300),
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          duration:
+                                              const Duration(milliseconds: 300),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 6, vertical: 2),
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
-                                              colors: [Colors.red[400]!, Colors.red[600]!],
+                                              colors: [
+                                                Colors.red[400]!,
+                                                Colors.red[600]!
+                                              ],
                                             ),
-                                            borderRadius: BorderRadius.circular(10),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.red.withValues(alpha: 0.4),
+                                                color: Colors.red
+                                                    .withValues(alpha: 0.4),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 2),
                                               ),
@@ -312,7 +341,10 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                             minHeight: 20,
                                           ),
                                           child: Text(
-                                            _pendingRequestsCount > 99 ? '99+' : _pendingRequestsCount.toString(),
+                                            _pendingRequestsCount > 99
+                                                ? '99+'
+                                                : _pendingRequestsCount
+                                                    .toString(),
                                             style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 11,
@@ -371,17 +403,20 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                           controller: _searchController,
                           decoration: InputDecoration(
                             hintText: "Tafuta mwanajumuiya...",
-                            prefixIcon: Icon(CupertinoIcons.search, color: Colors.grey[600]),
+                            prefixIcon: Icon(CupertinoIcons.search,
+                                color: Colors.grey[600]),
                             suffixIcon: _searchQuery.isNotEmpty
                                 ? IconButton(
-                                    icon: Icon(Icons.clear, color: Colors.grey[600]),
+                                    icon: Icon(Icons.clear,
+                                        color: Colors.grey[600]),
                                     onPressed: () {
                                       _searchController.clear();
                                     },
                                   )
                                 : null,
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
                           ),
                         ),
                       ),
@@ -391,7 +426,10 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [mainFontColor, mainFontColor.withValues(alpha: 0.8)],
+                            colors: [
+                              mainFontColor,
+                              mainFontColor.withValues(alpha: 0.8)
+                            ],
                           ),
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
@@ -411,7 +449,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                 context: context,
                                 isScrollControlled: true,
                                 shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(25)),
                                 ),
                                 builder: (_) => AddUserPageAdmin(
                                   rootContext: context,
@@ -422,11 +461,13 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                               );
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.add, color: Colors.white, size: 20),
+                                  const Icon(Icons.add,
+                                      color: Colors.white, size: 20),
                                   const SizedBox(width: 4),
                                   const Text(
                                     "Ongeza",
@@ -460,7 +501,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircularProgressIndicator(color: mainFontColor.withValues(alpha: 0.3)),
+                        CircularProgressIndicator(
+                            color: mainFontColor.withValues(alpha: 0.3)),
                         const SizedBox(height: 16),
                         Text(
                           "Inatafuta wanajumuiya...",
@@ -480,7 +522,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
+                        Icon(Icons.error_outline,
+                            size: 64, color: Colors.red[300]),
                         const SizedBox(height: 16),
                         Text(
                           "Imeshindikana kupakia taarifa za wanajumuiya.",
@@ -501,7 +544,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(CupertinoIcons.person_3, size: 64, color: Colors.grey[400]),
+                        Icon(CupertinoIcons.person_3,
+                            size: 64, color: Colors.grey[400]),
                         const SizedBox(height: 16),
                         Text(
                           "Hakuna taarifa za wanajumuiya zilizopatikana.",
@@ -527,7 +571,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(CupertinoIcons.search, size: 64, color: Colors.grey[400]),
+                        Icon(CupertinoIcons.search,
+                            size: 64, color: Colors.grey[400]),
                         const SizedBox(height: 16),
                         Text(
                           "Hakuna mwanajumuiya aliyepatikana\nkwa utafutaji '$_searchQuery'",
@@ -572,11 +617,13 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                             children: [
                               // Header with name and role
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           item.userFullName ?? "Jina Halipo",
@@ -598,12 +645,19 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                     ),
                                   ),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 6),
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: item.role == "ADMIN"
-                                            ? [Colors.red[400]!, Colors.red[600]!]
-                                            : [Colors.blue[400]!, Colors.blue[600]!],
+                                            ? [
+                                                Colors.red[400]!,
+                                                Colors.red[600]!
+                                              ]
+                                            : [
+                                                Colors.blue[400]!,
+                                                Colors.blue[600]!
+                                              ],
                                       ),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
@@ -636,7 +690,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                               ),
 
                               // Admin-only details
-                              if (userData != null && userData!.user.role == "ADMIN") ...[
+                              if (userData != null &&
+                                  userData!.user.role == "ADMIN") ...[
                                 const SizedBox(height: 8),
                                 _buildInfoRow(
                                   icon: Icons.location_on,
@@ -682,7 +737,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                           ),
                           child: Row(
                             children: [
-                              if (userData != null && userData!.user.role == "ADMIN") ...[
+                              if (userData != null &&
+                                  userData!.user.role == "ADMIN") ...[
                                 Expanded(
                                   child: _buildActionButton(
                                     icon: Icons.edit_outlined,
@@ -693,7 +749,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                         context: context,
                                         isScrollControlled: true,
                                         shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(25)),
                                         ),
                                         builder: (_) => AddUserPageAdmin(
                                           rootContext: context,
@@ -714,16 +771,22 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                   label: "Piga Simu",
                                   color: Colors.green,
                                   onPressed: () async {
-                                    final phone = (item.phone ?? '').replaceAll(' ', '');
-                                    String formattedPhone = formatPhoneNumber(phone);
+                                    final phone =
+                                        (item.phone ?? '').replaceAll(' ', '');
+                                    String formattedPhone =
+                                        formatPhoneNumber(phone);
                                     if (phone.isNotEmpty) {
-                                      final Uri url = Uri.parse('tel:$formattedPhone');
+                                      final Uri url =
+                                          Uri.parse('tel:$formattedPhone');
                                       if (await canLaunchUrl(url)) {
                                         await launchUrl(url);
                                       } else {
                                         // ignore: use_build_context_synchronously
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text("Imeshindikana kupiga simu.")),
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  "Imeshindikana kupiga simu.")),
                                         );
                                       }
                                     }
@@ -874,7 +937,8 @@ class _StickySearchHeaderDelegate extends SliverPersistentHeaderDelegate {
   _StickySearchHeaderDelegate({required this.child});
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
     return child;
   }
 

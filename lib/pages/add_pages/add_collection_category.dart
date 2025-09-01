@@ -21,7 +21,8 @@ class AddCollectionTypePage extends StatefulWidget {
 
 class _AddCollectionTypePageState extends State<AddCollectionTypePage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController collectionNameController = TextEditingController();
+  final TextEditingController collectionNameController =
+      TextEditingController();
   bool _isLoading = false;
 
   Future<void> saveCollectionType() async {
@@ -48,7 +49,8 @@ class _AddCollectionTypePageState extends State<AddCollectionTypePage> {
       if (response.statusCode == 200 && jsonResponse['status'] == "200") {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-          const SnackBar(content: Text("✅ Aina ya mchango imehifadhiwa kwa mafanikio")),
+          const SnackBar(
+              content: Text("✅ Aina ya mchango imehifadhiwa kwa mafanikio")),
         );
         // ignore: use_build_context_synchronously
         Navigator.pop(context);
@@ -63,7 +65,7 @@ class _AddCollectionTypePageState extends State<AddCollectionTypePage> {
       setState(() => _isLoading = false);
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(widget.rootContext).showSnackBar(
-        SnackBar(content: Text("📡 Tatizo la intaneti au seva: $e")),
+        SnackBar(content: Text("📡 Tatizo la intaneti au seva")),
       );
     }
   }
@@ -96,7 +98,9 @@ class _AddCollectionTypePageState extends State<AddCollectionTypePage> {
                     labelText: "✏️ Aina ya Mchango (Mf. Sadaka ya Maendeleo)",
                     border: OutlineInputBorder(),
                   ),
-                  validator: (value) => value == null || value.trim().isEmpty ? "Tafadhali jaza jina la mchango" : null,
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? "Tafadhali jaza jina la mchango"
+                      : null,
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton.icon(

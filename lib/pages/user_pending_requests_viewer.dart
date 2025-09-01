@@ -11,7 +11,8 @@ class UserPendingRequestsViewer extends StatefulWidget {
   const UserPendingRequestsViewer({super.key});
 
   @override
-  State<UserPendingRequestsViewer> createState() => _UserPendingRequestsViewerState();
+  State<UserPendingRequestsViewer> createState() =>
+      _UserPendingRequestsViewerState();
 }
 
 class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
@@ -66,7 +67,8 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }
@@ -95,7 +97,8 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
   }
@@ -106,7 +109,8 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
     });
 
     try {
-      final String myApi = "$baseUrl/auth/get_all_user_associated_by_user_id.php";
+      final String myApi =
+          "$baseUrl/auth/get_all_user_associated_by_user_id.php";
       final response = await http.post(
         Uri.parse(myApi),
         headers: {'Content-type': 'application/json'},
@@ -140,7 +144,8 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
       });
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti: $e")),
+        SnackBar(
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
 
@@ -208,12 +213,15 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
                                 Text(
                                   "Maombi Yangu",
                                   style: TextStyle(
-                                    color: const Color.fromARGB(255, 32, 21, 234).withValues(alpha: 0.8),
+                                    color:
+                                        const Color.fromARGB(255, 32, 21, 234)
+                                            .withValues(alpha: 0.8),
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
                                     shadows: [
                                       Shadow(
-                                        color: Colors.black.withValues(alpha: 0.3),
+                                        color:
+                                            Colors.black.withValues(alpha: 0.3),
                                         offset: const Offset(0, 2),
                                         blurRadius: 4,
                                       ),
@@ -223,12 +231,15 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
                                 Text(
                                   "${pendingRequests?.data.length ?? 0} maombi${_searchQuery.isNotEmpty ? ' (${_filterRequests(pendingRequests?.data ?? []).length} yamepatikana)' : ''}",
                                   style: TextStyle(
-                                    color: const Color.fromARGB(255, 32, 21, 234).withValues(alpha: 0.7),
+                                    color:
+                                        const Color.fromARGB(255, 32, 21, 234)
+                                            .withValues(alpha: 0.7),
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                     shadows: [
                                       Shadow(
-                                        color: Colors.black.withValues(alpha: 0.2),
+                                        color:
+                                            Colors.black.withValues(alpha: 0.2),
                                         offset: const Offset(0, 1),
                                         blurRadius: 2,
                                       ),
@@ -265,7 +276,8 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: "Tafuta ombi...",
-                      prefixIcon: Icon(CupertinoIcons.search, color: Colors.grey[600]),
+                      prefixIcon:
+                          Icon(CupertinoIcons.search, color: Colors.grey[600]),
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
                               icon: Icon(Icons.clear, color: Colors.grey[600]),
@@ -275,7 +287,8 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
                             )
                           : null,
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                     ),
                   ),
                 ),
@@ -291,7 +304,8 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircularProgressIndicator(color: mainFontColor.withValues(alpha: 0.3)),
+                        CircularProgressIndicator(
+                            color: mainFontColor.withValues(alpha: 0.3)),
                         const SizedBox(height: 16),
                         Text(
                           "Inatafuta maombi...",
@@ -311,7 +325,8 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(CupertinoIcons.clock, size: 64, color: Colors.grey[400]),
+                            Icon(CupertinoIcons.clock,
+                                size: 64, color: Colors.grey[400]),
                             const SizedBox(height: 16),
                             Text(
                               "Hakuna maombi yaliyopatikana.",
@@ -537,7 +552,8 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: request.status == "PENDING"
@@ -672,7 +688,8 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
               Icon(Icons.check_circle, color: Colors.green, size: 24),
@@ -711,7 +728,8 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
               Icon(Icons.cancel, color: Colors.red, size: 24),
@@ -752,7 +770,8 @@ class _StickySearchHeaderDelegate extends SliverPersistentHeaderDelegate {
   _StickySearchHeaderDelegate({required this.child});
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
     return child;
   }
 

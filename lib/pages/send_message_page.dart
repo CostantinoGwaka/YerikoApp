@@ -86,7 +86,7 @@ class _SendMessagePageState extends State<SendMessagePage> {
     } catch (e) {
       // Handle error silently
       if (kDebugMode) {
-        print('Error fetching SMS bando summary: $e');
+        print('Error fetching SMS bando summary');
       }
     } finally {
       setState(() {
@@ -131,7 +131,7 @@ class _SendMessagePageState extends State<SendMessagePage> {
     } catch (e) {
       // Handle error silently
       if (kDebugMode) {
-        print('Error fetching used SMS summary: $e');
+        print('Error fetching used SMS summary');
       }
     } finally {
       setState(() {

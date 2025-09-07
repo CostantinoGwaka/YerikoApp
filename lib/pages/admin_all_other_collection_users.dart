@@ -1761,40 +1761,157 @@ class _AdminOtherAllUserCollectionsState
   Future<void> _exportToExcel() async {
     try {
       setState(() => isLoading = true);
-      var excel = Excel.createExcel();
-      var sheet = excel['Michango'];
 
-      // Add headers
-      sheet.appendRow([
+      // Create Excel workbook
+      var excel = Excel.createExcel();
+
+      // Remove default sheet and create custom one
+      excel.delete('Sheet1');
+      var sheet = excel['Michango Mengineyo'];
+
+      // Style for headers
+      var headerStyle = CellStyle(
+        bold: true,
+        backgroundColorHex: '#D3D3D3',
+        horizontalAlign: HorizontalAlign.Center,
+      );
+
+      // Add headers with styling
+      var headers = [
         'Mwanajumuiya',
-        'Kiasi',
+        'Kiasi (TZS)',
         'Aina ya Mchango',
         'Mwezi',
         'Tarehe ya Usajili'
-      ]);
+      ];
 
-      // Add data
+      for (int i = 0; i < headers.length; i++) {
+        var cell =
+            sheet.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0));
+        cell.value = headers[i];
+        cell.cellStyle = headerStyle;
+      }
+
+      // Add data rows and calculate total
+      int rowIndex = 1;
+      int totalAmount = 0;
+
       collectionsOthers?.data.forEach((item) {
-        sheet.appendRow([
-          item.user.userFullName,
-          item.amount,
-          item.collectionType.collectionName,
-          item.monthly,
-          item.registeredDate,
-        ]);
+        // Name
+        var nameCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+        nameCell.value = item.user.userFullName ?? '';
+
+        // Amount (formatted as number)
+        var amountCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+        try {
+          int amount = int.parse(item.amount);
+          amountCell.value = amount;
+          totalAmount += amount;
+        } catch (e) {
+          amountCell.value = item.amount; // Keep as string if parsing fails
+        }
+
+        // Collection Type
+        var typeCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: rowIndex));
+        typeCell.value = item.collectionType.collectionName;
+
+        // Month
+        var monthCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: rowIndex));
+        monthCell.value = item.monthly;
+
+        // Registration Date
+        var dateCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: rowIndex));
+        dateCell.value = item.registeredDate;
+
+        rowIndex++;
       });
 
-      // Save and share
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File(
-          '${directory.path}/michango_${DateTime.now().millisecondsSinceEpoch}.xlsx');
-      await file.writeAsBytes(excel.encode()!);
+      // Add summary rows
+      if (collectionsOthers?.data.isNotEmpty == true) {
+        rowIndex++; // Skip a row
 
-      await Share.share(
-        'Ripoti ya Michango (Excel)',
-        subject:
-            'Ripoti_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.xlsx',
-      );
+        // Summary label
+        var summaryLabelCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+        summaryLabelCell.value = 'JUMLA';
+        summaryLabelCell.cellStyle = CellStyle(bold: true);
+
+        // Summary amount
+        var summaryAmountCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+        summaryAmountCell.value = totalAmount;
+        summaryAmountCell.cellStyle = CellStyle(bold: true);
+
+        // Total count
+        rowIndex++;
+        var countLabelCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+        countLabelCell.value = 'Idadi ya Wanajumuiya';
+        countLabelCell.cellStyle = CellStyle(bold: true);
+
+        var countCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+        countCell.value = collectionsOthers?.data.length ?? 0;
+        countCell.cellStyle = CellStyle(bold: true);
+
+        // Add date generated
+        rowIndex++;
+        var dateGeneratedCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+        dateGeneratedCell.value = 'Tarehe ya Ripoti';
+        dateGeneratedCell.cellStyle = CellStyle(bold: true);
+
+        var dateValueCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+        dateValueCell.value = DateFormat('dd/MM/yyyy').format(DateTime.now());
+        dateValueCell.cellStyle = CellStyle(bold: true);
+      }
+
+      // Set column widths (if supported by your Excel package version)
+      try {
+        sheet.setColWidth(0, 25); // Name column
+        sheet.setColWidth(1, 15); // Amount column
+        sheet.setColWidth(2, 20); // Collection type column
+        sheet.setColWidth(3, 12); // Month column
+        sheet.setColWidth(4, 15); // Date column
+      } catch (e) {
+        // Continue without column width setting
+      }
+
+      // Save the Excel file
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName =
+          'Ripoti_Mengineyo_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.xlsx';
+      final file = File('${directory.path}/$fileName');
+
+      // Encode and save
+      var excelBytes = excel.encode();
+      if (excelBytes != null) {
+        await file.writeAsBytes(excelBytes);
+
+        // Share the actual Excel file
+        await Share.shareXFiles(
+          [XFile(file.path)],
+          text: 'Ripoti ya Michango Mengineyo (Excel)',
+          subject: fileName,
+        );
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Excel file ya michango mengineyo imesajiliwa na kushirikiwa!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        throw Exception('Failed to encode Excel file');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Hitilafu: $e')),

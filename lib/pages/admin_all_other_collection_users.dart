@@ -1469,11 +1469,21 @@ class _AdminOtherAllUserCollectionsState
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Later'),
+            child: const Text(
+              'Baadaye',
+              style: TextStyle(
+                fontSize: 12.0,
+              ),
+            ),
           ),
           ElevatedButton.icon(
             icon: const Icon(Icons.star),
-            label: const Text('Upgrade Now'),
+            label: const Text(
+              'Huduma za Ziada',
+              style: TextStyle(
+                fontSize: 12.0,
+              ),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.amber,
               foregroundColor: Colors.black87,

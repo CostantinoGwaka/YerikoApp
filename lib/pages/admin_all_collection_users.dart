@@ -513,7 +513,9 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         color: mainFontColor,
         child: getBody(),
       ),
-      floatingActionButton: _buildPremiumFeaturesFAB(),
+      floatingActionButton: selectedTabIndex == 0
+          ? _buildPremiumFeaturesFAB()
+          : SizedBox.shrink(),
     );
   }
 

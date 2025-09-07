@@ -18,7 +18,7 @@ class _SmsSentListPageState extends State<SmsSentListPage> {
   bool _isLoading = false;
   List<dynamic> _smsList = [];
   List<dynamic> _filteredSmsList = [];
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
 
   @override

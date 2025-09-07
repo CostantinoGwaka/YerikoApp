@@ -1904,6 +1904,64 @@ class _AdminOtherAllUserCollectionsState
   }
 
   Widget _buildLineChart() {
+    // Process data to group collections by month
+    Map<String, double> monthlyTotals = {};
+
+    if (collectionsOthers?.data != null) {
+      for (var item in collectionsOthers!.data) {
+        // Extract month from the monthly field or use registration date
+        String month = item.monthly.split(' ').first;
+        double amount = double.tryParse(item.amount) ?? 0.0;
+
+        // Add amount to corresponding month
+        if (monthlyTotals.containsKey(month)) {
+          monthlyTotals[month] = (monthlyTotals[month] ?? 0) + amount;
+        } else {
+          monthlyTotals[month] = amount;
+        }
+      }
+    }
+
+    // Sort months chronologically
+    List<String> sortedMonths = monthlyTotals.keys.toList();
+    sortedMonths.sort((a, b) {
+      // Assuming month names are standard - can be enhanced with a more robust month sorting
+      final months = [
+        'JANUARY',
+        'FEBRUARY',
+        'MARCH',
+        'APRIL',
+        'MAY',
+        'JUNE',
+        'JULY',
+        'AUGUST',
+        'SEPTEMBER',
+        'OCTOBER',
+        'NOVEMBER',
+        'DECEMBER'
+      ];
+      return months.indexOf(a.toUpperCase()) - months.indexOf(b.toUpperCase());
+    });
+
+    // Create spots for the chart, limited to the last 6 months if there are more
+    List<FlSpot> spots = [];
+    if (sortedMonths.isNotEmpty) {
+      final displayMonths = sortedMonths.length > 6
+          ? sortedMonths.sublist(sortedMonths.length - 6)
+          : sortedMonths;
+
+      for (int i = 0; i < displayMonths.length; i++) {
+        String month = displayMonths[i];
+        spots.add(FlSpot(
+            i.toDouble(),
+            monthlyTotals[month]! /
+                100000)); // Scale down for better visualization
+      }
+    } else {
+      // Fallback if no data
+      spots = [const FlSpot(0, 0)];
+    }
+
     return LineChart(
       LineChartData(
         gridData: FlGridData(show: false),
@@ -1911,34 +1969,54 @@ class _AdminOtherAllUserCollectionsState
           leftTitles: AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
+          rightTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, meta) {
+                return Text('${value.toInt() * 100}K',
+                    style: const TextStyle(fontSize: 10, color: Colors.grey));
+              },
+              reservedSize: 40,
+            ),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) {
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-                if (value.toInt() < months.length) {
-                  return Text(months[value.toInt()]);
+                final index = value.toInt();
+                if (sortedMonths.isNotEmpty &&
+                    index >= 0 &&
+                    index < sortedMonths.length) {
+                  // Show abbreviated month name
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(sortedMonths[index].substring(0, 3),
+                        style: const TextStyle(fontSize: 10)),
+                  );
                 }
                 return const Text('');
               },
             ),
           ),
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
-        borderData: FlBorderData(show: false),
+        borderData: FlBorderData(
+            show: true,
+            border: Border.all(color: Colors.grey.withOpacity(0.2))),
+        minX: 0,
+        maxX: (spots.isEmpty ? 1 : spots.length - 1).toDouble(),
+        minY: 0,
         lineBarsData: [
           LineChartBarData(
-            spots: [
-              const FlSpot(0, 3),
-              const FlSpot(1, 1),
-              const FlSpot(2, 4),
-              const FlSpot(3, 2),
-              const FlSpot(4, 5),
-              const FlSpot(5, 3),
-            ],
+            spots: spots,
             isCurved: true,
             color: Colors.purple,
             barWidth: 3,
-            dotData: FlDotData(show: false),
+            dotData: FlDotData(show: true),
+            belowBarData: BarAreaData(
+              show: true,
+              color: Colors.purple.withOpacity(0.2),
+            ),
           ),
         ],
       ),
@@ -1946,31 +2024,138 @@ class _AdminOtherAllUserCollectionsState
   }
 
   Widget _buildPieChart() {
-    return PieChart(
-      PieChartData(
-        sectionsSpace: 0,
-        centerSpaceRadius: 40,
-        sections: [
-          PieChartSectionData(
-            color: Colors.blue,
-            value: 40,
-            title: '40%',
-            radius: 50,
+    // Categorize data for the pie chart based on amount ranges
+    int smallContributions = 0; // < 50K
+    int mediumContributions = 0; // 50K - 100K
+    int largeContributions = 0; // > 100K
+
+    if (collectionsOthers?.data != null) {
+      for (var item in collectionsOthers!.data) {
+        double amount = double.tryParse(item.amount) ?? 0.0;
+
+        if (amount < 50000) {
+          smallContributions++;
+        } else if (amount <= 100000) {
+          mediumContributions++;
+        } else {
+          largeContributions++;
+        }
+      }
+    }
+
+    // Calculate total contributions
+    int totalContributions =
+        smallContributions + mediumContributions + largeContributions;
+
+    // Calculate percentages, ensuring we don't divide by zero
+    double smallPercentage = totalContributions > 0
+        ? (smallContributions / totalContributions) * 100
+        : 0;
+    double mediumPercentage = totalContributions > 0
+        ? (mediumContributions / totalContributions) * 100
+        : 0;
+    double largePercentage = totalContributions > 0
+        ? (largeContributions / totalContributions) * 100
+        : 0;
+
+    return Column(
+      children: [
+        SizedBox(
+          height: 150,
+          child: PieChart(
+            PieChartData(
+              sectionsSpace: 2,
+              centerSpaceRadius: 40,
+              sections: [
+                if (smallPercentage > 0)
+                  PieChartSectionData(
+                    color: Colors.blue,
+                    value: smallPercentage,
+                    title: '${smallPercentage.toStringAsFixed(1)}%',
+                    radius: 50,
+                    titleStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                if (mediumPercentage > 0)
+                  PieChartSectionData(
+                    color: Colors.green,
+                    value: mediumPercentage,
+                    title: '${mediumPercentage.toStringAsFixed(1)}%',
+                    radius: 50,
+                    titleStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                if (largePercentage > 0)
+                  PieChartSectionData(
+                    color: Colors.orange,
+                    value: largePercentage,
+                    title: '${largePercentage.toStringAsFixed(1)}%',
+                    radius: 50,
+                    titleStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                // Show a placeholder if no data
+                if (totalContributions == 0)
+                  PieChartSectionData(
+                    color: Colors.grey.shade300,
+                    value: 100,
+                    title: 'No Data',
+                    radius: 50,
+                    titleStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54,
+                    ),
+                  ),
+              ],
+            ),
           ),
-          PieChartSectionData(
-            color: Colors.red,
-            value: 30,
-            title: '30%',
-            radius: 50,
+        ),
+        const SizedBox(height: 20),
+        // Legend
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildLegendItem('< 50,000 TZS', Colors.blue, smallContributions),
+              _buildLegendItem(
+                  '50,000 - 100,000 TZS', Colors.green, mediumContributions),
+              _buildLegendItem(
+                  '> 100,000 TZS', Colors.orange, largeContributions),
+            ],
           ),
-          PieChartSectionData(
-            color: Colors.green,
-            value: 30,
-            title: '30%',
-            radius: 50,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLegendItem(String label, Color color, int count) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '$label ($count)',
+          style: const TextStyle(fontSize: 10),
+        ),
+      ],
     );
   }
 

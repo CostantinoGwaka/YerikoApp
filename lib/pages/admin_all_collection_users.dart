@@ -32,7 +32,7 @@ class AdminAllUserCollections extends StatefulWidget {
 
 class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   // Add new state variables
-  bool isPremiumUser = false; // TODO: Connect to actual premium status
+  bool isPremiumUser = false;
   bool showPremiumDialog = false;
 
   CollectionResponse? collectionsMonthly;
@@ -86,7 +86,6 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   }
 
   Future<void> _checkPremiumStatus() async {
-    // TODO: Implement actual premium status check
     setState(() {
       isPremiumUser = false; // Default to false for testing
     });
@@ -3085,120 +3084,8 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
               ),
             ),
           ),
-
-          const SizedBox(height: 16),
-
-          // // Tab selector for Monthly vs Other collections
-          // Container(
-          //   padding: const EdgeInsets.all(4),
-          //   decoration: BoxDecoration(
-          //     color: Colors.white,
-          //     borderRadius: BorderRadius.circular(25),
-          //     boxShadow: [
-          //       BoxShadow(
-          //         color: Colors.grey.withValues(alpha: 0.1),
-          //         spreadRadius: 2,
-          //         blurRadius: 10,
-          //         offset: const Offset(0, 3),
-          //       ),
-          //     ],
-          //   ),
-          //   child: Row(
-          //     children: [
-          //       Expanded(
-          //         child: GestureDetector(
-          //           onTap: () {
-          //             setState(() {
-          //               selectedTabIndex = 0;
-          //             });
-          //           },
-          //           child: Container(
-          //             padding: const EdgeInsets.symmetric(vertical: 8),
-          //             decoration: BoxDecoration(
-          //               color: selectedTabIndex == 0 ? mainFontColor : Colors.transparent,
-          //               borderRadius: BorderRadius.circular(20),
-          //             ),
-          //             child: Center(
-          //               child: Text(
-          //                 "Michango ya Mwezi",
-          //                 style: TextStyle(
-          //                   color: selectedTabIndex == 0 ? Colors.white : Colors.grey[600],
-          //                   fontSize: 12,
-          //                   fontWeight: FontWeight.w600,
-          //                 ),
-          //               ),
-          //             ),
-          //           ),
-          //         ),
-          //       ),
-          //       Expanded(
-          //         child: GestureDetector(
-          //           onTap: () {
-          //             setState(() {
-          //               selectedTabIndex = 1;
-          //             });
-          //           },
-          //           child: Container(
-          //             padding: const EdgeInsets.symmetric(vertical: 8),
-          //             decoration: BoxDecoration(
-          //               color: selectedTabIndex == 1 ? mainFontColor : Colors.transparent,
-          //               borderRadius: BorderRadius.circular(20),
-          //             ),
-          //             child: Center(
-          //               child: Text(
-          //                 "Michango Mingineyo",
-          //                 style: TextStyle(
-          //                   color: selectedTabIndex == 1 ? Colors.white : Colors.grey[600],
-          //                   fontSize: 12,
-          //                   fontWeight: FontWeight.w600,
-          //                 ),
-          //               ),
-          //             ),
-          //           ),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-
-          // const SizedBox(height: 16),
-
-          // // Collections List based on selected tab
-          // Expanded(
-          //   child: selectedTabIndex == 0 ? _buildUserMonthlyCollections(size) : _buildUserOtherCollections(size),
-          // ),
         ],
       ),
     );
   }
-
-  // Widget _buildUserMonthlyCollections(Size size) {
-  //   if (collectionsMonthly == null || collectionsMonthly!.data.isEmpty) {
-  //     return _buildEmptyCard("Hakuna michango ya kila mwezi ya ${selectedUser?.userFullName ?? ''}.");
-  //   }
-
-  //   return ListView.separated(
-  //     itemCount: collectionsMonthly!.data.length,
-  //     separatorBuilder: (context, index) => const SizedBox(height: 12),
-  //     itemBuilder: (context, index) {
-  //       final item = collectionsMonthly!.data[index];
-  //       return _buildCollectionCard(item, size);
-  //     },
-  //   );
-  // }
-
-  // Widget _buildUserOtherCollections(Size size) {
-  //   if (collectionsOthers == null || collectionsOthers!.data.isEmpty) {
-  //     return _buildEmptyCard("Hakuna michango mingineyo ya ${selectedUser?.userFullName ?? ''}.");
-  //   }
-
-  //   return ListView.separated(
-  //     itemCount: collectionsOthers!.data.length,
-  //     separatorBuilder: (context, index) => const SizedBox(height: 12),
-  //     itemBuilder: (context, index) {
-  //       final item = collectionsOthers!.data[index];
-  //       return _buildCollectionCard(item, size);
-  //     },
-  //   );
-  // }
 }

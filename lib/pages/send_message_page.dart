@@ -460,9 +460,16 @@ class _SendMessagePageState extends State<SendMessagePage> {
                               counterStyle: TextStyle(color: Colors.grey[600]),
                             ),
                             onChanged: (value) {
-                              if (value.length <= 250) {
-                                setState(() => _messageController.text = value);
-                              }
+                              setState(() {
+                                if (value.length > 250) {
+                                  _messageController.text =
+                                      value.substring(0, 250);
+                                  _messageController.selection =
+                                      TextSelection.fromPosition(
+                                    TextPosition(offset: 250),
+                                  );
+                                }
+                              });
                             },
                           ),
                         ],

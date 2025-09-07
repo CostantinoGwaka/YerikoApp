@@ -61,19 +61,26 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? ''),
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id']?.toString() ?? ''),
       phone: json['phone']?.toString(),
       userFullName: json['userFullName']?.toString(),
       yearRegistered: json['yearRegistered']?.toString(),
       createdAt: json['createdAt']?.toString(),
       userName: json['userName']?.toString(),
-      location: json['location']?.toString(), // Optional field, not used in the current context
-      gender: json['gender']?.toString(), // Optional field, not used in the current context
-      dobdate: json['dobdate']?.toString(), // Optional field, not used in the current context
+      location: json['location']
+          ?.toString(), // Optional field, not used in the current context
+      gender: json['gender']
+          ?.toString(), // Optional field, not used in the current context
+      dobdate: json['dobdate']
+          ?.toString(), // Optional field, not used in the current context
       martialstatus: json['martialstatus']?.toString(), //
       role: json['role']?.toString(),
-      jumuiya_id: json['jumuiya_id']?.toString(), // Optional field, not used in the current context
-      jina_jumuiya: json['jina_jumuiya']?.toString(), // Optional field, not used in the current context
+      jumuiya_id: json['jumuiya_id']
+          ?.toString(), // Optional field, not used in the current context
+      jina_jumuiya: json['jina_jumuiya']
+          ?.toString(), // Optional field, not used in the current context
     );
   }
 
@@ -87,16 +94,20 @@ class User {
         'location': location, // Optional field, not used in the current context
         'gender': gender,
         'dobdate': dobdate, // Optional field, not used in the current context
-        'martialstatus': martialstatus, // Optional field, not used in the current context
+        'martialstatus':
+            martialstatus, // Optional field, not used in the current context
         'role': role,
-        'jumuiya_id': jumuiya_id, // Optional field, not used in the current context
-        'jina_jumuiya': jina_jumuiya, // Optional field, not used in the current context
+        'jumuiya_id':
+            jumuiya_id, // Optional field, not used in the current context
+        'jina_jumuiya':
+            jina_jumuiya, // Optional field, not used in the current context
       };
 
   // ✅ This is the fix
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is User && runtimeType == other.runtimeType && id == other.id;
+      identical(this, other) ||
+      other is User && runtimeType == other.runtimeType && id == other.id;
 
   @override
   int get hashCode => id.hashCode;

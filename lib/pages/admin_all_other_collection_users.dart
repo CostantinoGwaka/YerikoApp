@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -373,6 +375,7 @@ class _AdminOtherAllUserCollectionsState
         color: mainFontColor,
         child: getBody(),
       ),
+      floatingActionButton: _buildPremiumFeaturesFAB(),
     );
   }
 
@@ -953,9 +956,42 @@ class _AdminOtherAllUserCollectionsState
               size: 16,
               color: Colors.grey[400],
             ),
+
+            // Premium badge (if applicable)
+            if (true) ...[
+              _buildContributorBadge(double.parse(item.amount)),
+            ],
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildContributorBadge(double amount) {
+    IconData icon;
+    Color color;
+
+    if (amount >= 1000000) {
+      icon = Icons.diamond;
+      color = Colors.blue;
+    } else if (amount >= 500000) {
+      icon = Icons.star;
+      color = Colors.amber;
+    } else if (amount >= 100000) {
+      icon = Icons.workspace_premium;
+      color = Colors.brown;
+    } else {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      margin: const EdgeInsets.only(right: 8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Icon(icon, size: 16, color: color),
     );
   }
 
@@ -1356,5 +1392,156 @@ class _AdminOtherAllUserCollectionsState
         ],
       ),
     );
+  }
+
+  Widget _buildPremiumFeaturesFAB() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (true) ...[
+          FloatingActionButton.small(
+            heroTag: 'export_pdf',
+            onPressed: () => _exportToPDF(),
+            backgroundColor: Colors.blue,
+            child: const Icon(Icons.picture_as_pdf),
+          ),
+          const SizedBox(height: 8),
+          FloatingActionButton.small(
+            heroTag: 'export_excel',
+            onPressed: () => _exportToExcel(),
+            backgroundColor: Colors.green,
+            child: const Icon(Icons.table_chart),
+          ),
+          const SizedBox(height: 8),
+          FloatingActionButton.small(
+            heroTag: 'detailed_report',
+            onPressed: () => _showDetailedReport(),
+            backgroundColor: Colors.purple,
+            child: const Icon(Icons.analytics),
+          ),
+          const SizedBox(height: 16),
+        ],
+        if (!(false)) ...[
+          FloatingActionButton.small(
+            heroTag: 'upgrade',
+            onPressed: () => _showPremiumDialog(),
+            backgroundColor: Colors.amber,
+            child: const Icon(Icons.star),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ],
+    );
+  }
+
+  void _showPremiumDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.star, color: Colors.amber[600]),
+            const SizedBox(width: 8),
+            const Text('Huduma za Ziada'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildPremiumFeature(
+              Icons.analytics,
+              'Ripoti za Kina',
+              'Pata ufahamu kamili kuhusu michango',
+            ),
+            _buildPremiumFeature(
+              Icons.picture_as_pdf,
+              'Hamisha kwenda PDF',
+              'Pakua ripoti za kitaalamu za PDF',
+            ),
+            _buildPremiumFeature(
+              Icons.table_chart,
+              'Hamisha kwenda Excel',
+              'Changanuza data katika majedwali',
+            ),
+            _buildPremiumFeature(
+              Icons.workspace_premium,
+              'Beji za Wachangiaji',
+              'Tambua wachangiaji wakuu',
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Later'),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.star),
+            label: const Text('Upgrade Now'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber,
+              foregroundColor: Colors.black87,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              // Navigate to subscription page
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPremiumFeature(IconData icon, String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.amber.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 20, color: Colors.amber[700]),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _exportToPDF() async {
+    // Implement PDF export
+  }
+
+  Future<void> _exportToExcel() async {
+    // Implement Excel export
+  }
+
+  Future<void> _showDetailedReport() async {
+    // Show detailed analytics
   }
 }

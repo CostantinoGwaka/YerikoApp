@@ -13,6 +13,7 @@ import 'package:jumuiya_yangu/pages/supports_pages/collection_table_against_mont
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:excel/excel.dart' hide Border;
 import 'package:path_provider/path_provider.dart';
@@ -1532,53 +1533,211 @@ class _AdminOtherAllUserCollectionsState
       setState(() => isLoading = true);
       final pdf = pw.Document();
 
-      // Add header
-      pdf.addPage(
-        pw.Page(
-          build: (context) {
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Header(
-                  level: 0,
-                  child: pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text('Ripoti ya Michango',
-                          style: pw.TextStyle(fontSize: 24)),
-                      pw.Text(DateFormat('dd/MM/yyyy').format(DateTime.now())),
-                    ],
-                  ),
-                ),
-                pw.SizedBox(height: 20),
-                pw.Table.fromTextArray(
-                  headers: ['Mwanajumuiya', 'Kiasi', 'Aina', 'Mwezi', 'Tarehe'],
-                  data: collectionsOthers?.data
-                          .map((item) => [
-                                item.user.userFullName,
-                                'TZS ${NumberFormat("#,##0").format(int.parse(item.amount))}',
-                                item.collectionType.collectionName,
-                                item.monthly,
-                                item.registeredDate,
-                              ])
-                          .toList() ??
-                      [],
-                ),
-              ],
-            );
-          },
-        ),
-      );
+      // Create data array
+      final tableData = collectionsOthers?.data.map((item) {
+            return [
+              item.user.userFullName ?? '',
+              'TZS ${NumberFormat("#,##0").format(int.parse(item.amount))}',
+              item.collectionType.collectionName,
+              item.monthly,
+              item.registeredDate,
+            ];
+          }).toList() ??
+          [];
 
-      // Save and share
+      // Debug: Print the data length
+
+      // Define rows per page (adjust based on your needs)
+      const int rowsPerPage = 20; // Reduced due to extra column
+
+      // Calculate number of pages needed
+      int totalPages = (tableData.length / rowsPerPage).ceil();
+      if (totalPages == 0) totalPages = 1; // At least one page
+
+      // Calculate total amount for summary
+      int totalAmount = 0;
+      collectionsOthers?.data.forEach((item) {
+        try {
+          totalAmount += int.parse(item.amount);
+        } catch (e) {
+          // print('Error parsing amount: ${item.amount}');
+        }
+      });
+
+      // Create pages with data
+      for (int pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+        final startIndex = pageIndex * rowsPerPage;
+        final endIndex = (startIndex + rowsPerPage > tableData.length)
+            ? tableData.length
+            : startIndex + rowsPerPage;
+
+        final pageData = tableData.sublist(startIndex, endIndex);
+
+        pdf.addPage(
+          pw.Page(
+            orientation: pw.PageOrientation.landscape, // Better for 5 columns
+            theme: pw.ThemeData.withFont(
+              base: pw.Font.courier(),
+              bold: pw.Font.courierBold(),
+            ),
+            build: (context) {
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // Header (show on every page)
+                  pw.Header(
+                    level: 0,
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Ripoti ya Michango Mengineyo',
+                            style: pw.TextStyle(
+                                fontSize: 20, font: pw.Font.courierBold())),
+                        pw.Text(
+                          DateFormat('dd/MM/yyyy').format(DateTime.now()),
+                          style: const pw.TextStyle(
+                            color: PdfColors.black,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Page info
+                  pw.Text(
+                    'Ukurasa ${pageIndex + 1} wa $totalPages',
+                    style: pw.TextStyle(fontSize: 10),
+                  ),
+                  pw.SizedBox(height: 8),
+
+                  // Table
+                  pw.Expanded(
+                    child: pw.Table(
+                      border: pw.TableBorder.all(),
+                      columnWidths: {
+                        0: const pw.FlexColumnWidth(2.5), // Name column
+                        1: const pw.FlexColumnWidth(1.5), // Amount column
+                        2: const pw.FlexColumnWidth(2), // Type column
+                        3: const pw.FlexColumnWidth(1.5), // Month column
+                        4: const pw.FlexColumnWidth(1.5), // Date column
+                      },
+                      children: [
+                        // Header row (show on every page)
+                        pw.TableRow(
+                          decoration:
+                              pw.BoxDecoration(color: PdfColors.grey300),
+                          children: [
+                            'Mwanajumuiya',
+                            'Kiasi',
+                            'Aina',
+                            'Mwezi',
+                            'Tarehe'
+                          ]
+                              .map((header) => pw.Container(
+                                    padding: const pw.EdgeInsets.all(4),
+                                    child: pw.Text(
+                                      header,
+                                      style: pw.TextStyle(
+                                        font: pw.Font.courierBold(),
+                                        fontSize: 8,
+                                      ),
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
+                        // Data rows for this page
+                        ...pageData.map((row) => pw.TableRow(
+                              children: row
+                                  .map((cell) => pw.Container(
+                                        padding: const pw.EdgeInsets.all(4),
+                                        child: pw.Text(
+                                          cell.toString(),
+                                          style: pw.TextStyle(fontSize: 7),
+                                        ),
+                                      ))
+                                  .toList(),
+                            )),
+                      ],
+                    ),
+                  ),
+
+                  // Summary (show only on last page)
+                  if (pageIndex == totalPages - 1) ...[
+                    pw.SizedBox(height: 10),
+                    pw.Divider(),
+                    pw.Text(
+                      'Jumla ya Michango: TZS ${NumberFormat("#,##0").format(totalAmount)}',
+                      style: pw.TextStyle(
+                        font: pw.Font.courierBold(),
+                        fontSize: 10,
+                      ),
+                    ),
+                    pw.Text(
+                      'Jumla ya Wanajumuiya: ${tableData.length}',
+                      style: pw.TextStyle(
+                        font: pw.Font.courierBold(),
+                        fontSize: 9,
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
+          ),
+        );
+      }
+
+      // Handle case where there's no data
+      if (tableData.isEmpty) {
+        pdf.addPage(
+          pw.Page(
+            theme: pw.ThemeData.withFont(
+              base: pw.Font.courier(),
+              bold: pw.Font.courierBold(),
+            ),
+            build: (context) {
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Header(
+                    level: 0,
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Ripoti ya Michango Mengineyo',
+                            style: pw.TextStyle(
+                                fontSize: 24, font: pw.Font.courierBold())),
+                        pw.Text(
+                          DateFormat('dd/MM/yyyy').format(DateTime.now()),
+                          style: const pw.TextStyle(
+                            color: PdfColors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  pw.SizedBox(height: 20),
+                  pw.Text('Hakuna data ya kuonyesha.'),
+                ],
+              );
+            },
+          ),
+        );
+      }
+
+      // Save the PDF file
       final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/michango_ripoti.pdf');
+      final fileName =
+          'Ripoti_Mengineyo_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.pdf';
+      final file = File('${directory.path}/$fileName');
       await file.writeAsBytes(await pdf.save());
 
-      await Share.share(
-        'Ripoti ya Michango',
-        subject:
-            'Ripoti_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.pdf',
+      // Share the actual PDF file
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'Ripoti ya Michango Mengineyo',
+        subject: fileName,
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

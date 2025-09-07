@@ -1997,106 +1997,191 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       setState(() => isLoading = true);
       final pdf = pw.Document();
 
-      // Add header
-      pdf.addPage(
-        pw.Page(
-          // Use the built-in Courier font which has Unicode support
-          theme: pw.ThemeData.withFont(
-            base: pw.Font.courier(),
-            bold: pw.Font.courierBold(),
-          ),
-          build: (context) {
-            // Print for debugging
-            // print(
-            //     'Collections data length: ${collectionsMonthly?.data.length}');
+      // Create data array
+      final tableData = collectionsMonthly?.data.map((item) {
+            return [
+              item.user.userFullName ?? '',
+              'TZS ${NumberFormat("#,##0").format(int.parse(item.amount))}',
+              item.monthly,
+              item.registeredDate,
+            ];
+          }).toList() ??
+          [];
 
-            // Create data array
-            final tableData = collectionsMonthly?.data.map((item) {
-                  return [
-                    item.user.userFullName ?? '',
-                    'TZS ${NumberFormat("#,##0").format(int.parse(item.amount))}',
-                    item.monthly,
-                    item.registeredDate,
-                  ];
-                }).toList() ??
-                [];
+      // Debug: Print the data length
 
-            // Print table data for debugging
+      // Define rows per page (adjust based on your needs)
+      const int rowsPerPage = 25;
 
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Header(
-                  level: 0,
-                  child: pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text('Ripoti ya Michango 2',
-                          style: pw.TextStyle(
-                              fontSize: 24, font: pw.Font.courierBold())),
-                      pw.Text(
-                        DateFormat('dd/MM/yyyy').format(DateTime.now()),
-                        style: const pw.TextStyle(
-                          color: PdfColors.black,
+      // Calculate number of pages needed
+      int totalPages = (tableData.length / rowsPerPage).ceil();
+      if (totalPages == 0) totalPages = 1; // At least one page
+
+      // Create pages with data
+      for (int pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+        final startIndex = pageIndex * rowsPerPage;
+        final endIndex = (startIndex + rowsPerPage > tableData.length)
+            ? tableData.length
+            : startIndex + rowsPerPage;
+
+        final pageData = tableData.sublist(startIndex, endIndex);
+
+        pdf.addPage(
+          pw.Page(
+            theme: pw.ThemeData.withFont(
+              base: pw.Font.courier(),
+              bold: pw.Font.courierBold(),
+            ),
+            build: (context) {
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // Header (show on every page)
+                  pw.Header(
+                    level: 0,
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Ripoti ya Michango',
+                            style: pw.TextStyle(
+                                fontSize: 24, font: pw.Font.courierBold())),
+                        pw.Text(
+                          DateFormat('dd/MM/yyyy').format(DateTime.now()),
+                          style: const pw.TextStyle(
+                            color: PdfColors.black,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                pw.SizedBox(height: 20),
 
-                // Ensure table is created with valid data
-                if (tableData.isNotEmpty)
-                  pw.Table(
-                    border: pw.TableBorder.all(),
-                    children: [
-                      // Header row
-                      pw.TableRow(
-                        decoration: pw.BoxDecoration(color: PdfColors.grey300),
-                        children: ['Mwanajumuiya', 'Kiasi', 'Mwezi', 'Tarehe']
-                            .map((header) => pw.Container(
-                                  padding: const pw.EdgeInsets.all(8),
-                                  child: pw.Text(
-                                    header,
-                                    style: pw.TextStyle(
-                                      font: pw.Font.courierBold(),
+                  // Page info
+                  pw.Text(
+                    'Ukurasa ${pageIndex + 1} wa $totalPages',
+                    style: pw.TextStyle(fontSize: 12),
+                  ),
+                  pw.SizedBox(height: 10),
+
+                  // Table
+                  pw.Expanded(
+                    child: pw.Table(
+                      border: pw.TableBorder.all(),
+                      columnWidths: {
+                        0: const pw.FlexColumnWidth(3), // Name column wider
+                        1: const pw.FlexColumnWidth(2), // Amount column
+                        2: const pw.FlexColumnWidth(2), // Month column
+                        3: const pw.FlexColumnWidth(2), // Date column
+                      },
+                      children: [
+                        // Header row (show on every page)
+                        pw.TableRow(
+                          decoration:
+                              pw.BoxDecoration(color: PdfColors.grey300),
+                          children: ['Mwanajumuiya', 'Kiasi', 'Mwezi', 'Tarehe']
+                              .map((header) => pw.Container(
+                                    padding: const pw.EdgeInsets.all(6),
+                                    child: pw.Text(
+                                      header,
+                                      style: pw.TextStyle(
+                                        font: pw.Font.courierBold(),
+                                        fontSize: 10,
+                                      ),
                                     ),
-                                  ),
-                                ))
-                            .toList(),
-                      ),
-                      // Data rows
-                      ...tableData.map((row) => pw.TableRow(
-                            children: row
-                                .map((cell) => pw.Container(
-                                      padding: const pw.EdgeInsets.all(8),
-                                      child: pw.Text(cell),
-                                    ))
-                                .toList(),
-                          ))
-                    ],
+                                  ))
+                              .toList(),
+                        ),
+                        // Data rows for this page
+                        ...pageData.map((row) => pw.TableRow(
+                              children: row
+                                  .map((cell) => pw.Container(
+                                        padding: const pw.EdgeInsets.all(6),
+                                        child: pw.Text(
+                                          cell.toString(),
+                                          style: pw.TextStyle(fontSize: 9),
+                                        ),
+                                      ))
+                                  .toList(),
+                            )),
+                      ],
+                    ),
                   ),
 
-                // Add summary at bottom
-                pw.SizedBox(height: 20),
-                pw.Text(
-                    'Jumla ya Michango: TZS ${NumberFormat("#,##0").format(totalMonthlyCollections)}',
-                    style: pw.TextStyle(font: pw.Font.courierBold())),
-              ],
-            );
-          },
-        ),
-      );
+                  // Summary (show only on last page)
+                  if (pageIndex == totalPages - 1) ...[
+                    pw.SizedBox(height: 15),
+                    pw.Divider(),
+                    pw.Text(
+                      'Jumla ya Michango: TZS ${NumberFormat("#,##0").format(totalMonthlyCollections)}',
+                      style: pw.TextStyle(
+                        font: pw.Font.courierBold(),
+                        fontSize: 12,
+                      ),
+                    ),
+                    pw.Text(
+                      'Jumla ya Wanajumuiya: ${tableData.length}',
+                      style: pw.TextStyle(
+                        font: pw.Font.courierBold(),
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
+          ),
+        );
+      }
 
-      // Save and share
+      // Handle case where there's no data
+      if (tableData.isEmpty) {
+        pdf.addPage(
+          pw.Page(
+            theme: pw.ThemeData.withFont(
+              base: pw.Font.courier(),
+              bold: pw.Font.courierBold(),
+            ),
+            build: (context) {
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Header(
+                    level: 0,
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Ripoti ya Michango',
+                            style: pw.TextStyle(
+                                fontSize: 24, font: pw.Font.courierBold())),
+                        pw.Text(
+                          DateFormat('dd/MM/yyyy').format(DateTime.now()),
+                          style: const pw.TextStyle(
+                            color: PdfColors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  pw.SizedBox(height: 20),
+                  pw.Text('Hakuna data ya kuonyesha.'),
+                ],
+              );
+            },
+          ),
+        );
+      }
+
+      // Save the PDF file
       final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/michango_ripoti.pdf');
+      final fileName =
+          'Ripoti_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.pdf';
+      final file = File('${directory.path}/$fileName');
       await file.writeAsBytes(await pdf.save());
 
-      await Share.share(
-        'Ripoti ya Michango',
-        subject:
-            'Ripoti_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.pdf',
+      // Share the actual PDF file
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'Ripoti ya Michango',
+        subject: fileName,
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -2110,33 +2195,133 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   Future<void> _exportToExcel() async {
     try {
       setState(() => isLoading = true);
+
+      // Create Excel workbook
       var excel = Excel.createExcel();
+
+      // Remove default sheet and create custom one
+      excel.delete('Sheet1');
       var sheet = excel['Michango'];
 
-      // Add headers
-      sheet.appendRow(['Mwanajumuiya', 'Kiasi', 'Mwezi', 'Tarehe ya Usajili']);
+      // Style for headers
+      var headerStyle = CellStyle(
+        bold: true,
+        backgroundColorHex: '#D3D3D3',
+        horizontalAlign: HorizontalAlign.Center,
+      );
 
-      // Add data
+      // Add headers with styling
+      var headers = [
+        'Mwanajumuiya',
+        'Kiasi (TZS)',
+        'Mwezi',
+        'Tarehe ya Usajili'
+      ];
+      for (int i = 0; i < headers.length; i++) {
+        var cell =
+            sheet.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0));
+        cell.value = headers[i];
+        cell.cellStyle = headerStyle;
+      }
+
+      // Add data rows
+      int rowIndex = 1;
       collectionsMonthly?.data.forEach((item) {
-        sheet.appendRow([
-          item.user.userFullName,
-          item.amount,
-          item.monthly,
-          item.registeredDate,
-        ]);
+        // Name
+        var nameCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+        nameCell.value = item.user.userFullName ?? '';
+
+        // Amount (formatted as number)
+        var amountCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+        try {
+          amountCell.value = int.parse(item.amount);
+        } catch (e) {
+          amountCell.value = item.amount; // Keep as string if parsing fails
+        }
+
+        // Month
+        var monthCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: rowIndex));
+        monthCell.value = item.monthly;
+
+        // Registration Date
+        var dateCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: rowIndex));
+        dateCell.value = item.registeredDate;
+
+        rowIndex++;
       });
 
-      // Save and share
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File(
-          '${directory.path}/michango_${DateTime.now().millisecondsSinceEpoch}.xlsx');
-      await file.writeAsBytes(excel.encode()!);
+      // Add summary row
+      if (collectionsMonthly?.data.isNotEmpty == true) {
+        rowIndex++; // Skip a row
 
-      await Share.share(
-        'Ripoti ya Michango (Excel)',
-        subject:
-            'Ripoti_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.xlsx',
-      );
+        // Summary label
+        var summaryLabelCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+        summaryLabelCell.value = 'JUMLA';
+        summaryLabelCell.cellStyle = CellStyle(bold: true);
+
+        // Summary amount
+        var summaryAmountCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+        summaryAmountCell.value = totalMonthlyCollections;
+        summaryAmountCell.cellStyle = CellStyle(bold: true);
+
+        // Total count
+        rowIndex++;
+        var countLabelCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+        countLabelCell.value = 'Idadi ya Wanajumuiya';
+        countLabelCell.cellStyle = CellStyle(bold: true);
+
+        var countCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+        countCell.value = collectionsMonthly?.data.length ?? 0;
+        countCell.cellStyle = CellStyle(bold: true);
+      }
+
+      // Auto-fit columns (approximate)
+      sheet.setColWidth(0, 25); // Name column
+      sheet.setColWidth(1, 15); // Amount column
+      sheet.setColWidth(2, 12); // Month column
+      sheet.setColWidth(3, 15); // Date column
+
+      // Save the Excel file
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName =
+          'Ripoti_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.xlsx';
+      final file = File('${directory.path}/$fileName');
+
+      // Encode and save
+      var excelBytes = excel.encode();
+      if (excelBytes != null) {
+        await file.writeAsBytes(excelBytes);
+
+        // // Debug: Check if file was created
+        // print('Excel file created: ${file.path}');
+        // print('File exists: ${await file.exists()}');
+        // print('File size: ${await file.length()} bytes');
+
+        // Share the actual Excel file
+        await Share.shareXFiles(
+          [XFile(file.path)],
+          text: 'Ripoti ya Michango (Excel)',
+          subject: fileName,
+        );
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Excel file imesajiliwa na kushirikiwa!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        throw Exception('Failed to encode Excel file');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Hitilafu: $e')),

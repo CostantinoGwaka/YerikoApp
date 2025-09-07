@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +24,10 @@ class AdminAllUserCollections extends StatefulWidget {
 }
 
 class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
+  // Add new state variables
+  bool isPremiumUser = false; // TODO: Connect to actual premium status
+  bool showPremiumDialog = false;
+
   CollectionResponse? collectionsMonthly;
   CollectionResponse? collectionsOthers;
   UserMonthlyCollectionResponse? userMonthlyCollectionResponse;
@@ -69,6 +75,14 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   void initState() {
     super.initState();
     _loadInitialData();
+    _checkPremiumStatus();
+  }
+
+  Future<void> _checkPremiumStatus() async {
+    // TODO: Implement actual premium status check
+    setState(() {
+      isPremiumUser = false; // Default to false for testing
+    });
   }
 
   Future<void> _loadInitialData() async {
@@ -504,6 +518,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         color: mainFontColor,
         child: getBody(),
       ),
+      floatingActionButton: _buildPremiumFeaturesFAB(),
     );
   }
 
@@ -1317,6 +1332,9 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   }
 
   Widget _buildCollectionCard(dynamic item, Size size) {
+    bool isTopContributor =
+        double.parse(item.amount) >= 100000; // Example threshold
+
     return GestureDetector(
       onTap: () => _showCollectionDetails(context, item),
       child: Container(
@@ -1358,13 +1376,44 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    item.user.userFullName ?? '',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        item.user.userFullName ?? '',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      if (isPremiumUser && isTopContributor) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.star,
+                                  color: Colors.amber[600], size: 14),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Top Contributor',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber[800],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -1449,361 +1498,515 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
-          ),
-          child: DraggableScrollableSheet(
-            expand: false,
-            initialChildSize: 0.6,
-            maxChildSize: 0.95,
-            minChildSize: 0.4,
-            builder: (_, controller) => Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Handle bar
-                  Center(
-                    child: Container(
-                      height: 4,
-                      width: 40,
-                      margin: const EdgeInsets.only(bottom: 24),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(2),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+            ),
+            child: DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.6,
+              maxChildSize: 0.95,
+              minChildSize: 0.4,
+              builder: (_, controller) => Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Handle bar
+                    Center(
+                      child: Container(
+                        height: 4,
+                        width: 40,
+                        margin: const EdgeInsets.only(bottom: 24),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                     ),
-                  ),
 
-                  // Header with actions
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: mainFontColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(15),
+                    // Header with actions
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: mainFontColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Icon(Icons.receipt_long,
+                              color: mainFontColor, size: 24),
                         ),
-                        child: Icon(Icons.receipt_long,
-                            color: mainFontColor, size: 24),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Maelezo ya Mchango",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              Text(
+                                "Taarifa kamili za mchango",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (userData!.user.role == "ADMIN") ...[
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.blue.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.edit,
+                                  color: Colors.blue, size: 20),
+                              tooltip: 'Hariri',
+                              onPressed: () {
+                                Navigator.pop(context);
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (_) => Container(
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(25)),
+                                    ),
+                                    child: AddMonthCollectionUserAdmin(
+                                      rootContext: rootContext,
+                                      initialData: dataItem,
+                                      onSubmit: (data) {
+                                        Navigator.of(context).pop();
+                                        _reloadData();
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.delete,
+                                  color: Colors.red, size: 20),
+                              tooltip: 'Futa',
+                              onPressed: () async {
+                                final confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    title: Row(
+                                      children: [
+                                        Icon(Icons.warning,
+                                            color: Colors.orange[600]),
+                                        const SizedBox(width: 8),
+                                        const Text('Futa Mchango'),
+                                      ],
+                                    ),
+                                    content: const Text(
+                                        'Una uhakika unataka kufuta mchango huu?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(ctx).pop(false),
+                                        child: Text('Hapana',
+                                            style: TextStyle(
+                                                color: Colors.grey[600])),
+                                      ),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        onPressed: () =>
+                                            Navigator.of(ctx).pop(true),
+                                        child: const Text('Ndiyo'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                if (confirm == true) {
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.of(context)
+                                      .pop(); // Close the modal first
+                                  deleteTimeTable(dataItem.id);
+                                }
+                              },
+                            ),
+                          ),
+                        ]
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Content
+                    Expanded(
+                      child: SingleChildScrollView(
+                        controller: controller,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              "Maelezo ya Mchango",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                            // User info card
+                            Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8FAFF),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                    color:
+                                        mainFontColor.withValues(alpha: 0.1)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 24,
+                                        backgroundColor: mainFontColor
+                                            .withValues(alpha: 0.1),
+                                        child: Text(
+                                          (user.userFullName?.isNotEmpty ??
+                                                  false)
+                                              ? user.userFullName![0]
+                                                  .toUpperCase()
+                                              : '?',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: mainFontColor,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              user.userFullName ?? '',
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                            Text(
+                                              user.role ?? '',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[600],
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  _buildDetailRow(
+                                      Icons.phone, "Simu", user.phone ?? ''),
+                                  _buildDetailRow(Icons.account_circle,
+                                      "Jina la Mtumiaji", user.userName ?? ''),
+                                ],
                               ),
                             ),
-                            Text(
-                              "Taarifa kamili za mchango",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
+
+                            const SizedBox(height: 20),
+
+                            // Amount card
+                            Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.green[50]!,
+                                    Colors.green[100]!,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                    color: Colors.green.withValues(alpha: 0.2)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.green
+                                              .withValues(alpha: 0.2),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Icon(Icons.payments,
+                                            color: Colors.green[700], size: 20),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Text(
+                                        "Kiasi cha Mchango",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(dataItem.amount))}",
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green[700],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // Details card
+                            Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                    color: Colors.grey.withValues(alpha: 0.2)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue
+                                              .withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Icon(Icons.info_outline,
+                                            color: Colors.blue[700], size: 20),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Text(
+                                        "Maelezo ya Ziada",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  _buildDetailRow(Icons.calendar_month, "Mwezi",
+                                      dataItem.monthly),
+                                  _buildDetailRow(
+                                      Icons.calendar_today,
+                                      "Tarehe ya Usajili",
+                                      dataItem.registeredDate),
+                                  _buildDetailRow(Icons.person_outline,
+                                      "Aliyesajili", dataItem.registeredBy),
+                                  _buildDetailRow(Icons.date_range,
+                                      "Mwaka wa Kanisa", year.churchYear),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                      if (userData!.user.role == "ADMIN") ...[
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.edit,
-                                color: Colors.blue, size: 20),
-                            tooltip: 'Hariri',
-                            onPressed: () {
-                              Navigator.pop(context);
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (_) => Container(
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(25)),
-                                  ),
-                                  child: AddMonthCollectionUserAdmin(
-                                    rootContext: rootContext,
-                                    initialData: dataItem,
-                                    onSubmit: (data) {
-                                      Navigator.of(context).pop();
-                                      _reloadData();
-                                    },
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.red.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.delete,
-                                color: Colors.red, size: 20),
-                            tooltip: 'Futa',
-                            onPressed: () async {
-                              final confirm = await showDialog<bool>(
-                                context: context,
-                                builder: (ctx) => AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  title: Row(
-                                    children: [
-                                      Icon(Icons.warning,
-                                          color: Colors.orange[600]),
-                                      const SizedBox(width: 8),
-                                      const Text('Futa Mchango'),
-                                    ],
-                                  ),
-                                  content: const Text(
-                                      'Una uhakika unataka kufuta mchango huu?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(ctx).pop(false),
-                                      child: Text('Hapana',
-                                          style: TextStyle(
-                                              color: Colors.grey[600])),
-                                    ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      onPressed: () =>
-                                          Navigator.of(ctx).pop(true),
-                                      child: const Text('Ndiyo'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                              if (confirm == true) {
-                                // ignore: use_build_context_synchronously
-                                Navigator.of(context)
-                                    .pop(); // Close the modal first
-                                deleteTimeTable(dataItem.id);
-                              }
-                            },
-                          ),
-                        ),
-                      ]
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Content
-                  Expanded(
-                    child: SingleChildScrollView(
-                      controller: controller,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // User info card
-                          Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF8FAFF),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                  color: mainFontColor.withValues(alpha: 0.1)),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 24,
-                                      backgroundColor:
-                                          mainFontColor.withValues(alpha: 0.1),
-                                      child: Text(
-                                        (user.userFullName?.isNotEmpty ?? false)
-                                            ? user.userFullName![0]
-                                                .toUpperCase()
-                                            : '?',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: mainFontColor,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            user.userFullName ?? '',
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                          Text(
-                                            user.role ?? '',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey[600],
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                _buildDetailRow(
-                                    Icons.phone, "Simu", user.phone ?? ''),
-                                _buildDetailRow(Icons.account_circle,
-                                    "Jina la Mtumiaji", user.userName ?? ''),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // Amount card
-                          Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Colors.green[50]!,
-                                  Colors.green[100]!,
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                  color: Colors.green.withValues(alpha: 0.2)),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            Colors.green.withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Icon(Icons.payments,
-                                          color: Colors.green[700], size: 20),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    const Text(
-                                      "Kiasi cha Mchango",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  "TZS ${NumberFormat("#,##0", "en_US").format(int.parse(dataItem.amount))}",
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // Details card
-                          Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                  color: Colors.grey.withValues(alpha: 0.2)),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            Colors.blue.withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Icon(Icons.info_outline,
-                                          color: Colors.blue[700], size: 20),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    const Text(
-                                      "Maelezo ya Ziada",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                _buildDetailRow(Icons.calendar_month, "Mwezi",
-                                    dataItem.monthly),
-                                _buildDetailRow(
-                                    Icons.calendar_today,
-                                    "Tarehe ya Usajili",
-                                    dataItem.registeredDate),
-                                _buildDetailRow(Icons.person_outline,
-                                    "Aliyesajili", dataItem.registeredBy),
-                                _buildDetailRow(Icons.date_range,
-                                    "Mwaka wa Kanisa", year.churchYear),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ),
-        );
+            ));
       },
     );
+  }
+
+  Widget _buildPremiumFeaturesFAB() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (true) ...[
+          FloatingActionButton.small(
+            heroTag: 'export_pdf',
+            onPressed: () => _exportToPDF(),
+            backgroundColor: Colors.blue,
+            child: const Icon(Icons.picture_as_pdf),
+          ),
+          const SizedBox(height: 8),
+          FloatingActionButton.small(
+            heroTag: 'export_excel',
+            onPressed: () => _exportToExcel(),
+            backgroundColor: Colors.green,
+            child: const Icon(Icons.table_chart),
+          ),
+          const SizedBox(height: 8),
+          FloatingActionButton.small(
+            heroTag: 'detailed_report',
+            onPressed: () => _showDetailedReport(),
+            backgroundColor: Colors.purple,
+            child: const Icon(Icons.analytics),
+          ),
+          const SizedBox(height: 16),
+        ],
+        if (!(false)) ...[
+          FloatingActionButton.small(
+            heroTag: 'upgrade',
+            onPressed: () => _showPremiumDialog(),
+            backgroundColor: Colors.amber,
+            child: const Icon(Icons.star),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ],
+    );
+  }
+
+  void _showPremiumDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.star, color: Colors.amber[600]),
+            const SizedBox(width: 8),
+            const Text('Huduma za Ziada'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildPremiumFeature(
+              Icons.analytics,
+              'Ripoti za Kina',
+              'Pata ufahamu kamili kuhusu michango',
+            ),
+            _buildPremiumFeature(
+              Icons.picture_as_pdf,
+              'Hamisha kwenda PDF',
+              'Pakua ripoti za kitaalamu za PDF',
+            ),
+            _buildPremiumFeature(
+              Icons.table_chart,
+              'Hamisha kwenda Excel',
+              'Changanuza data katika majedwali',
+            ),
+            _buildPremiumFeature(
+              Icons.workspace_premium,
+              'Beji za Wachangiaji',
+              'Tambua wachangiaji wakuu',
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Later'),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.star),
+            label: const Text('Upgrade Now'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber,
+              foregroundColor: Colors.black87,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              // Navigate to subscription page
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPremiumFeature(IconData icon, String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.amber.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 20, color: Colors.amber[700]),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _exportToPDF() async {
+    // Implement PDF export
+  }
+
+  Future<void> _exportToExcel() async {
+    // Implement Excel export
+  }
+
+  Future<void> _showDetailedReport() async {
+    // Show detailed analytics
   }
 
   Widget _buildDetailRow(IconData icon, String label, String value) {

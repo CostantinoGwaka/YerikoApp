@@ -1933,11 +1933,21 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Later'),
+            child: const Text(
+              'Baadaye',
+              style: TextStyle(
+                fontSize: 12.0,
+              ),
+            ),
           ),
           ElevatedButton.icon(
             icon: const Icon(Icons.star),
-            label: const Text('Upgrade Now'),
+            label: const Text(
+              'Huduma za Ziada',
+              style: TextStyle(
+                fontSize: 12.0,
+              ),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.amber,
               foregroundColor: Colors.black87,
@@ -2441,6 +2451,47 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   }
 
   Widget _buildTopContributorsCard() {
+    // Sort contributors by amount
+    List<CollectionItem> sortedContributors = [];
+
+    if (collectionsMonthly?.data != null) {
+      sortedContributors = List.from(collectionsMonthly!.data);
+      // Group by user and sum their contributions
+      Map<String, double> userTotals = {};
+      Map<String, CollectionItem> userItems = {};
+
+      for (var item in sortedContributors) {
+        String userId = item.user.id.toString();
+        double amount = double.tryParse(item.amount) ?? 0.0;
+
+        if (userTotals.containsKey(userId)) {
+          userTotals[userId] = (userTotals[userId] ?? 0) + amount;
+        } else {
+          userTotals[userId] = amount;
+          userItems[userId] = item;
+        }
+      }
+
+      // Convert back to a list for sorting
+      sortedContributors = [];
+      userTotals.forEach((userId, total) {
+        if (userItems.containsKey(userId)) {
+          CollectionItem item = userItems[userId]!;
+          // Create a copy with the updated amount
+          // Note: this is simplified, in a real app you'd need to create a proper copy
+          item.total = total.toString();
+          sortedContributors.add(item);
+        }
+      });
+
+      // Sort by amount (descending)
+      sortedContributors.sort((a, b) {
+        double amountA = double.tryParse(a.total) ?? 0.0;
+        double amountB = double.tryParse(b.total) ?? 0.0;
+        return amountB.compareTo(amountA);
+      });
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -2465,16 +2516,50 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
             ),
           ),
           const SizedBox(height: 20),
-          ...List.generate(
-            3,
-            (index) => _buildTopContributorItem(
-              name: 'Mwanajumuiya ${index + 1}',
-              amount: (3 - index) * 500000,
-              rank: index + 1,
+          if (sortedContributors.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  'Hakuna data ya kuonyesha',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+              ),
+            )
+          else
+            ...List.generate(
+              sortedContributors.length > 3 ? 3 : sortedContributors.length,
+              (index) {
+                final contributor = sortedContributors[index];
+                return _buildTopContributorItem(
+                  name: contributor.user.userFullName ?? 'Unknown',
+                  amount: double.tryParse(contributor.total) ?? 0.0,
+                  rank: index + 1,
+                );
+              },
             ),
-          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildLegendItem(String label, Color color, int count) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '$label ($count)',
+          style: const TextStyle(fontSize: 10),
+        ),
+      ],
     );
   }
 
@@ -2550,6 +2635,64 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   }
 
   Widget _buildLineChart() {
+    // Process data to group collections by month
+    Map<String, double> monthlyTotals = {};
+
+    if (collectionsMonthly?.data != null) {
+      for (var item in collectionsMonthly!.data) {
+        // Extract month from the monthly field or use registration date
+        String month = item.monthly.split(' ').first;
+        double amount = double.tryParse(item.amount) ?? 0.0;
+
+        // Add amount to corresponding month
+        if (monthlyTotals.containsKey(month)) {
+          monthlyTotals[month] = (monthlyTotals[month] ?? 0) + amount;
+        } else {
+          monthlyTotals[month] = amount;
+        }
+      }
+    }
+
+    // Sort months chronologically
+    List<String> sortedMonths = monthlyTotals.keys.toList();
+    sortedMonths.sort((a, b) {
+      // Assuming month names are standard - can be enhanced with a more robust month sorting
+      final months = [
+        'JANUARY',
+        'FEBRUARY',
+        'MARCH',
+        'APRIL',
+        'MAY',
+        'JUNE',
+        'JULY',
+        'AUGUST',
+        'SEPTEMBER',
+        'OCTOBER',
+        'NOVEMBER',
+        'DECEMBER'
+      ];
+      return months.indexOf(a.toUpperCase()) - months.indexOf(b.toUpperCase());
+    });
+
+    // Create spots for the chart, limited to the last 6 months if there are more
+    List<FlSpot> spots = [];
+    if (sortedMonths.isNotEmpty) {
+      final displayMonths = sortedMonths.length > 6
+          ? sortedMonths.sublist(sortedMonths.length - 6)
+          : sortedMonths;
+
+      for (int i = 0; i < displayMonths.length; i++) {
+        String month = displayMonths[i];
+        spots.add(FlSpot(
+            i.toDouble(),
+            monthlyTotals[month]! /
+                100000)); // Scale down for better visualization
+      }
+    } else {
+      // Fallback if no data
+      spots = [const FlSpot(0, 0)];
+    }
+
     return LineChart(
       LineChartData(
         gridData: FlGridData(show: false),
@@ -2557,34 +2700,54 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
           leftTitles: AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
+          rightTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, meta) {
+                return Text('${value.toInt() * 100}K',
+                    style: const TextStyle(fontSize: 10, color: Colors.grey));
+              },
+              reservedSize: 40,
+            ),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) {
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-                if (value.toInt() < months.length) {
-                  return Text(months[value.toInt()]);
+                final index = value.toInt();
+                if (sortedMonths.isNotEmpty &&
+                    index >= 0 &&
+                    index < sortedMonths.length) {
+                  // Show abbreviated month name
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(sortedMonths[index].substring(0, 3),
+                        style: const TextStyle(fontSize: 10)),
+                  );
                 }
                 return const Text('');
               },
             ),
           ),
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
-        borderData: FlBorderData(show: false),
+        borderData: FlBorderData(
+            show: true,
+            border: Border.all(color: Colors.grey.withOpacity(0.2))),
+        minX: 0,
+        maxX: (spots.isEmpty ? 1 : spots.length - 1).toDouble(),
+        minY: 0,
         lineBarsData: [
           LineChartBarData(
-            spots: [
-              const FlSpot(0, 3),
-              const FlSpot(1, 1),
-              const FlSpot(2, 4),
-              const FlSpot(3, 2),
-              const FlSpot(4, 5),
-              const FlSpot(5, 3),
-            ],
+            spots: spots,
             isCurved: true,
             color: Colors.purple,
             barWidth: 3,
-            dotData: FlDotData(show: false),
+            dotData: FlDotData(show: true),
+            belowBarData: BarAreaData(
+              show: true,
+              color: Colors.purple.withOpacity(0.2),
+            ),
           ),
         ],
       ),
@@ -2592,31 +2755,118 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   }
 
   Widget _buildPieChart() {
-    return PieChart(
-      PieChartData(
-        sectionsSpace: 0,
-        centerSpaceRadius: 40,
-        sections: [
-          PieChartSectionData(
-            color: Colors.blue,
-            value: 40,
-            title: '40%',
-            radius: 50,
+    // Categorize data for the pie chart based on amount ranges
+    int smallContributions = 0; // < 50K
+    int mediumContributions = 0; // 50K - 100K
+    int largeContributions = 0; // > 100K
+
+    if (collectionsMonthly?.data != null) {
+      for (var item in collectionsMonthly!.data) {
+        double amount = double.tryParse(item.amount) ?? 0.0;
+
+        if (amount < 50000) {
+          smallContributions++;
+        } else if (amount <= 100000) {
+          mediumContributions++;
+        } else {
+          largeContributions++;
+        }
+      }
+    }
+
+    // Calculate total contributions
+    int totalContributions =
+        smallContributions + mediumContributions + largeContributions;
+
+    // Calculate percentages, ensuring we don't divide by zero
+    double smallPercentage = totalContributions > 0
+        ? (smallContributions / totalContributions) * 100
+        : 0;
+    double mediumPercentage = totalContributions > 0
+        ? (mediumContributions / totalContributions) * 100
+        : 0;
+    double largePercentage = totalContributions > 0
+        ? (largeContributions / totalContributions) * 100
+        : 0;
+
+    return Column(
+      children: [
+        SizedBox(
+          height: 150,
+          child: PieChart(
+            PieChartData(
+              sectionsSpace: 2,
+              centerSpaceRadius: 40,
+              sections: [
+                if (smallPercentage > 0)
+                  PieChartSectionData(
+                    color: Colors.blue,
+                    value: smallPercentage,
+                    title: '${smallPercentage.toStringAsFixed(1)}%',
+                    radius: 50,
+                    titleStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                if (mediumPercentage > 0)
+                  PieChartSectionData(
+                    color: Colors.green,
+                    value: mediumPercentage,
+                    title: '${mediumPercentage.toStringAsFixed(1)}%',
+                    radius: 50,
+                    titleStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                if (largePercentage > 0)
+                  PieChartSectionData(
+                    color: Colors.orange,
+                    value: largePercentage,
+                    title: '${largePercentage.toStringAsFixed(1)}%',
+                    radius: 50,
+                    titleStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                // Show a placeholder if no data
+                if (totalContributions == 0)
+                  PieChartSectionData(
+                    color: Colors.grey.shade300,
+                    value: 100,
+                    title: 'No Data',
+                    radius: 50,
+                    titleStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54,
+                    ),
+                  ),
+              ],
+            ),
           ),
-          PieChartSectionData(
-            color: Colors.red,
-            value: 30,
-            title: '30%',
-            radius: 50,
+        ),
+        const SizedBox(height: 20),
+        // Legend
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildLegendItem('< 50,000 TZS', Colors.blue, smallContributions),
+              _buildLegendItem(
+                  '50,000 - 100,000 TZS', Colors.green, mediumContributions),
+              _buildLegendItem(
+                  '> 100,000 TZS', Colors.orange, largeContributions),
+            ],
           ),
-          PieChartSectionData(
-            color: Colors.green,
-            value: 30,
-            title: '30%',
-            radius: 50,
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

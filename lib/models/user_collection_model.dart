@@ -15,7 +15,10 @@ class CollectionResponse {
     return CollectionResponse(
       status: json['status'] ?? '',
       message: json['message'] ?? '',
-      data: (json['data'] as List<dynamic>?)?.map((e) => CollectionItem.fromJson(e)).toList() ?? [],
+      data: (json['data'] as List<dynamic>?)
+              ?.map((e) => CollectionItem.fromJson(e))
+              .toList() ??
+          [],
     );
   }
 }
@@ -23,6 +26,7 @@ class CollectionResponse {
 class CollectionItem {
   final int id;
   final String amount;
+  String total; // Made mutable
   final String monthly;
   final String registeredBy;
   final String registeredDate;
@@ -32,6 +36,7 @@ class CollectionItem {
   CollectionItem({
     required this.id,
     required this.amount,
+    this.total = "0",
     required this.monthly,
     required this.registeredBy,
     required this.registeredDate,

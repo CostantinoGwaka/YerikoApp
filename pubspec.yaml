@@ -55,6 +55,10 @@ dependencies:
   open_store:
   # dependencies:
   restart_app:
+  pdf: ^3.8.4
+  excel: ^2.1.0
+  path_provider: ^2.0.15
+  fl_chart: ^0.63.0
 
 dev_dependencies:
   flutter_test:

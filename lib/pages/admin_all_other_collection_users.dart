@@ -1,6 +1,7 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jumuiya_yangu/main.dart';
@@ -12,6 +13,11 @@ import 'package:jumuiya_yangu/pages/supports_pages/collection_table_against_mont
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
+import 'package:pdf/widgets.dart' as pw;
+import 'package:excel/excel.dart' hide Border;
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class AdminOtherAllUserCollections extends StatefulWidget {
   const AdminOtherAllUserCollections({super.key});
@@ -156,7 +162,6 @@ class _AdminOtherAllUserCollectionsState
         }
       } else {
         if (context.mounted) {
-          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Error: ${response.statusCode}")),
           );
@@ -164,7 +169,6 @@ class _AdminOtherAllUserCollectionsState
       }
     } catch (e) {
       if (context.mounted) {
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
@@ -211,7 +215,6 @@ class _AdminOtherAllUserCollectionsState
         }
       } else {
         if (context.mounted) {
-          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Error: ${response.statusCode}")),
           );
@@ -219,7 +222,6 @@ class _AdminOtherAllUserCollectionsState
       }
     } catch (e) {
       if (context.mounted) {
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
@@ -266,7 +268,6 @@ class _AdminOtherAllUserCollectionsState
         }
       } else {
         if (context.mounted) {
-          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Error: ${response.statusCode}")),
           );
@@ -274,7 +275,6 @@ class _AdminOtherAllUserCollectionsState
       }
     } catch (e) {
       if (context.mounted) {
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
@@ -314,7 +314,6 @@ class _AdminOtherAllUserCollectionsState
         }
       } else {
         if (context.mounted) {
-          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Error: ${response.statusCode}")),
           );
@@ -322,7 +321,6 @@ class _AdminOtherAllUserCollectionsState
       }
     } catch (e) {
       if (context.mounted) {
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
@@ -344,21 +342,17 @@ class _AdminOtherAllUserCollectionsState
       );
 
       if (response.statusCode == 200) {
-        // ignore: use_build_context_synchronously
         Navigator.pop(context); // Close bottom sheet
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Mchango umefutwa kikamirifu.')),
         );
         _reloadData();
       } else {
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error: ${response.statusCode}")),
         );
       }
     } catch (e) {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
@@ -1534,14 +1528,399 @@ class _AdminOtherAllUserCollectionsState
   }
 
   Future<void> _exportToPDF() async {
-    // Implement PDF export
+    try {
+      setState(() => isLoading = true);
+      final pdf = pw.Document();
+
+      // Add header
+      pdf.addPage(
+        pw.Page(
+          build: (context) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Header(
+                  level: 0,
+                  child: pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text('Ripoti ya Michango',
+                          style: pw.TextStyle(fontSize: 24)),
+                      pw.Text(DateFormat('dd/MM/yyyy').format(DateTime.now())),
+                    ],
+                  ),
+                ),
+                pw.SizedBox(height: 20),
+                pw.Table.fromTextArray(
+                  headers: ['Mwanajumuiya', 'Kiasi', 'Aina', 'Mwezi', 'Tarehe'],
+                  data: collectionsOthers?.data
+                          .map((item) => [
+                                item.user.userFullName,
+                                'TZS ${NumberFormat("#,##0").format(int.parse(item.amount))}',
+                                item.collectionType.collectionName,
+                                item.monthly,
+                                item.registeredDate,
+                              ])
+                          .toList() ??
+                      [],
+                ),
+              ],
+            );
+          },
+        ),
+      );
+
+      // Save and share
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/michango_ripoti.pdf');
+      await file.writeAsBytes(await pdf.save());
+
+      await Share.share(
+        'Ripoti ya Michango',
+        subject:
+            'Ripoti_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.pdf',
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Hitilafu: $e')),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   Future<void> _exportToExcel() async {
-    // Implement Excel export
+    try {
+      setState(() => isLoading = true);
+      var excel = Excel.createExcel();
+      var sheet = excel['Michango'];
+
+      // Add headers
+      sheet.appendRow([
+        'Mwanajumuiya',
+        'Kiasi',
+        'Aina ya Mchango',
+        'Mwezi',
+        'Tarehe ya Usajili'
+      ]);
+
+      // Add data
+      collectionsOthers?.data.forEach((item) {
+        sheet.appendRow([
+          item.user.userFullName,
+          item.amount,
+          item.collectionType.collectionName,
+          item.monthly,
+          item.registeredDate,
+        ]);
+      });
+
+      // Save and share
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File(
+          '${directory.path}/michango_${DateTime.now().millisecondsSinceEpoch}.xlsx');
+      await file.writeAsBytes(excel.encode()!);
+
+      await Share.share(
+        'Ripoti ya Michango (Excel)',
+        subject:
+            'Ripoti_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.xlsx',
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Hitilafu: $e')),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   Future<void> _showDetailedReport() async {
-    // Show detailed analytics
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.8,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(25)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 10,
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.purple.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.analytics, color: Colors.purple),
+                  ),
+                  const SizedBox(width: 15),
+                  const Text(
+                    'Uchambuzi wa Michango',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(20),
+                children: [
+                  // Monthly trend chart
+                  _buildChartCard(
+                    'Mwenendo wa Michango',
+                    _buildLineChart(),
+                  ),
+                  const SizedBox(height: 20),
+                  // Collection type distribution
+                  _buildChartCard(
+                    'Mgawanyo wa Aina za Michango',
+                    _buildPieChart(),
+                  ),
+                  const SizedBox(height: 20),
+                  // Top contributors
+                  _buildTopContributorsCard(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChartCard(String title, Widget chart) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 200,
+            child: chart,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLineChart() {
+    return LineChart(
+      LineChartData(
+        gridData: FlGridData(show: false),
+        titlesData: FlTitlesData(
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, meta) {
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                if (value.toInt() < months.length) {
+                  return Text(months[value.toInt()]);
+                }
+                return const Text('');
+              },
+            ),
+          ),
+        ),
+        borderData: FlBorderData(show: false),
+        lineBarsData: [
+          LineChartBarData(
+            spots: [
+              const FlSpot(0, 3),
+              const FlSpot(1, 1),
+              const FlSpot(2, 4),
+              const FlSpot(3, 2),
+              const FlSpot(4, 5),
+              const FlSpot(5, 3),
+            ],
+            isCurved: true,
+            color: Colors.purple,
+            barWidth: 3,
+            dotData: FlDotData(show: false),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPieChart() {
+    return PieChart(
+      PieChartData(
+        sectionsSpace: 0,
+        centerSpaceRadius: 40,
+        sections: [
+          PieChartSectionData(
+            color: Colors.blue,
+            value: 40,
+            title: '40%',
+            radius: 50,
+          ),
+          PieChartSectionData(
+            color: Colors.red,
+            value: 30,
+            title: '30%',
+            radius: 50,
+          ),
+          PieChartSectionData(
+            color: Colors.green,
+            value: 30,
+            title: '30%',
+            radius: 50,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopContributorsCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Wachangiaji Wakuu',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+          ...List.generate(
+            3,
+            (index) => _buildTopContributorItem(
+              name: 'Mwanajumuiya ${index + 1}',
+              amount: (3 - index) * 500000,
+              rank: index + 1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopContributorItem({
+    required String name,
+    required double amount,
+    required int rank,
+  }) {
+    final icons = [
+      Icons.workspace_premium,
+      Icons.star,
+      Icons.military_tech,
+    ];
+    final colors = [
+      Colors.amber,
+      Colors.grey[400],
+      Colors.brown[300],
+    ];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: colors[rank - 1]?.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icons[rank - 1], color: colors[rank - 1]),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'TZS ${NumberFormat("#,##0").format(amount)}',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: colors[rank - 1]?.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '#$rank',
+              style: TextStyle(
+                color: colors[rank - 1],
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

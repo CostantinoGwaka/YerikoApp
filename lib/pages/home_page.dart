@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     ];
 
     List<String> labels = [
-      'Nyumbani',
+      'Nyumbani ',
       'Ratiba',
       'Michango',
       'Wasifu',

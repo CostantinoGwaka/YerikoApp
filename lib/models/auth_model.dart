@@ -38,6 +38,7 @@ class User {
   // ignore: non_constant_identifier_names
   final String? jina_jumuiya; // Optional field, not used in the current context
   final String? role;
+  final String? reportTrials;
   // ignore: non_constant_identifier_names
   final dynamic jumuiya_id; // Optional field, not used in the current context
 
@@ -55,6 +56,7 @@ class User {
     this.jina_jumuiya,
     this.martialstatus,
     this.role,
+    this.reportTrials,
     // ignore: non_constant_identifier_names
     this.jumuiya_id, // Optional field, not used in the current contex
   });
@@ -77,6 +79,7 @@ class User {
           ?.toString(), // Optional field, not used in the current context
       martialstatus: json['martialstatus']?.toString(), //
       role: json['role']?.toString(),
+      reportTrials: json['report_trials']?.toString(),
       jumuiya_id: json['jumuiya_id']
           ?.toString(), // Optional field, not used in the current context
       jina_jumuiya: json['jina_jumuiya']
@@ -99,6 +102,7 @@ class User {
         'role': role,
         'jumuiya_id':
             jumuiya_id, // Optional field, not used in the current context
+        'report_trials': reportTrials,
         'jina_jumuiya':
             jina_jumuiya, // Optional field, not used in the current context
       };

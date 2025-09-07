@@ -7,6 +7,7 @@ class UserDetails {
   final String password;
   final String createdAt;
   final String role;
+  final String? reportTrials;
 
   UserDetails({
     required this.id,
@@ -17,6 +18,7 @@ class UserDetails {
     required this.password,
     required this.createdAt,
     required this.role,
+    this.reportTrials,
   });
 
   factory UserDetails.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class UserDetails {
       password: json['password'],
       createdAt: json['createdAt'],
       role: json['role'],
+      reportTrials: json['report_trials'],
     );
   }
 
@@ -42,6 +45,7 @@ class UserDetails {
       'password': password,
       'createdAt': createdAt,
       'role': role,
+      'reportTrials': reportTrials,
     };
   }
 }

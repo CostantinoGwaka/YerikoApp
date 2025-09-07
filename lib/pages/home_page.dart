@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jumuiya_yangu/main.dart';
-import 'package:jumuiya_yangu/pages/admin_all_collection_users.dart';
+import 'package:jumuiya_yangu/pages/admin_all_collection_users.dart' as admin;
 import 'package:jumuiya_yangu/pages/all_collection_users.dart';
 import 'package:jumuiya_yangu/pages/all_user_viewer.dart';
 import 'package:jumuiya_yangu/pages/church_time_table.dart';
@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         const DailyPage(), // index 0
         const ChurchTimeTable(), // index 1
         (userData != null && userData!.user.role == "ADMIN")
-            ? AdminAllUserCollections()
+            ? admin.AdminAllUserCollections()
             : AllUserCollections(), // index 2
         AllViewerUserWithAdmin(), // index 3
         const ProfilePage(), // index 4

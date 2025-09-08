@@ -252,7 +252,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (int.parse(userTrialsNumber!.data[0].reportTrials) != 0) ...[
+        if (userTrialsNumber != null &&
+            int.parse(userTrialsNumber!.data[0].reportTrials) != 0) ...[
           FloatingActionButton.small(
             heroTag: 'export_pdf',
             onPressed: () => _exportToPDF(),
@@ -268,7 +269,126 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
           ),
           const SizedBox(height: 8),
         ],
+        if (userTrialsNumber != null &&
+            int.parse(userTrialsNumber!.data[0].reportTrials) == 0) ...[
+          FloatingActionButton.small(
+            heroTag: 'upgrade',
+            onPressed: () => _showPremiumDialog(),
+            backgroundColor: Colors.amber,
+            child: const Icon(Icons.star),
+          ),
+          const SizedBox(height: 16),
+        ],
       ],
+    );
+  }
+
+  Widget _buildPremiumFeature(IconData icon, String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.amber.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 20, color: Colors.amber[700]),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPremiumDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.star, color: Colors.amber[600]),
+            const SizedBox(width: 8),
+            const Text('Huduma za Ziada'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildPremiumFeature(
+              Icons.analytics,
+              'Ripoti za Kina',
+              'Pata ufahamu kamili kuhusu michango',
+            ),
+            _buildPremiumFeature(
+              Icons.picture_as_pdf,
+              'Hamisha kwenda PDF',
+              'Pakua ripoti za kitaalamu za PDF',
+            ),
+            _buildPremiumFeature(
+              Icons.table_chart,
+              'Hamisha kwenda Excel',
+              'Changanuza data katika majedwali',
+            ),
+            _buildPremiumFeature(
+              Icons.workspace_premium,
+              'Beji za Wachangiaji',
+              'Tambua wachangiaji wakuu',
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Baadaye',
+              style: TextStyle(
+                fontSize: 12.0,
+              ),
+            ),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.star),
+            label: const Text(
+              'Huduma za Ziada',
+              style: TextStyle(
+                fontSize: 12.0,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber,
+              foregroundColor: Colors.black87,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              // Navigate to subscription page
+            },
+          ),
+        ],
+      ),
     );
   }
 

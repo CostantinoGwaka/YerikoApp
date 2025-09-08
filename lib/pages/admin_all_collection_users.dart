@@ -4,12 +4,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:excel/excel.dart' hide Border;
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/user_collection_model.dart';
 import 'package:jumuiya_yangu/models/user_collection_table_model.dart';
+import 'package:jumuiya_yangu/models/user_trials_number_response.dart';
 import 'package:jumuiya_yangu/pages/add_pages/add_month_collection.dart';
 import 'package:jumuiya_yangu/pages/add_pages/add_other_month_collection.dart';
 import 'package:jumuiya_yangu/pages/admin_all_other_collection_users.dart';
@@ -36,6 +38,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   bool showPremiumDialog = false;
 
   CollectionResponse? collectionsMonthly;
+  UserTrialsNumberResponse? userTrialsNumber;
   CollectionResponse? collectionsOthers;
   UserMonthlyCollectionResponse? userMonthlyCollectionResponse;
   int selectedTabIndex = 0;
@@ -100,6 +103,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       getUserCollections(),
       getOtherUserCollections(),
       fetchUsers(),
+      getUserTrialsNumber()
     ]);
 
     setState(() {
@@ -216,6 +220,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
     // This will show both monthly and other collections for the selected user
     await getUserYearCollections();
     await getUserOtherCollections();
+    await getUserTrialsNumber();
   }
 
   Future<CollectionResponse?> getUserOtherCollections() async {
@@ -259,6 +264,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
     await Future.wait([
       getUserCollections(),
       getOtherUserCollections(),
+      getUserTrialsNumber()
     ]);
 
     setState(() {
@@ -312,6 +318,78 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
 
     // 🔁 Always return something to complete Future
     return null;
+  }
+
+  Future<UserTrialsNumberResponse?> getUserTrialsNumber() async {
+    try {
+      if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa",
+              ),
+            ),
+          );
+        }
+        return null;
+      }
+
+      final String myApi =
+          "$baseUrl/report_features/get_my_trials_report.php?user_id=${userData!.user.id}";
+      final response = await http
+          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse != null) {
+          setState(() {
+            userTrialsNumber = UserTrialsNumberResponse.fromJson(jsonResponse);
+          });
+
+          return userTrialsNumber;
+        }
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: ${response.statusCode}")),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            ),
+          ),
+        );
+      }
+    }
+
+    // 🔁 Always return something to complete Future
+    return null;
+  }
+
+  Future<void> reduceUserTrials() async {
+    try {
+      final response = await http.post(
+          headers: {'Accept': 'application/json'},
+          Uri.parse('$baseUrl/report_features/update_my_report_trials.php'),
+          body: jsonEncode({
+            "user_id": userData!.user.id.toString(),
+          }));
+
+      if (response.statusCode == 200) {
+        getUserTrialsNumber();
+      }
+    } catch (e) {
+      // Handle error silently or show message
+      if (kDebugMode) {
+        print('Error fetching jumuiya data');
+      }
+    }
   }
 
   Future<UserMonthlyCollectionResponse?> getUserCollectionAgainstTable() async {
@@ -938,7 +1016,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '${userData!.user.reportTrials} Ripoti Bure',
+                      '${userData!.user.reportTrials} Ripoti Bure ${userTrialsNumber?.data[0].reportTrials ?? 0} Zaidi',
                       style: TextStyle(
                         color: Colors.grey[800],
                         fontWeight: FontWeight.bold,
@@ -1897,7 +1975,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (int.parse(userData!.user.reportTrials.toString()) != 0) ...[
+        if (int.parse(userTrialsNumber!.data[0].reportTrials) != 0) ...[
           FloatingActionButton.small(
             heroTag: 'export_pdf',
             onPressed: () => _exportToPDF(),
@@ -1920,7 +1998,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
           ),
           const SizedBox(height: 16),
         ],
-        if (int.parse(userData!.user.reportTrials.toString()) == 0) ...[
+        if (int.parse(userTrialsNumber!.data[0].reportTrials) == 0) ...[
           FloatingActionButton.small(
             heroTag: 'upgrade',
             onPressed: () => _showPremiumDialog(),
@@ -2044,6 +2122,148 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
 
   Future<void> _exportToPDF() async {
     try {
+      if (int.parse(userTrialsNumber!.data[0].reportTrials) != 0) {
+        // Show remaining trials dialog
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: Stack(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blue.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(Icons.info_outline,
+                            color: Colors.blue[600], size: 24),
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        'Taarifa ya Majaribio',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            content: Container(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.amber.shade100),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.access_time,
+                            color: Colors.amber[700], size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Una majaribio ${userTrialsNumber!.data[0].reportTrials} yaliyobaki',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.monetization_on,
+                            color: Colors.green[600], size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Baada ya majaribio kuisha, utahitaji kulipia TZS 1,000 kwa mwezi kupata huduma hii.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[700],
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue[600],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Sawa, Nimeelewa',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
       setState(() => isLoading = true);
       final pdf = pw.Document();
 
@@ -2233,6 +2453,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         text: 'Ripoti ya Michango',
         subject: fileName,
       );
+      await reduceUserTrials();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Hitilafu: $e')),
@@ -2361,6 +2582,8 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
           text: 'Ripoti ya Michango (Excel)',
           subject: fileName,
         );
+
+        await reduceUserTrials();
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(

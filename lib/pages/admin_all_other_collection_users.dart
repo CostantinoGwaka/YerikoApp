@@ -2,12 +2,14 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/other_collection_model.dart';
 import 'package:jumuiya_yangu/models/user_collection_table_model.dart';
+import 'package:jumuiya_yangu/models/user_trials_number_response.dart';
 import 'package:jumuiya_yangu/pages/add_pages/add_other_month_collection.dart';
 import 'package:jumuiya_yangu/pages/supports_pages/collection_table_against_month.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
@@ -36,6 +38,7 @@ class _AdminOtherAllUserCollectionsState
   bool viewTable = false;
   bool isLoading = false;
   bool showUserCollections = false;
+  UserTrialsNumberResponse? userTrialsNumber;
 
   //month
   String filterOption = 'TAARIFA ZOTE';
@@ -76,6 +79,7 @@ class _AdminOtherAllUserCollectionsState
     getUserCollections();
     fetchUsers();
     fetchCollectionTypes();
+    getUserTrialsNumber();
   }
 
   Future<void> fetchUsers() async {
@@ -91,6 +95,78 @@ class _AdminOtherAllUserCollectionsState
       });
     } else {
       // handle error
+    }
+  }
+
+  Future<UserTrialsNumberResponse?> getUserTrialsNumber() async {
+    try {
+      if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa",
+              ),
+            ),
+          );
+        }
+        return null;
+      }
+
+      final String myApi =
+          "$baseUrl/report_features/get_my_trials_report.php?user_id=${userData!.user.id}";
+      final response = await http
+          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse != null) {
+          setState(() {
+            userTrialsNumber = UserTrialsNumberResponse.fromJson(jsonResponse);
+          });
+
+          return userTrialsNumber;
+        }
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: ${response.statusCode}")),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            ),
+          ),
+        );
+      }
+    }
+
+    // 🔁 Always return something to complete Future
+    return null;
+  }
+
+  Future<void> reduceUserTrials() async {
+    try {
+      final response = await http.post(
+          headers: {'Accept': 'application/json'},
+          Uri.parse('$baseUrl/report_features/update_my_report_trials.php'),
+          body: jsonEncode({
+            "user_id": userData!.user.id.toString(),
+          }));
+
+      if (response.statusCode == 200) {
+        getUserTrialsNumber();
+      }
+    } catch (e) {
+      // Handle error silently or show message
+      if (kDebugMode) {
+        print('Error fetching jumuiya data');
+      }
     }
   }
 
@@ -131,6 +207,7 @@ class _AdminOtherAllUserCollectionsState
 
   Future<void> _reloadData() async {
     await getUserCollections();
+    getUserTrialsNumber();
     setState(() {}); // Refresh UI after fetching data
   }
 
@@ -1788,6 +1865,7 @@ class _AdminOtherAllUserCollectionsState
         text: 'Ripoti ya Michango Mengineyo',
         subject: fileName,
       );
+      await reduceUserTrials();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Hitilafu: $e')),
@@ -1939,6 +2017,7 @@ class _AdminOtherAllUserCollectionsState
           text: 'Ripoti ya Michango Mengineyo (Excel)',
           subject: fileName,
         );
+        await reduceUserTrials();
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(

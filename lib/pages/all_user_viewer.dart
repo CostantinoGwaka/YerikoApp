@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Border;
 import 'package:intl/intl.dart';
+import 'package:jumuiya_yangu/models/user_trials_number_response.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:share_plus/share_plus.dart';
@@ -32,11 +34,13 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
   bool _hasUserPendingRequests = false;
   int _pendingRequestsCount = 0;
   bool isLoading = false;
+  UserTrialsNumberResponse? userTrialsNumber;
 
   @override
   void initState() {
     super.initState();
     getUsersCollections();
+    getUserTrialsNumber();
     if (userData != null &&
         (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
       checkUserPendingRequests();
@@ -61,6 +65,80 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
       await checkUserPendingRequests();
     }
     setState(() {}); // Refresh UI after fetching data
+  }
+
+  Future<UserTrialsNumberResponse?> getUserTrialsNumber() async {
+    try {
+      if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa",
+              ),
+            ),
+          );
+        }
+        return null;
+      }
+
+      final String myApi =
+          "$baseUrl/report_features/get_my_trials_report.php?user_id=${userData!.user.id}";
+      final response = await http
+          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse != null) {
+          setState(() {
+            userTrialsNumber = UserTrialsNumberResponse.fromJson(jsonResponse);
+          });
+
+          return userTrialsNumber;
+        }
+      } else {
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: ${response.statusCode}")),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            ),
+          ),
+        );
+      }
+    }
+
+    // 🔁 Always return something to complete Future
+    return null;
+  }
+
+  Future<void> reduceUserTrials() async {
+    try {
+      final response = await http.post(
+          headers: {'Accept': 'application/json'},
+          Uri.parse('$baseUrl/report_features/update_my_report_trials.php'),
+          body: jsonEncode({
+            "user_id": userData!.user.id.toString(),
+          }));
+
+      if (response.statusCode == 200) {
+        getUserTrialsNumber();
+      }
+    } catch (e) {
+      // Handle error silently or show message
+      if (kDebugMode) {
+        print('Error fetching jumuiya data');
+      }
+    }
   }
 
   Future<void> checkUserPendingRequests() async {
@@ -382,6 +460,8 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
         text: 'Ripoti ya Michango',
         subject: fileName,
       );
+
+      await reduceUserTrials();
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(

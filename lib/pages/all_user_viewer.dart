@@ -1,6 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Border;
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/all_users_model.dart';
@@ -10,6 +16,7 @@ import 'package:jumuiya_yangu/pages/user_pending_requests_viewer.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
+import 'package:pdf/widgets.dart' as pw;
 
 class AllViewerUserWithAdmin extends StatefulWidget {
   const AllViewerUserWithAdmin({super.key});
@@ -24,6 +31,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
   String _searchQuery = '';
   bool _hasUserPendingRequests = false;
   int _pendingRequestsCount = 0;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -157,9 +165,380 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primary,
-      body: RefreshIndicator(onRefresh: _reloadData, child: getBody()),
+        backgroundColor: primary,
+        body: RefreshIndicator(onRefresh: _reloadData, child: getBody()),
+        floatingActionButton: _buildPremiumFeaturesFAB());
+  }
+
+  Widget _buildPremiumFeaturesFAB() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (int.parse(userData!.user.reportTrials.toString()) != 0) ...[
+          FloatingActionButton.small(
+            heroTag: 'export_pdf',
+            onPressed: () => _exportToPDF(),
+            backgroundColor: Colors.blue,
+            child: const Icon(Icons.picture_as_pdf),
+          ),
+          const SizedBox(height: 8),
+          FloatingActionButton.small(
+            heroTag: 'export_excel',
+            onPressed: () => _exportToExcel(),
+            backgroundColor: Colors.green,
+            child: const Icon(Icons.table_chart),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ],
     );
+  }
+
+  Future<void> _exportToPDF() async {
+    try {
+      setState(() => isLoading = true);
+      final pdf = pw.Document();
+
+      // Create data array
+      /* Example structure:
+       'Jina',
+        'Simu',
+        'Anapoishi',
+        'Jinsia',
+            'Hali ya Ndoa',
+        'Tarehe',
+      */
+      final tableData = collections?.data.map((item) {
+            return [
+              item.userFullName ?? '',
+              item.phone,
+              item.location ?? '',
+              item.gender ?? '',
+              item.martialstatus ?? '',
+              item.dobdate,
+            ];
+          }).toList() ??
+          [];
+
+      // Debug: Print the data length
+
+      // Define rows per page (adjust based on your needs)
+      const int rowsPerPage = 25;
+
+      // Calculate number of pages needed
+      int totalPages = (tableData.length / rowsPerPage).ceil();
+      if (totalPages == 0) totalPages = 1; // At least one page
+
+      // Create pages with data
+      for (int pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+        final startIndex = pageIndex * rowsPerPage;
+        final endIndex = (startIndex + rowsPerPage > tableData.length)
+            ? tableData.length
+            : startIndex + rowsPerPage;
+
+        final pageData = tableData.sublist(startIndex, endIndex);
+
+        pdf.addPage(
+          pw.Page(
+            theme: pw.ThemeData.withFont(
+              base: pw.Font.courier(),
+              bold: pw.Font.courierBold(),
+            ),
+            build: (context) {
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // Header (show on every page)
+                  pw.Header(
+                    level: 0,
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Ripoti ya Wanajumuiya',
+                            style: pw.TextStyle(
+                                fontSize: 24, font: pw.Font.courierBold())),
+                        pw.Text(
+                          DateFormat('dd/MM/yyyy').format(DateTime.now()),
+                          style: const pw.TextStyle(
+                            color: PdfColors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Page info
+                  pw.Text(
+                    'Ukurasa ${pageIndex + 1} wa $totalPages',
+                    style: pw.TextStyle(fontSize: 12),
+                  ),
+                  pw.SizedBox(height: 10),
+
+                  // Table
+                  pw.Expanded(
+                    child: pw.Table(
+                      border: pw.TableBorder.all(),
+                      columnWidths: {
+                        0: const pw.FlexColumnWidth(3), // Name column wider
+                        1: const pw.FlexColumnWidth(2), // Amount column
+                        2: const pw.FlexColumnWidth(2), // Month column
+                        3: const pw.FlexColumnWidth(2), // Date column
+                      },
+                      children: [
+                        // Header row (show on every page)
+                        pw.TableRow(
+                          decoration:
+                              pw.BoxDecoration(color: PdfColors.grey300),
+                          children: [
+                            'Jina',
+                            'Simu',
+                            'Anapoishi',
+                            'Jinsia',
+                            'Hali ya Ndoa',
+                            'Tarehe',
+                          ]
+                              .map((header) => pw.Container(
+                                    padding: const pw.EdgeInsets.all(6),
+                                    child: pw.Text(
+                                      header,
+                                      style: pw.TextStyle(
+                                        font: pw.Font.courierBold(),
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
+                        // Data rows for this page
+                        ...pageData.map((row) => pw.TableRow(
+                              children: row
+                                  .map((cell) => pw.Container(
+                                        padding: const pw.EdgeInsets.all(6),
+                                        child: pw.Text(
+                                          cell.toString(),
+                                          style: pw.TextStyle(fontSize: 9),
+                                        ),
+                                      ))
+                                  .toList(),
+                            )),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      }
+
+      // Handle case where there's no data
+      if (tableData.isEmpty) {
+        pdf.addPage(
+          pw.Page(
+            theme: pw.ThemeData.withFont(
+              base: pw.Font.courier(),
+              bold: pw.Font.courierBold(),
+            ),
+            build: (context) {
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Header(
+                    level: 0,
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Ripoti ya Michango',
+                            style: pw.TextStyle(
+                                fontSize: 24, font: pw.Font.courierBold())),
+                        pw.Text(
+                          DateFormat('dd/MM/yyyy').format(DateTime.now()),
+                          style: const pw.TextStyle(
+                            color: PdfColors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  pw.SizedBox(height: 20),
+                  pw.Text('Hakuna data ya kuonyesha.'),
+                ],
+              );
+            },
+          ),
+        );
+      }
+
+      // Save the PDF file
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName =
+          'Ripoti_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.pdf';
+      final file = File('${directory.path}/$fileName');
+      await file.writeAsBytes(await pdf.save());
+
+      // Share the actual PDF file
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'Ripoti ya Michango',
+        subject: fileName,
+      );
+    } catch (e) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Hitilafu: $e')),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> _exportToExcel() async {
+    try {
+      setState(() => isLoading = true);
+
+      // Create Excel workbook
+      var excel = Excel.createExcel();
+
+      // Remove default sheet and create custom one
+      excel.delete('Sheet1');
+      var sheet = excel['Michango'];
+
+      // Style for headers
+      var headerStyle = CellStyle(
+        bold: true,
+        backgroundColorHex: '#D3D3D3',
+        horizontalAlign: HorizontalAlign.Center,
+      );
+
+      // Add headers with styling
+      var headers = [
+        'Jina',
+        'Simu',
+        'Anapoishi',
+        'Jinsia',
+        'Hali ya Ndoa',
+        'Tarehe',
+      ];
+      for (int i = 0; i < headers.length; i++) {
+        var cell =
+            sheet.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0));
+        cell.value = headers[i];
+        cell.cellStyle = headerStyle;
+      }
+
+      // Add data rows
+      int rowIndex = 1;
+      collections?.data.forEach((item) {
+        // Name
+        var nameCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+        nameCell.value = item.userFullName ?? '';
+
+        // Phone
+        var phoneCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+        phoneCell.value = item.phone ?? '';
+
+        // Location
+        var locationCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: rowIndex));
+        locationCell.value = item.location ?? '';
+
+        // Gender
+        var genderCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: rowIndex));
+        genderCell.value = item.gender ?? '';
+
+        // Marital Status
+        var maritalStatusCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: rowIndex));
+        maritalStatusCell.value = item.martialstatus ?? '';
+
+        // Date
+        var dateCell = sheet.cell(
+            CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: rowIndex));
+        dateCell.value = item.dobdate ?? '';
+
+        rowIndex++;
+      });
+
+      // Add summary row
+      // if (collections?.data.isNotEmpty == true) {
+      //   rowIndex++; // Skip a row
+
+      //   // Summary label
+      //   var summaryLabelCell = sheet.cell(
+      //       CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+      //   summaryLabelCell.value = 'JUMLA';
+      //   summaryLabelCell.cellStyle = CellStyle(bold: true);
+
+      //   // Summary amount
+      //   var summaryAmountCell = sheet.cell(
+      //       CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+      //   summaryAmountCell.value = totalMonthlyCollections;
+      //   summaryAmountCell.cellStyle = CellStyle(bold: true);
+
+      //   // Total count
+      //   rowIndex++;
+      //   var countLabelCell = sheet.cell(
+      //       CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex));
+      //   countLabelCell.value = 'Idadi ya Wanajumuiya';
+      //   countLabelCell.cellStyle = CellStyle(bold: true);
+
+      //   var countCell = sheet.cell(
+      //       CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex));
+      //   countCell.value = collections?.data.length ?? 0;
+      //   countCell.cellStyle = CellStyle(bold: true);
+      // }
+
+      // Auto-fit columns (approximate)
+      sheet.setColWidth(0, 25); // Name column
+      sheet.setColWidth(1, 15); // Amount column
+      sheet.setColWidth(2, 12); // Month column
+      sheet.setColWidth(3, 15); // Date column
+
+      // Save the Excel file
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName =
+          'Ripoti_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.xlsx';
+      final file = File('${directory.path}/$fileName');
+
+      // Encode and save
+      var excelBytes = excel.encode();
+      if (excelBytes != null) {
+        await file.writeAsBytes(excelBytes);
+
+        // // Debug: Check if file was created
+        // print('Excel file created: ${file.path}');
+        // print('File exists: ${await file.exists()}');
+        // print('File size: ${await file.length()} bytes');
+
+        // Share the actual Excel file
+        await Share.shareXFiles(
+          [XFile(file.path)],
+          text: 'Ripoti ya Michango (Excel)',
+          subject: fileName,
+        );
+
+        // Show success message
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Excel file imesajiliwa na kushirikiwa!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        throw Exception('Failed to encode Excel file');
+      }
+    } catch (e) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Hitilafu: $e')),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   Widget getBody() {

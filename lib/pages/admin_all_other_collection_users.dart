@@ -1477,36 +1477,36 @@ class _AdminOtherAllUserCollectionsState
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: Colors.grey[600]),
-          const SizedBox(width: 12),
-          Text(
-            "$label:",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildDetailRow(IconData icon, String label, String value) {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(bottom: 12),
+  //     child: Row(
+  //       children: [
+  //         Icon(icon, size: 16, color: Colors.grey[600]),
+  //         const SizedBox(width: 12),
+  //         Text(
+  //           "$label:",
+  //           style: TextStyle(
+  //             fontSize: 14,
+  //             color: Colors.grey[600],
+  //             fontWeight: FontWeight.w500,
+  //           ),
+  //         ),
+  //         const SizedBox(width: 8),
+  //         Expanded(
+  //           child: Text(
+  //             value,
+  //             style: const TextStyle(
+  //               fontSize: 14,
+  //               color: Colors.black87,
+  //               fontWeight: FontWeight.w600,
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildPremiumFeaturesFAB() {
     return Column(
@@ -2434,6 +2434,190 @@ class _AdminOtherAllUserCollectionsState
     );
   }
 
+  Widget _buildTopContributorsCard() {
+    // Sort contributors by amount
+    List<OtherCollection> sortedContributors = [];
+
+    if (collectionsOthers?.data != null) {
+      sortedContributors = List.from(collectionsOthers!.data);
+      // Group by user and sum their contributions
+      Map<String, double> userTotals = {};
+      Map<String, OtherCollection> userItems = {};
+
+      for (var item in sortedContributors) {
+        String userId = item.user.id.toString();
+        double amount = double.tryParse(item.amount) ?? 0.0;
+
+        if (userTotals.containsKey(userId)) {
+          userTotals[userId] = (userTotals[userId] ?? 0) + amount;
+        } else {
+          userTotals[userId] = amount;
+          userItems[userId] = item;
+        }
+      }
+
+      // Convert back to a list for sorting
+      sortedContributors = [];
+      userTotals.forEach((userId, total) {
+        if (userItems.containsKey(userId)) {
+          OtherCollection item = userItems[userId]!;
+          // Create a copy with the updated amount
+          // Note: this is simplified, in a real app you'd need to create a proper copy
+          item.total = total.toString();
+          sortedContributors.add(item);
+        }
+      });
+
+      // Sort by amount (descending)
+      sortedContributors.sort((a, b) {
+        double amountA = double.tryParse(a.total) ?? 0.0;
+        double amountB = double.tryParse(b.total) ?? 0.0;
+        return amountB.compareTo(amountA);
+      });
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Wachangiaji Wakuu',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+          if (sortedContributors.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  'Hakuna data ya kuonyesha',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+              ),
+            )
+          else
+            ...List.generate(
+              sortedContributors.length > 3 ? 3 : sortedContributors.length,
+              (index) {
+                final contributor = sortedContributors[index];
+                return _buildTopContributorItem(
+                  name: contributor.user.userFullName ?? 'Unknown',
+                  amount: double.tryParse(contributor.total) ?? 0.0,
+                  rank: index + 1,
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegendItem(String label, Color color, int count) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '$label ($count)',
+          style: const TextStyle(fontSize: 10),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTopContributorItem({
+    required String name,
+    required double amount,
+    required int rank,
+  }) {
+    final icons = [
+      Icons.workspace_premium,
+      Icons.star,
+      Icons.military_tech,
+    ];
+    final colors = [
+      Colors.amber,
+      Colors.grey[400],
+      Colors.brown[300],
+    ];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: colors[rank - 1]?.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icons[rank - 1], color: colors[rank - 1]),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'TZS ${NumberFormat("#,##0").format(amount)}',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: colors[rank - 1]?.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '#$rank',
+              style: TextStyle(
+                color: colors[rank - 1],
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLineChart() {
     // Process data to group collections by month
     Map<String, double> monthlyTotals = {};
@@ -2670,127 +2854,29 @@ class _AdminOtherAllUserCollectionsState
     );
   }
 
-  Widget _buildLegendItem(String label, Color color, int count) {
-    return Row(
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          '$label ($count)',
-          style: const TextStyle(fontSize: 10),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTopContributorsCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Wachangiaji Wakuu',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 20),
-          ...List.generate(
-            3,
-            (index) => _buildTopContributorItem(
-              name: 'Mwanajumuiya ${index + 1}',
-              amount: (3 - index) * 500000,
-              rank: index + 1,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTopContributorItem({
-    required String name,
-    required double amount,
-    required int rank,
-  }) {
-    final icons = [
-      Icons.workspace_premium,
-      Icons.star,
-      Icons.military_tech,
-    ];
-    final colors = [
-      Colors.amber,
-      Colors.grey[400],
-      Colors.brown[300],
-    ];
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-      ),
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: colors[rank - 1]?.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icons[rank - 1], color: colors[rank - 1]),
-          ),
+          Icon(icon, size: 16, color: Colors.grey[600]),
           const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'TZS ${NumberFormat("#,##0").format(amount)}',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+          Text(
+            "$label:",
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: colors[rank - 1]?.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
+          const SizedBox(width: 8),
+          Expanded(
             child: Text(
-              '#$rank',
-              style: TextStyle(
-                color: colors[rank - 1],
-                fontWeight: FontWeight.bold,
+              value,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black87,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),

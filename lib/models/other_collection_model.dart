@@ -5,11 +5,8 @@ class OtherCollectionResponse {
   final String message;
   final List<OtherCollection> data;
 
-  OtherCollectionResponse({
-    required this.status,
-    required this.message,
-    required this.data,
-  });
+  OtherCollectionResponse(
+      {required this.status, required this.message, required this.data});
 
   factory OtherCollectionResponse.fromJson(Map<String, dynamic> json) {
     return OtherCollectionResponse(
@@ -31,17 +28,18 @@ class OtherCollection {
   final CollectionType collectionType;
   final User user;
   final ChurchYearEntity churchYearEntity;
+  String total;
 
-  OtherCollection({
-    required this.id,
-    required this.amount,
-    required this.monthly,
-    required this.registeredBy,
-    required this.registeredDate,
-    required this.collectionType,
-    required this.user,
-    required this.churchYearEntity,
-  });
+  OtherCollection(
+      {required this.id,
+      required this.amount,
+      required this.monthly,
+      required this.registeredBy,
+      required this.registeredDate,
+      required this.collectionType,
+      required this.user,
+      required this.churchYearEntity,
+      this.total = '0'});
 
   factory OtherCollection.fromJson(Map<String, dynamic> json) {
     return OtherCollection(
@@ -82,7 +80,10 @@ class CollectionType {
   // ✅ override equality so DropdownButton can compare correctly
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is CollectionType && runtimeType == other.runtimeType && id == other.id;
+      identical(this, other) ||
+      other is CollectionType &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;

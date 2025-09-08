@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:excel/excel.dart' hide Border;
@@ -423,7 +425,6 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            // ignore: deprecated_member_use
                             color: Colors.blue.withOpacity(0.1),
                             blurRadius: 8,
                             offset: const Offset(0, 2),

@@ -422,8 +422,47 @@ class _AdminOtherAllUserCollectionsState
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.purple.shade100,
+                      Colors.blue.shade100,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.workspace_premium,
+                      color: Colors.amber[700],
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${userData!.user.reportTrials} Ripoti Bure',
+                      style: TextStyle(
+                        color: Colors.grey[800],
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               TextButton.icon(
                 style: TextButton.styleFrom(
                   foregroundColor: mainFontColor,
@@ -1393,7 +1432,7 @@ class _AdminOtherAllUserCollectionsState
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (true) ...[
+        if (int.parse(userData!.user.reportTrials.toString()) != 0) ...[
           FloatingActionButton.small(
             heroTag: 'export_pdf',
             onPressed: () => _exportToPDF(),
@@ -1416,7 +1455,7 @@ class _AdminOtherAllUserCollectionsState
           ),
           const SizedBox(height: 16),
         ],
-        if (!(false)) ...[
+        if (int.parse(userData!.user.reportTrials.toString()) == 0) ...[
           FloatingActionButton.small(
             heroTag: 'upgrade',
             onPressed: () => _showPremiumDialog(),

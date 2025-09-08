@@ -1509,7 +1509,7 @@ class _AdminOtherAllUserCollectionsState
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (int.parse(userData!.user.reportTrials.toString()) != 0) ...[
+        if (int.parse(userTrialsNumber!.data[0].reportTrials) != 0) ...[
           FloatingActionButton.small(
             heroTag: 'export_pdf',
             onPressed: () => _exportToPDF(),

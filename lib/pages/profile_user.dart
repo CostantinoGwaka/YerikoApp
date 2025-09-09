@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/sms_bando_summary_model.dart';
 import 'package:jumuiya_yangu/models/sms_bando_used_model.dart';
+import 'package:jumuiya_yangu/pages/huduma_za_ziada_page.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:share_plus/share_plus.dart';
@@ -1041,6 +1042,20 @@ class _ProfilePageState extends State<ProfilePage> {
                               subtitle: "Tengeneza mchango mpya",
                               onTap: () =>
                                   _showAddCollectionTypeDialog(context),
+                              color: green,
+                            ),
+                            Divider(height: 1, color: Colors.grey[200]),
+                            _buildModernMenuItem(
+                              icon: Icons.money,
+                              title: "Huduma Za Ziada",
+                              subtitle: "Nunua na Angalia Huduma Za Ziada",
+                              onTap: () => Navigator.push(
+                                context,
+                                PageTransition(
+                                  type: PageTransitionType.rightToLeft,
+                                  child: const HudumaZaZiadaPage(),
+                                ),
+                              ),
                               color: green,
                             ),
                           ],

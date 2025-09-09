@@ -104,6 +104,7 @@ class _AdminOtherAllUserCollectionsState
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
+              backgroundColor: Colors.yellow,
               content: Text(
                 "⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa",
               ),
@@ -130,7 +131,12 @@ class _AdminOtherAllUserCollectionsState
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${response.statusCode}")),
+            SnackBar(
+              backgroundColor: Colors.red,
+              content: Text(
+                "Error: ${response.statusCode}",
+              ),
+            ),
           );
         }
       }
@@ -138,6 +144,7 @@ class _AdminOtherAllUserCollectionsState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            backgroundColor: Colors.yellow,
             content: Text(
               "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
             ),
@@ -217,6 +224,7 @@ class _AdminOtherAllUserCollectionsState
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
+                backgroundColor: Colors.yellow,
                 content:
                     Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
@@ -241,7 +249,10 @@ class _AdminOtherAllUserCollectionsState
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${response.statusCode}")),
+            SnackBar(
+              backgroundColor: Colors.red,
+              content: Text("Error: ${response.statusCode}"),
+            ),
           );
         }
       }
@@ -249,8 +260,9 @@ class _AdminOtherAllUserCollectionsState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+            backgroundColor: Colors.yellow,
+            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti"),
+          ),
         );
       }
     }
@@ -265,6 +277,7 @@ class _AdminOtherAllUserCollectionsState
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
+                backgroundColor: Colors.red,
                 content:
                     Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
@@ -294,7 +307,12 @@ class _AdminOtherAllUserCollectionsState
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${response.statusCode}")),
+            SnackBar(
+              backgroundColor: Colors.red,
+              content: Text(
+                "Error: ${response.statusCode}",
+              ),
+            ),
           );
         }
       }
@@ -302,6 +320,7 @@ class _AdminOtherAllUserCollectionsState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+              backgroundColor: Colors.yellow,
               content:
                   Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
@@ -318,8 +337,11 @@ class _AdminOtherAllUserCollectionsState
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content:
-                    Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
+              backgroundColor: Colors.yellow,
+              content: Text(
+                "⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa",
+              ),
+            ),
           );
         }
         // setState(() => _isLoading = false);
@@ -347,7 +369,12 @@ class _AdminOtherAllUserCollectionsState
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${response.statusCode}")),
+            SnackBar(
+              backgroundColor: Colors.red,
+              content: Text(
+                "Error: ${response.statusCode}",
+              ),
+            ),
           );
         }
       }
@@ -355,8 +382,11 @@ class _AdminOtherAllUserCollectionsState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+            backgroundColor: Colors.yellow,
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            ),
+          ),
         );
       }
     }
@@ -371,6 +401,7 @@ class _AdminOtherAllUserCollectionsState
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
+                backgroundColor: Colors.yellow,
                 content:
                     Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
@@ -393,7 +424,12 @@ class _AdminOtherAllUserCollectionsState
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${response.statusCode}")),
+            SnackBar(
+              backgroundColor: Colors.red,
+              content: Text(
+                "Error: ${response.statusCode}",
+              ),
+            ),
           );
         }
       }
@@ -401,6 +437,7 @@ class _AdminOtherAllUserCollectionsState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+              backgroundColor: Colors.yellow,
               content:
                   Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
@@ -422,17 +459,22 @@ class _AdminOtherAllUserCollectionsState
       if (response.statusCode == 200) {
         Navigator.pop(context); // Close bottom sheet
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Mchango umefutwa kikamirifu.')),
+          const SnackBar(
+              backgroundColor: Colors.green,
+              content: Text('Mchango umefutwa kikamirifu.')),
         );
         _reloadData();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${response.statusCode}")),
+          SnackBar(
+              backgroundColor: Colors.red,
+              content: Text("Error: ${response.statusCode}")),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+            backgroundColor: Colors.red,
             content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
@@ -2014,7 +2056,7 @@ class _AdminOtherAllUserCollectionsState
       await reduceUserTrials();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Hitilafu: $e')),
+        SnackBar(backgroundColor: Colors.red, content: Text('Hitilafu: $e')),
       );
     } finally {
       setState(() => isLoading = false);
@@ -2318,7 +2360,7 @@ class _AdminOtherAllUserCollectionsState
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Hitilafu: $e')),
+        SnackBar(backgroundColor: Colors.red, content: Text('Hitilafu: $e')),
       );
     } finally {
       setState(() => isLoading = false);

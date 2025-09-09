@@ -48,6 +48,7 @@ class _LoginPageState extends State<LoginPage> {
       if (username == "" || password == "") {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+              backgroundColor: Colors.red,
               content: Text(
                   "⚠️ Tafadhali hakikisha umeweka namba ya simu na nenosiri")),
         );
@@ -107,6 +108,7 @@ class _LoginPageState extends State<LoginPage> {
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+                backgroundColor: Colors.green,
                 content:
                     Text("✅ Umefanikiwa! Umeingia kwenye mfumo kwa mafanikio")),
           );
@@ -118,7 +120,10 @@ class _LoginPageState extends State<LoginPage> {
           });
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(jsonResponse['message'])),
+            SnackBar(
+              backgroundColor: Colors.red,
+              content: Text(jsonResponse['message']),
+            ),
           );
         } else {
           setState(() {
@@ -127,8 +132,10 @@ class _LoginPageState extends State<LoginPage> {
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(jsonResponse['message'] ??
-                    "ℹ️ Mtumiaji hakupatikana kwenye mfumo wetu")),
+              backgroundColor: Colors.red,
+              content: Text(jsonResponse['message'] ??
+                  "ℹ️ Mtumiaji hakupatikana kwenye mfumo wetu"),
+            ),
           );
         }
       }
@@ -139,6 +146,7 @@ class _LoginPageState extends State<LoginPage> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+            backgroundColor: Colors.red,
             content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }

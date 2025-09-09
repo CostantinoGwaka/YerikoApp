@@ -75,6 +75,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
+              backgroundColor: Colors.red,
               content: Text(
                 "⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa",
               ),
@@ -102,7 +103,9 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
         if (context.mounted) {
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${response.statusCode}")),
+            SnackBar(
+                backgroundColor: Colors.red,
+                content: Text("Error: ${response.statusCode}")),
           );
         }
       }
@@ -111,6 +114,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            backgroundColor: Colors.yellow,
             content: Text(
               "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
             ),
@@ -192,13 +196,16 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
       } else {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${response.statusCode}")),
+          SnackBar(
+              backgroundColor: Colors.red,
+              content: Text("Error: ${response.statusCode}")),
         );
       }
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+            backgroundColor: Colors.red,
             content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
@@ -230,13 +237,19 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
       } else {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${response.statusCode}")),
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(
+              "Error: ${response.statusCode}",
+            ),
+          ),
         );
       }
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+            backgroundColor: Colors.red,
             content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
@@ -728,7 +741,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Hitilafu: $e')),
+        SnackBar(backgroundColor: Colors.red, content: Text('Hitilafu: $e')),
       );
     } finally {
       setState(() => isLoading = false);
@@ -1017,7 +1030,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Hitilafu: $e')),
+        SnackBar(backgroundColor: Colors.red, content: Text('Hitilafu: $e')),
       );
     } finally {
       setState(() => isLoading = false);

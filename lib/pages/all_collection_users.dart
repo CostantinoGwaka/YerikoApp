@@ -35,6 +35,7 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
+                backgroundColor: Colors.red,
                 content:
                     Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
@@ -59,7 +60,12 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
         if (context.mounted) {
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${response.statusCode}")),
+            SnackBar(
+              backgroundColor: Colors.red,
+              content: Text(
+                "Error: ${response.statusCode}",
+              ),
+            ),
           );
         }
       }
@@ -68,6 +74,7 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+              backgroundColor: Colors.red,
               content:
                   Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
@@ -95,20 +102,32 @@ class _AllUserCollectionsState extends State<AllUserCollections> {
         Navigator.pop(context); // Close bottom sheet
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ratiba imefutwa kikamirifu.')),
+          const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text(
+              'Ratiba imefutwa kikamirifu.',
+            ),
+          ),
         );
         _reloadData();
       } else {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${response.statusCode}")),
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("Error: ${response.statusCode}"),
+          ),
         );
       }
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+          backgroundColor: Colors.red,
+          content: Text(
+            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+          ),
+        ),
       );
     }
   }

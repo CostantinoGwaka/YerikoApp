@@ -75,7 +75,9 @@ class _DailyPageState extends State<DailyPage> {
     // Show snackBar AFTER navigation is complete using post-frame callback
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("✅ Umefanikiwa! Umetoka kwenye mfumo.")),
+        const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text("✅ Umefanikiwa! Umetoka kwenye mfumo.")),
       );
     });
   }
@@ -158,7 +160,9 @@ class _DailyPageState extends State<DailyPage> {
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("✅ Umebadilishwa kwa jumuiya: $jumuiyaName")),
+          SnackBar(
+              backgroundColor: Colors.green,
+              content: Text("✅ Umebadilishwa kwa jumuiya: $jumuiyaName")),
         );
       }
     } catch (e) {
@@ -169,6 +173,7 @@ class _DailyPageState extends State<DailyPage> {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+              backgroundColor: Colors.red,
               content:
                   Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
@@ -180,6 +185,7 @@ class _DailyPageState extends State<DailyPage> {
     if (jumuiyaData.length < 2) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
+            backgroundColor: Colors.red,
             content: Text("⚠️ Huna jumuiya zaidi ya moja za kubadilishia")),
       );
       return;
@@ -313,6 +319,7 @@ class _DailyPageState extends State<DailyPage> {
       if (userId.toString().isEmpty || year == "" || year.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+              backgroundColor: Colors.red,
               content: Text("⚠️ Tafadhali hakikisha umeweka User ID na mwaka")),
         );
         setState(() {
@@ -342,7 +349,9 @@ class _DailyPageState extends State<DailyPage> {
           });
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(jsonResponse['message'])),
+            SnackBar(
+                backgroundColor: Colors.red,
+                content: Text(jsonResponse['message'])),
           );
         } else {
           setState(() {
@@ -357,6 +366,7 @@ class _DailyPageState extends State<DailyPage> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+            backgroundColor: Colors.red,
             content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
@@ -368,6 +378,7 @@ class _DailyPageState extends State<DailyPage> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
+                backgroundColor: Colors.red,
                 content:
                     Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
@@ -392,7 +403,9 @@ class _DailyPageState extends State<DailyPage> {
         if (context.mounted) {
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${response.statusCode}")),
+            SnackBar(
+                backgroundColor: Colors.red,
+                content: Text("Error: ${response.statusCode}")),
           );
         }
       }
@@ -401,6 +414,7 @@ class _DailyPageState extends State<DailyPage> {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+              backgroundColor: Colors.red,
               content:
                   Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );
@@ -417,6 +431,7 @@ class _DailyPageState extends State<DailyPage> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
+                backgroundColor: Colors.red,
                 content:
                     Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
@@ -451,6 +466,7 @@ class _DailyPageState extends State<DailyPage> {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+              backgroundColor: Colors.red,
               content:
                   Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
         );

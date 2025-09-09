@@ -49,13 +49,16 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
       } else {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${response.statusCode}")),
+          SnackBar(
+              backgroundColor: Colors.red,
+              content: Text("Error: ${response.statusCode}")),
         );
       }
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+            backgroundColor: Colors.red,
             content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
@@ -81,19 +84,24 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
         Navigator.pop(context); // Close bottom sheet
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ratiba imefutwa kikamirifu.')),
+          const SnackBar(
+              backgroundColor: Colors.red,
+              content: Text('Ratiba imefutwa kikamirifu.')),
         );
         _reloadData();
       } else {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${response.statusCode}")),
+          SnackBar(
+              backgroundColor: Colors.red,
+              content: Text("Error: ${response.statusCode}")),
         );
       }
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+            backgroundColor: Colors.red,
             content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
       );
     }
@@ -664,7 +672,9 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     } else {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Imeshindikana kufungua ramani')),
+        const SnackBar(
+            backgroundColor: Colors.red,
+            content: Text('Imeshindikana kufungua ramani')),
       );
     }
   }

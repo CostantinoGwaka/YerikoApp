@@ -12,6 +12,7 @@ import 'package:jumuiya_yangu/models/user_collection_table_model.dart';
 import 'package:jumuiya_yangu/models/user_trials_number_response.dart';
 import 'package:jumuiya_yangu/pages/add_pages/add_other_month_collection.dart';
 import 'package:jumuiya_yangu/pages/supports_pages/collection_table_against_month.dart';
+import 'package:jumuiya_yangu/pages/user_features_payment_page.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
@@ -1653,7 +1654,11 @@ class _AdminOtherAllUserCollectionsState
             ),
             onPressed: () {
               Navigator.pop(context);
-              // Navigate to subscription page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const UserFeaturesPaymentPage()),
+              );
             },
           ),
         ],

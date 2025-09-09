@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Border;
 import 'package:intl/intl.dart';
 import 'package:jumuiya_yangu/models/user_trials_number_response.dart';
+import 'package:jumuiya_yangu/pages/user_features_payment_page.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:share_plus/share_plus.dart';
@@ -399,7 +400,11 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
             ),
             onPressed: () {
               Navigator.pop(context);
-              // Navigate to subscription page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const UserFeaturesPaymentPage()),
+              );
             },
           ),
         ],

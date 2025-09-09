@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:jumuiya_yangu/pages/user_features_payment_page.dart';
 import 'package:jumuiya_yangu/shared/components/modern_widgets.dart';
 
 import '../main.dart';
@@ -326,15 +327,17 @@ class _HudumaZaZiadaPageState extends State<HudumaZaZiadaPage> {
         onPressed: () {
           // Navigate to buy features page
           // This would be implemented in a future update
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content:
-                  Text('Kipengele cha kununua huduma kitakuja hivi karibuni!'),
-            ),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const UserFeaturesPaymentPage()),
           );
         },
         backgroundColor: mainFontColor,
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
     );
   }

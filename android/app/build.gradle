@@ -33,7 +33,7 @@ android {
     namespace 'com.isoftzt.jumuiya_yangu'
 
     compileSdkVersion 35
-    ndkVersion "25.1.8937393"
+    ndkVersion "26.1.10909125"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

@@ -1,0 +1,3 @@
+key - SKVwViFqomoZNRJnFQRdnYJo1L9iOXuiFRrhp5fUSo
+client - IDAE9t3adCE9QZN9jgt5tu7egG4UpAyI
+JumuiyaYanguApp

@@ -6,6 +6,7 @@ import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Border;
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:jumuiya_yangu/models/user_trials_number_response.dart';
 import 'package:jumuiya_yangu/pages/user_features_payment_page.dart';
@@ -1560,6 +1561,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                 label: "Simu",
                                 value: item.phone ?? "Hajaongeza",
                                 color: Colors.green,
+                                showCopy: true,
                               ),
                               const SizedBox(height: 8),
                               _buildInfoRow(
@@ -1665,8 +1667,9 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
-                                              content: Text(
-                                                  "Imeshindikana kupiga simu.")),
+                                            content: Text(
+                                                "Imeshindikana kupiga simu."),
+                                          ),
                                         );
                                       }
                                     }
@@ -1716,6 +1719,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
     required String label,
     required String value,
     required Color color,
+    bool showCopy = false,
   }) {
     return Row(
       children: [
@@ -1751,6 +1755,27 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
             ],
           ),
         ),
+        if (showCopy)
+          GestureDetector(
+            onTap: () {
+              Clipboard.setData(ClipboardData(text: value));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('$label imenakiliwa'),
+                  duration: const Duration(seconds: 2),
+                  backgroundColor: color,
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.copy, size: 16, color: color),
+            ),
+          ),
       ],
     );
   }

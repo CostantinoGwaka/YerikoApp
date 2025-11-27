@@ -112,7 +112,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
         var jsonResponse = json.decode(response.body);
 
         if (kDebugMode) {
-          print(jsonResponse);
+          // print(jsonResponse);
         }
 
         if (jsonResponse != null && jsonResponse['status'] == 200) {
@@ -280,6 +280,8 @@ class _ForgetPasswordState extends State<ForgetPassword> {
 
         var jsonResponse = json.decode(response.body);
 
+        // print(jsonResponse);
+
         if (jsonResponse != null && jsonResponse['status'] == 200) {
           setState(() {
             _isLoading = false;
@@ -310,8 +312,9 @@ class _ForgetPasswordState extends State<ForgetPassword> {
           // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(jsonResponse['message'] ??
-                    "❎ Imegoma kubadili nenosiri kwenye mfumo wetu")),
+              content: Text(jsonResponse['message'] ??
+                  "❎ Imegoma kubadili nenosiri kwenye mfumo wetu"),
+            ),
           );
         }
       }

@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jumuiya_yangu/pages/forget_password.dart';
 import 'package:jumuiya_yangu/utils/global/appSetting.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:jumuiya_yangu/main.dart';
@@ -450,7 +451,14 @@ class _LoginPageState extends State<LoginPage> {
               // Forgot Password Link
               TextButton(
                 onPressed: () {
-                  showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
+                  // showSnackBar(context, "✅ Bado Ipo Katika Ujenzi.");
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ForgetPassword(),
+                    ),
+                  );
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: mainFontColor,

@@ -740,8 +740,8 @@ class _ForgetPasswordState extends State<ForgetPassword> {
           obscureText: _obscureConfirmPassword,
           validator: _validateConfirmPassword,
           decoration: InputDecoration(
-            labelText: 'Confirm Password',
-            hintText: 'Re-enter new password',
+            labelText: 'Thibitisha Nenosiri',
+            hintText: 'Ingiza tena nenosiri jipya',
             prefixIcon: const Icon(Icons.lock_outline, color: buttoncolor),
             suffixIcon: IconButton(
               icon: Icon(

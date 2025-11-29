@@ -959,8 +959,220 @@ class _DailyPageState extends State<DailyPage> {
                   ),
                 ),
               ),
-
               SizedBox(height: 24),
+
+              // Loans Section
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: mainFontColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.savings_rounded,
+                            color: mainFontColor,
+                            size: 20,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          "Mikopo",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: isSmallScreen ? 18 : 22,
+                            color: mainFontColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: mainFontColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isSmallScreen ? 12 : 16,
+                          vertical: isSmallScreen ? 8 : 10,
+                        ),
+                        elevation: 3,
+                      ),
+                      icon: Icon(
+                        Icons.visibility_rounded,
+                        size: isSmallScreen ? 14 : 16,
+                      ),
+                      label: Text(
+                        "Tazama Yote",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: isSmallScreen ? 12 : 14,
+                        ),
+                      ),
+                      onPressed: () => _navigateToCollections(),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 16),
+              // Collections List
+              FutureBuilder(
+                future: getUserCollections(),
+                builder:
+                    (context, AsyncSnapshot<CollectionResponse?> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container(
+                      margin:
+                          EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                      height: 200,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(mainFontColor),
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              "Inatafuta michango...",
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Container(
+                      margin:
+                          EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.red[50],
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.red[200]!),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.error_outline_rounded,
+                            color: Colors.red[400],
+                            size: 32,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            "Imeshindikana kupakia michango",
+                            style: TextStyle(
+                              color: Colors.red[700],
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
+                    return Container(
+                      margin:
+                          EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.inbox_rounded,
+                            color: Colors.grey[400],
+                            size: 48,
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            "Hakuna michango iliyopatikana",
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            "Michango itaonekana hapa baada ya kuongezwa",
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  final collections = snapshot.data!.data;
+                  final displayCount =
+                      collections.length > 4 ? 4 : collections.length;
+
+                  return Column(
+                    children: [
+                      ListView.builder(
+                        itemCount: displayCount,
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final item = collections[index];
+                          return _buildCollectionCard(
+                              context, item, index, collections, isSmallScreen);
+                        },
+                      ),
+                      if (collections.length > 4)
+                        Container(
+                          margin: EdgeInsets.symmetric(
+                              horizontal: size.width * 0.05, vertical: 16),
+                          child: TextButton.icon(
+                            style: TextButton.styleFrom(
+                              foregroundColor: mainFontColor,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(
+                                    color:
+                                        mainFontColor.withValues(alpha: 0.3)),
+                              ),
+                            ),
+                            icon: Icon(Icons.expand_more_rounded),
+                            label: Text(
+                              "Tazama zaidi (${collections.length - 4})",
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            onPressed: () => _navigateToCollections(),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+
+              // Collections List
+
+              SizedBox(height: isSmallScreen ? 16 : 24),
 
               // Collections Section
               Container(
@@ -1024,7 +1236,7 @@ class _DailyPageState extends State<DailyPage> {
                 ),
               ),
 
-              SizedBox(height: 16),
+              SizedBox(height: isSmallScreen ? 12 : 16),
 
               // Collections List
               FutureBuilder(
@@ -1172,7 +1384,7 @@ class _DailyPageState extends State<DailyPage> {
                 },
               ),
 
-              SizedBox(height: 24),
+              SizedBox(height: isSmallScreen ? 12 : 16),
             ],
           ),
         ),

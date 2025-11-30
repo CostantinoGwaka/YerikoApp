@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jumuiya_yangu/pages/loan_apps_user.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
@@ -540,6 +541,15 @@ class _DailyPageState extends State<DailyPage> {
       MaterialPageRoute(
         builder: (_) => CollectionsTablePage(
             collections: collections != null ? collections!.data : []),
+      ),
+    );
+  }
+
+  void _navigateToLoanAppsUserPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LoanAppsUserPage(),
       ),
     );
   }
@@ -1272,15 +1282,7 @@ class _DailyPageState extends State<DailyPage> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  "Ukurasa wa mikopo utafunguliwa hivi karibuni",
-                                ),
-                              ),
-                            );
-                          },
+                          onPressed: _navigateToLoanAppsUserPage,
                         ),
                       ],
                     ),

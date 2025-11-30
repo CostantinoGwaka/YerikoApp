@@ -572,63 +572,65 @@ class _ProfilePageState extends State<ProfilePage> {
     final isSmallScreen = size.width < 360;
 
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Colors.deepPurple,
-      //   systemOverlayStyle: const SystemUiOverlayStyle(
-      //     statusBarColor: Colors.deepPurple,
-      //     statusBarIconBrightness: Brightness.light,
-      //     statusBarBrightness: Brightness.dark,
-      //   ),
-      // ),
+      backgroundColor: Colors.grey[50],
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Header Section
+              // Header Section - More compact and elegant
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(isSmallScreen ? 20 : 24),
+                padding: EdgeInsets.fromLTRB(
+                  isSmallScreen ? 16 : 20,
+                  isSmallScreen ? 16 : 20,
+                  isSmallScreen ? 16 : 20,
+                  isSmallScreen ? 20 : 24,
+                ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
                       mainFontColor,
-                      mainFontColor.withValues(alpha: 0.8),
+                      mainFontColor.withValues(alpha: 0.85),
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: mainFontColor.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Column(
                   children: [
-                    // Profile Image
+                    // Profile Image - Smaller and more compact
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.3),
-                          width: 4,
+                          color: Colors.white.withValues(alpha: 0.4),
+                          width: 3,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
+                            color: Colors.black.withValues(alpha: 0.15),
                             spreadRadius: 0,
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
                           ),
                         ],
                       ),
                       child: CircleAvatar(
-                        radius:
-                            isSmallScreen ? size.height / 8 : size.height / 20,
+                        radius: isSmallScreen ? 35 : 40,
                         backgroundColor: Colors.white,
                         child: CircleAvatar(
-                          radius: isSmallScreen
-                              ? size.height / 8
-                              : size.height / 20,
+                          radius: isSmallScreen ? 33 : 38,
                           backgroundColor: Colors.white,
                           backgroundImage:
                               const AssetImage("assets/avatar.png"),
@@ -636,29 +638,29 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     // User Name
                     Text(
                       userData?.user.userFullName ?? "Mtumiaji",
                       style: TextStyle(
-                        fontSize:
-                            isSmallScreen ? size.height / 80 : size.height / 50,
-                        fontWeight: FontWeight.bold,
+                        fontSize: isSmallScreen ? 18 : 20,
+                        fontWeight: FontWeight.w700,
                         color: Colors.white,
+                        letterSpacing: 0.5,
                       ),
                       textAlign: TextAlign.center,
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
 
-                    // Phone Number
+                    // Phone Number - More compact
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.white.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -666,13 +668,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           const Icon(
                             Icons.phone_rounded,
                             color: Colors.white,
-                            size: 16,
+                            size: 14,
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 6),
                           Text(
                             "+${userData?.user.phone ?? ''}",
                             style: const TextStyle(
-                              fontSize: 14,
+                              fontSize: 13,
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
                             ),
@@ -681,25 +683,54 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
 
                     // Role Badge
                     if (userData?.user.role != null)
-                      StatusChip(
-                        label: userData!.user.role!,
-                        color: Colors.white,
-                        icon: Icons.verified_user_rounded,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.verified_user_rounded,
+                              size: 14,
+                              color: mainFontColor,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              userData!.user.role!,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: mainFontColor,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
-                    // Jumuiya Names Section (show if more than 2)
+                    // Jumuiya Names Section
                     if (jumuiyaData.length >= 2) ...[
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.3),
                             width: 1,
@@ -709,35 +740,39 @@ class _ProfilePageState extends State<ProfilePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                              children: [
+                              children: const [
                                 Icon(
                                   Icons.group_rounded,
                                   color: Colors.white,
-                                  size: 18,
+                                  size: 16,
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 6),
                                 Text(
                                   "Jumuiya Zangu",
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 8),
                             if (_isLoadingJumuiya)
-                              SizedBox(
-                                width: 16,
-                                height: 16,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
+                              const Center(
+                                child: SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               )
                             else
                               Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
+                                spacing: 6,
+                                runSpacing: 6,
                                 children: jumuiyaData.map((jumuiyaItem) {
                                   final name = jumuiyaItem['name'] as String;
                                   final id = jumuiyaItem['id'];
@@ -753,41 +788,40 @@ class _ProfilePageState extends State<ProfilePage> {
                                     },
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 6),
+                                          horizontal: 10, vertical: 5),
                                       decoration: BoxDecoration(
                                         color: isActive
                                             ? Colors.white
                                                 .withValues(alpha: 0.3)
                                             : Colors.white
                                                 .withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(10),
                                         border: Border.all(
                                           color: isActive
                                               ? Colors.white
-                                                  .withValues(alpha: 0.8)
                                               : Colors.white
                                                   .withValues(alpha: 0.4),
-                                          width: isActive ? 2 : 1,
+                                          width: isActive ? 1.5 : 1,
                                         ),
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           if (isActive) ...[
-                                            Icon(
+                                            const Icon(
                                               Icons.check_circle,
                                               color: Colors.white,
-                                              size: 16,
+                                              size: 14,
                                             ),
-                                            const SizedBox(width: 6),
+                                            const SizedBox(width: 4),
                                           ],
                                           Text(
                                             name,
                                             style: TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 11,
                                               color: Colors.white,
                                               fontWeight: isActive
-                                                  ? FontWeight.bold
+                                                  ? FontWeight.w600
                                                   : FontWeight.w500,
                                             ),
                                           ),
@@ -801,15 +835,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ],
-                    // SMS Bando Summary Section
+
+                    // SMS Bando Summary Section - More compact
                     if (userData?.user.role == "ADMIN") ...[
                       const SizedBox(height: 12),
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.3),
                             width: 1,
@@ -825,44 +860,40 @@ class _ProfilePageState extends State<ProfilePage> {
                                     Icon(
                                       Icons.message_rounded,
                                       color: Colors.white,
-                                      size: 18,
+                                      size: 16,
                                     ),
-                                    SizedBox(width: 8),
+                                    SizedBox(width: 6),
                                     Text(
                                       "Muhtasari wa SMS",
                                       style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 13,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.white,
                                       ),
                                     ),
                                   ],
                                 ),
-                                // if (smsBandoSummaryList.isNotEmpty) ...[
-                                const SizedBox(height: 12),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.refresh,
-                                        color: Colors.white,
-                                      ),
-                                      onPressed: fetchSmsBandoSummary,
+                                SizedBox(
+                                  height: 32,
+                                  width: 32,
+                                  child: IconButton(
+                                    padding: EdgeInsets.zero,
+                                    icon: const Icon(
+                                      Icons.refresh_rounded,
+                                      color: Colors.white,
+                                      size: 18,
                                     ),
-                                  ],
+                                    onPressed: fetchSmsBandoSummary,
+                                  ),
                                 ),
-                                // ],
                               ],
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 8),
                             _isLoadingSmsSummary
                                 ? const Center(
                                     child: SizedBox(
-                                      width: 16,
-                                      height: 16,
+                                      width: 14,
+                                      height: 14,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
                                         color: Colors.white,
@@ -874,31 +905,37 @@ class _ProfilePageState extends State<ProfilePage> {
                                         "Hakuna taarifa za SMS",
                                         style: TextStyle(
                                           color: Colors.white70,
-                                          fontSize: 13,
+                                          fontSize: 12,
                                         ),
                                       )
                                     : Column(
                                         children: [
                                           Container(
-                                            padding: const EdgeInsets.all(16),
+                                            padding: const EdgeInsets.all(12),
                                             decoration: BoxDecoration(
-                                              color: Colors.black
-                                                  .withOpacity(0.05),
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
                                               borderRadius:
-                                                  BorderRadius.circular(12),
+                                                  BorderRadius.circular(10),
                                             ),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.spaceEvenly,
                                               children: [
                                                 _buildSmsStatItem(
-                                                  "SMS Zilizopo",
+                                                  "Zilizopo",
                                                   smsBandoSummaryList.isNotEmpty
                                                       ? smsBandoSummaryList[0]
                                                           .smsTotal
                                                           .toString()
                                                       : "0",
-                                                  Colors.blue,
+                                                  Colors.blue.shade300,
+                                                ),
+                                                Container(
+                                                  width: 1,
+                                                  height: 30,
+                                                  color: Colors.white
+                                                      .withOpacity(0.3),
                                                 ),
                                                 _buildSmsStatItem(
                                                   "Zilizotumiwa",
@@ -907,14 +944,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                                           .totalWaliotumiwa
                                                           .toString()
                                                       : "0",
-                                                  Colors.green,
+                                                  Colors.green.shade300,
                                                 ),
                                               ],
                                             ),
                                           ),
-                                          SizedBox(
-                                            height: 4,
-                                          ),
+                                          const SizedBox(height: 6),
                                           if (smsBandoSummaryList
                                               .isNotEmpty) ...[
                                             GestureDetector(
@@ -930,14 +965,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                               child: Container(
                                                 padding:
                                                     const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 8,
+                                                  horizontal: 10,
+                                                  vertical: 6,
                                                 ),
                                                 decoration: BoxDecoration(
                                                   color: Colors.white
-                                                      .withOpacity(0.2),
+                                                      .withOpacity(0.25),
                                                   borderRadius:
-                                                      BorderRadius.circular(20),
+                                                      BorderRadius.circular(16),
                                                 ),
                                                 child: Row(
                                                   mainAxisSize:
@@ -949,16 +984,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                                       "Angalia Zaidi",
                                                       style: TextStyle(
                                                         color: Colors.white,
-                                                        fontSize: 12,
+                                                        fontSize: 11,
                                                         fontWeight:
-                                                            FontWeight.w500,
+                                                            FontWeight.w600,
                                                       ),
                                                     ),
                                                     SizedBox(width: 4),
                                                     Icon(
                                                       Icons.arrow_forward_ios,
                                                       color: Colors.white,
-                                                      size: 12,
+                                                      size: 10,
                                                     ),
                                                   ],
                                                 ),
@@ -971,48 +1006,57 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ],
-                    const SizedBox(height: 12),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Menu Items
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                padding: EdgeInsets.symmetric(horizontal: size.width * 0.04),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Settings Section
                     _buildSectionTitle("⚙️ Mipangilio", isSmallScreen),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
-                    ModernCard(
-                      padding: EdgeInsets.zero,
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
                       child: Column(
                         children: [
                           _buildModernMenuItem(
-                            icon: Icons.person_rounded,
+                            icon: Icons.person_outline_rounded,
                             title: "Hariri Taarifa",
                             subtitle: "Badilisha jina lako",
                             onTap: () => _showEditProfileDialog(context),
                             color: blue,
                           ),
-                          Divider(height: 1, color: Colors.grey[200]),
+                          Divider(height: 1, color: Colors.grey[100]),
                           _buildModernMenuItem(
-                            icon: Icons.lock_rounded,
+                            icon: Icons.lock_outline_rounded,
                             title: "Badili Nenosiri",
                             subtitle: "Hifadhi akaunti yako",
                             onTap: () => _showChangePasswordDialog(context),
                             color: orange,
                           ),
                           if (userData?.user.role == "ADMIN") ...[
-                            Divider(height: 1, color: Colors.grey[200]),
+                            Divider(height: 1, color: Colors.grey[100]),
                             _buildModernMenuItem(
-                              icon: Icons.money,
+                              icon: Icons.wallet_outlined,
                               title: "Nunua Jumbe",
-                              subtitle: "Nunua na Angalia jumbe ulizonunua",
+                              subtitle: "Nunua na angalia jumbe",
                               onTap: () => Navigator.push(
                                 context,
                                 PageTransition(
@@ -1022,11 +1066,11 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               color: green,
                             ),
-                            Divider(height: 1, color: Colors.grey[200]),
+                            Divider(height: 1, color: Colors.grey[100]),
                             _buildModernMenuItem(
-                              icon: Icons.message_rounded,
+                              icon: Icons.send_outlined,
                               title: "Tuma Jumbe",
-                              subtitle: "Tuma na tazama jumbe ulizotuma",
+                              subtitle: "Tuma na tazama jumbe",
                               onTap: () => Navigator.push(
                                 context,
                                 PageTransition(
@@ -1034,40 +1078,38 @@ class _ProfilePageState extends State<ProfilePage> {
                                   child: const SendMessagePage(),
                                 ),
                               ),
-                              color: green,
+                              color: purple,
                             ),
-                            Divider(height: 1, color: Colors.grey[200]),
-                            if (userData?.user.role == "ADMIN") ...[
-                              _buildModernMenuItem(
-                                icon: Icons.attach_money,
-                                title: "Mikopo",
-                                subtitle: "Mpangilio wa mikopo ya watumiaji",
-                                onTap: () => Navigator.push(
-                                  context,
-                                  PageTransition(
-                                    type: PageTransitionType.rightToLeft,
-                                    child: LoanSettingPage(
-                                        jumuiyaId:
-                                            userData?.user.jumuiya_id ?? 0),
-                                  ),
-                                ),
-                                color: green,
-                              ),
-                              Divider(height: 1, color: Colors.grey[200]),
-                            ],
+                            Divider(height: 1, color: Colors.grey[100]),
                             _buildModernMenuItem(
-                              icon: Icons.category_rounded,
-                              title: "Ongeza Aina ya Mchango",
+                              icon: Icons.account_balance_wallet_outlined,
+                              title: "Mikopo",
+                              subtitle: "Mpangilio wa mikopo",
+                              onTap: () => Navigator.push(
+                                context,
+                                PageTransition(
+                                  type: PageTransitionType.rightToLeft,
+                                  child: LoanSettingPage(
+                                      jumuiyaId:
+                                          userData?.user.jumuiya_id ?? 0),
+                                ),
+                              ),
+                              color: Colors.indigo,
+                            ),
+                            Divider(height: 1, color: Colors.grey[100]),
+                            _buildModernMenuItem(
+                              icon: Icons.category_outlined,
+                              title: "Aina ya Mchango",
                               subtitle: "Tengeneza mchango mpya",
                               onTap: () =>
                                   _showAddCollectionTypeDialog(context),
-                              color: green,
+                              color: Colors.teal,
                             ),
-                            Divider(height: 1, color: Colors.grey[200]),
+                            Divider(height: 1, color: Colors.grey[100]),
                             _buildModernMenuItem(
-                              icon: Icons.money,
+                              icon: Icons.widgets_outlined,
                               title: "Huduma Za Ziada",
-                              subtitle: "Nunua na Angalia Huduma Za Ziada",
+                              subtitle: "Nunua huduma za ziada",
                               onTap: () => Navigator.push(
                                 context,
                                 PageTransition(
@@ -1075,41 +1117,51 @@ class _ProfilePageState extends State<ProfilePage> {
                                   child: const HudumaZaZiadaPage(),
                                 ),
                               ),
-                              color: green,
+                              color: Colors.cyan,
                             ),
                           ],
                         ],
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
 
                     // App Information Section
                     _buildSectionTitle("ℹ️ Taarifa za Programu", isSmallScreen),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
-                    ModernCard(
-                      padding: EdgeInsets.zero,
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
                       child: Column(
                         children: [
                           _buildModernMenuItem(
-                            icon: Icons.share_rounded,
+                            icon: Icons.share_outlined,
                             title: "Shiriki Programu",
                             subtitle: "Shiriki na marafiki",
                             onTap: () => _shareApp(),
                             color: purple,
                           ),
-                          Divider(height: 1, color: Colors.grey[200]),
+                          Divider(height: 1, color: Colors.grey[100]),
                           _buildModernMenuItem(
-                            icon: Icons.help_rounded,
+                            icon: Icons.help_outline_rounded,
                             title: "Msaada na Usaidizi",
                             subtitle: "Wasiliana nasi",
                             onTap: () => _contactSupport(),
                             color: blue,
                           ),
-                          Divider(height: 1, color: Colors.grey[200]),
+                          Divider(height: 1, color: Colors.grey[100]),
                           _buildModernMenuItem(
-                            icon: Icons.info_rounded,
+                            icon: Icons.info_outline_rounded,
                             title: "Kuhusu Programu",
                             subtitle: "Toleo na maelezo",
                             onTap: () => _showAboutDialog(context),
@@ -1119,16 +1171,41 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
 
                     // Logout Button
-                    ModernButton(
-                      text: "Toka",
-                      icon: Icons.logout_rounded,
-                      backgroundColor: errorColor,
-                      onPressed: () => _showLogoutDialog(context),
-                      isLoading: _isLoading,
-                      padding: const EdgeInsets.all(10),
+                    Container(
+                      width: double.infinity,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: errorColor.withValues(alpha: 0.3),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.logout_rounded, size: 20),
+                        label: const Text(
+                          'Toka',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: errorColor,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        onPressed: () => _showLogoutDialog(context),
+                      ),
                     ),
 
                     const SizedBox(height: 24),
@@ -1143,12 +1220,16 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildSectionTitle(String title, bool isSmallScreen) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: isSmallScreen ? 16 : 18,
-        fontWeight: FontWeight.bold,
-        color: textPrimary,
+    return Padding(
+      padding: const EdgeInsets.only(left: 4),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: isSmallScreen ? 15 : 16,
+          fontWeight: FontWeight.w700,
+          color: textPrimary,
+          letterSpacing: 0.3,
+        ),
       ),
     );
   }
@@ -1160,39 +1241,58 @@ class _ProfilePageState extends State<ProfilePage> {
     required VoidCallback onTap,
     required Color color,
   }) {
-    return ListTile(
+    return InkWell(
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      leading: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: textPrimary,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: textSecondary,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.grey[350],
+              size: 20,
+            ),
+          ],
         ),
-        child: Icon(
-          icon,
-          color: color,
-          size: 24,
-        ),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: textPrimary,
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: const TextStyle(
-          fontSize: 13,
-          color: textSecondary,
-        ),
-      ),
-      trailing: Icon(
-        Icons.chevron_right_rounded,
-        color: Colors.grey[400],
       ),
     );
   }
@@ -1523,32 +1623,36 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildSmsStatItem(String label, String value, Color color) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.2),
-            shape: BoxShape.circle,
-          ),
-          child: Text(
-            value,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.25),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -8,7 +8,7 @@ import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/sms_bando_summary_model.dart';
 import 'package:jumuiya_yangu/models/sms_bando_used_model.dart';
 import 'package:jumuiya_yangu/pages/huduma_za_ziada_page.dart';
-import 'package:jumuiya_yangu/pages/loan_setting.dart';
+import 'package:jumuiya_yangu/pages/loan_from_all_users.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:share_plus/share_plus.dart';
@@ -1088,9 +1088,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 context,
                                 PageTransition(
                                   type: PageTransitionType.rightToLeft,
-                                  child: LoanSettingPage(
+                                  child: LoanFromAllUsersPage(
                                       jumuiyaId:
-                                          userData?.user.jumuiya_id ?? 0),
+                                          userData?.user.jumuiya_id ?? ''),
                                 ),
                               ),
                               color: Colors.indigo,

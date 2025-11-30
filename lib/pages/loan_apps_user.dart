@@ -9,6 +9,8 @@ import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/loan_setting.dart';
 import 'package:jumuiya_yangu/models/user_total_model.dart';
 import 'package:jumuiya_yangu/models/user_loan_model.dart';
+import 'package:jumuiya_yangu/pages/loan_from_all_users.dart';
+import 'package:jumuiya_yangu/services/loan_setting_service.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 
@@ -597,10 +599,12 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                   padding: EdgeInsets.zero,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: userLoans.length,
-                  itemBuilder: (context, index) => _buildLoanCard(
-                    userLoans[index],
-                    screenWidth,
-                    isTablet,
+                  itemBuilder: (context, index) => LoanCard(
+                    loan: userLoans[index],
+                    statusColor: LoanSettingService.getStatusColor(
+                        userLoans[index].status),
+                    formatCurrency: LoanSettingService.formatCurrency,
+                    formatDate: LoanSettingService.formatDate,
                   ),
                 ),
         ],
@@ -635,165 +639,5 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         ),
       ),
     );
-  }
-
-  Widget _buildLoanCard(UserLoan loan, double screenWidth, bool isTablet) {
-    final status = loan.status;
-    final statusColor = status == 'approved'
-        ? Colors.green
-        : status == 'rejected'
-            ? Colors.red
-            : Colors.orange;
-
-    return Container(
-      margin: EdgeInsets.only(bottom: screenWidth * 0.03),
-      padding: EdgeInsets.all(screenWidth * 0.04),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(screenWidth * 0.03),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    NumberFormat.currency(symbol: 'TSh ').format(
-                      double.parse(loan.amount),
-                    ),
-                    style: TextStyle(
-                      fontSize: isTablet ? 24 : 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.03,
-                  vertical: screenWidth * 0.015,
-                ),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(screenWidth * 0.05),
-                ),
-                child: Text(
-                  status == 'approved'
-                      ? 'IMEIDHINISHWA'
-                      : status == 'rejected'
-                          ? 'IMEKATALIWA'
-                          : 'INASUBIRI',
-                  style: TextStyle(
-                    color: statusColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: isTablet ? 14 : 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: screenWidth * 0.03),
-          _buildLoanDetailRow(
-            Icons.percent,
-            'Riba',
-            '${loan.interestRate}%',
-            screenWidth,
-            isTablet,
-          ),
-          _buildLoanDetailRow(
-            Icons.account_balance_wallet,
-            'Jumla ya Malipo',
-            NumberFormat.currency(symbol: 'TSh ').format(
-              double.parse(loan.totalAmount),
-            ),
-            screenWidth,
-            isTablet,
-          ),
-          _buildLoanDetailRow(
-            Icons.payment,
-            'Malipo ya Kila Mwezi',
-            NumberFormat.currency(symbol: 'TSh ').format(
-              double.parse(loan.monthlyInstallment),
-            ),
-            screenWidth,
-            isTablet,
-          ),
-          _buildLoanDetailRow(
-            Icons.calendar_today,
-            'Tarehe ya Ombi',
-            _formatDate(loan.requestedAt),
-            screenWidth,
-            isTablet,
-          ),
-          if (loan.approvedAt != null)
-            _buildLoanDetailRow(
-              Icons.check_circle,
-              'Imeidhinishwa',
-              _formatDate(loan.approvedAt),
-              screenWidth,
-              isTablet,
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLoanDetailRow(
-    IconData icon,
-    String label,
-    String value,
-    double screenWidth,
-    bool isTablet,
-  ) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: screenWidth * 0.01),
-      child: Row(
-        children: [
-          Icon(icon, size: isTablet ? 18 : 16, color: Colors.grey[600]),
-          SizedBox(width: screenWidth * 0.02),
-          Expanded(
-            child: Text(
-              '$label: ',
-              style: TextStyle(
-                fontSize: isTablet ? 16 : 14,
-                color: Colors.grey[600],
-              ),
-            ),
-          ),
-          Flexible(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: isTablet ? 16 : 14,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.right,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatDate(String? date) {
-    if (date == null) return 'N/A';
-    try {
-      final dateTime = DateTime.parse(date);
-      return DateFormat('MMM dd, yyyy').format(dateTime);
-    } catch (e) {
-      return date;
-    }
   }
 }

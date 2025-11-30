@@ -36,9 +36,9 @@ class UserLoan {
   final String monthlyInstallment;
   final String status;
   final String loanType;
-  final String? approvedBy;
+  final dynamic approvedBy;
   final String requestedAt;
-  final String? approvedAt;
+  final dynamic approvedAt;
   final LoanJumuiya jumuiya;
   final LoanUser user;
 
@@ -66,9 +66,9 @@ class UserLoan {
       monthlyInstallment: json['monthly_installment'].toString(),
       status: json['status'] as String,
       loanType: json['loan_type'] as String,
-      approvedBy: json['approved_by']?.toString(),
+      approvedBy: json['approved_by']?.toString() ?? 'null',
       requestedAt: json['requested_at'] as String,
-      approvedAt: json['approved_at']?.toString(),
+      approvedAt: json['approved_at']?.toString() ?? 'null',
       jumuiya: LoanJumuiya.fromJson(json['jumuiya'] as Map<String, dynamic>),
       user: LoanUser.fromJson(json['user'] as Map<String, dynamic>),
     );
@@ -83,9 +83,9 @@ class UserLoan {
       'monthly_installment': monthlyInstallment,
       'status': status,
       'loan_type': loanType,
-      'approved_by': approvedBy,
+      'approved_by': approvedBy ?? 'null',
       'requested_at': requestedAt,
-      'approved_at': approvedAt,
+      'approved_at': approvedAt ?? 'null',
       'jumuiya': jumuiya.toJson(),
       'user': user.toJson(),
     };
@@ -118,36 +118,40 @@ class LoanJumuiya {
 
 class LoanUser {
   final dynamic id;
-  final String name;
   final String phone;
-  final String username;
+  final String userFullName;
+  final String userName;
   final String role;
+  final String createdAt;
 
   LoanUser({
     required this.id,
-    required this.name,
     required this.phone,
-    required this.username,
+    required this.userFullName,
+    required this.userName,
     required this.role,
+    required this.createdAt,
   });
 
   factory LoanUser.fromJson(Map<String, dynamic> json) {
     return LoanUser(
       id: json['id'],
-      name: json['name'] as String,
-      phone: json['phone'] as String,
-      username: json['username'] as String,
+      phone: json['phone'].toString(),
+      userFullName: json['userFullName'] as String,
+      userName: json['userName'] as String,
       role: json['role'] as String,
+      createdAt: json['createdAt'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
       'phone': phone,
-      'username': username,
+      'userFullName': userFullName,
+      'userName': userName,
       'role': role,
+      'createdAt': createdAt,
     };
   }
 }

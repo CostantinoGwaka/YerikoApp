@@ -8,9 +8,7 @@ import '../services/loan_setting_service.dart';
 
 class LoanSettingPage extends StatefulWidget {
   final dynamic jumuiyaId;
-
   const LoanSettingPage({super.key, required this.jumuiyaId});
-
   @override
   State<LoanSettingPage> createState() => _LoanSettingPageState();
 }

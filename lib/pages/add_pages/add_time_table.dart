@@ -240,7 +240,7 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: DropdownButtonFormField<User>(
-                    value: selectedUser,
+                    initialValue: selectedUser,
                     isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: "Chagua Mwenyeji",

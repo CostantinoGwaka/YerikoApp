@@ -529,7 +529,7 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
         border: Border.all(color: borderColor),
       ),
       child: DropdownButtonFormField<String>(
-        value: value,
+        initialValue: value,
         items: items.map((item) {
           return DropdownMenuItem(
             value: item,

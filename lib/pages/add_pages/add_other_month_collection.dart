@@ -282,7 +282,7 @@ class _AddOtherMonthCollectionUserAdminState
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
-                        value: selectedMonth,
+                        initialValue: selectedMonth,
                         decoration: InputDecoration(
                           hintText: "Chagua mwezi...",
                           prefixIcon: Icon(Icons.calendar_month,
@@ -384,7 +384,7 @@ class _AddOtherMonthCollectionUserAdminState
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<User>(
-                        value: selectedUser,
+                        initialValue: selectedUser,
                         isExpanded: true,
                         decoration: InputDecoration(
                           hintText: "Chagua mwanajumuiya...",
@@ -468,7 +468,7 @@ class _AddOtherMonthCollectionUserAdminState
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<CollectionType>(
-                        value: selectedType,
+                        initialValue: selectedType,
                         isExpanded: true,
                         decoration: InputDecoration(
                           hintText: "Chagua aina ya mchango...",

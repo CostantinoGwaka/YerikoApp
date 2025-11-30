@@ -364,7 +364,7 @@ class _AddMonthCollectionUserAdminState
         border: Border.all(color: borderColor),
       ),
       child: DropdownButtonFormField<String>(
-        value: selectedMonth,
+        initialValue: selectedMonth,
         isExpanded: true,
         decoration: InputDecoration(
           labelText: "Chagua Mwezi",
@@ -404,7 +404,7 @@ class _AddMonthCollectionUserAdminState
         border: Border.all(color: borderColor),
       ),
       child: DropdownButtonFormField<User>(
-        value: selectedUser,
+        initialValue: selectedUser,
         isExpanded: true,
         decoration: InputDecoration(
           labelText: "Chagua Mwanajumuiya",

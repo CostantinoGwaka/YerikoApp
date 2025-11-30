@@ -436,8 +436,9 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                   const Divider(height: 20),
                   _buildDetailRow(
                     'Malipo ya Kila Mwezi',
-                    NumberFormat.currency(symbol: 'TSh ')
-                        .format(monthlyInstallment),
+                    NumberFormat.currency(
+                      symbol: 'TSh ',
+                    ).format(monthlyInstallment),
                     color: Colors.blue[700],
                   ),
                 ],

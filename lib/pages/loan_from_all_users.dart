@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/user_loan_model.dart';
 import 'package:jumuiya_yangu/models/loan_repayment_history_model.dart';
+import 'package:jumuiya_yangu/models/jumuiya_loan_statistics_model.dart';
 import 'package:jumuiya_yangu/pages/loan_setting.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
@@ -29,11 +30,14 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
   String errorMessage = '';
   final TextEditingController _searchController = TextEditingController();
   String searchQuery = '';
+  List<LoanStatistic> statistics = [];
+  bool isLoadingStatistics = false;
 
   @override
   void initState() {
     super.initState();
     fetchLoans();
+    fetchStatistics();
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -110,6 +114,45 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
     }
   }
 
+  Future<void> fetchStatistics() async {
+    setState(() {
+      isLoadingStatistics = true;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/loans/get_loan_history_jumuiya_id.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'jumuiya_id': widget.jumuiyaId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == '200') {
+          final statsResponse = JumuiyaLoanStatisticsResponse.fromJson(data);
+          setState(() {
+            statistics = statsResponse.statistics;
+            isLoadingStatistics = false;
+          });
+        } else {
+          setState(() {
+            isLoadingStatistics = false;
+          });
+        }
+      } else {
+        setState(() {
+          isLoadingStatistics = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoadingStatistics = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -178,6 +221,157 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
               ),
             ),
           ),
+
+          // Statistics Section
+          if (isLoadingStatistics)
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else if (statistics.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                    child: Text(
+                      'Takwimu za Mikopo',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 140,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: statistics.length,
+                      itemBuilder: (context, index) {
+                        final stat = statistics[index];
+                        return Container(
+                          width: 280,
+                          margin: const EdgeInsets.only(right: 12),
+                          child: Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Mkopo #${stat.loanId}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              _getStatusColor(stat.loanStatus)
+                                                  .withOpacity(0.2),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          stat.loanStatus.toUpperCase(),
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: _getStatusColor(
+                                                stat.loanStatus),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _MiniStatItem(
+                                          label: 'Uliotolewa',
+                                          value:
+                                              LoanSettingService.formatCurrency(
+                                                  stat.totalLoanTaken),
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: _MiniStatItem(
+                                          label: 'Umerudishwa',
+                                          value:
+                                              LoanSettingService.formatCurrency(
+                                                  stat.totalLoanRepaid),
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Baki: ${LoanSettingService.formatCurrency(stat.remainingLoan)}',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                      Text(
+                                        '${stat.percentagePaid.toStringAsFixed(0)}%',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green[700],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: LinearProgressIndicator(
+                                      value: stat.percentagePaid / 100,
+                                      minHeight: 6,
+                                      backgroundColor: Colors.grey[300],
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.green[700]!,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
           // Status Filter Chips
           Container(
@@ -338,6 +532,22 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
         ],
       ),
     );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return Colors.green;
+      case 'in_progress':
+      case 'in-progress':
+        return Colors.orange;
+      case 'pending':
+        return Colors.blue;
+      case 'rejected':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 }
 
@@ -1286,6 +1496,44 @@ class _StatCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _MiniStatItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _MiniStatItem({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 }

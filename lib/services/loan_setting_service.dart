@@ -20,17 +20,16 @@ class LoanSettingService {
     }
   }
 
-  Future<LoanSetting?> getLoanSettingByJumuiyaId(int jumuiyaId) async {
+  Future<LoanSetting?> getLoanSettingByJumuiyaId(dynamic jumuiyaId) async {
     try {
       final response = await http.get(
         Uri.parse(
-            '$baseUrl/get_loan_setting_by_jumuiya_id.php?jumuiya_id=$jumuiyaId'),
+          '$baseUrl/loans/get_loan_setting_by_jumuiya_id.php?jumuiya_id=$jumuiyaId',
+        ),
         headers: {'Content-Type': 'application/json'},
       );
 
       final data = json.decode(response.body);
-
-      print(data);
 
       if (data['status'] == '200' && data['data'] != null) {
         return LoanSetting.fromJson(data['data']);

@@ -272,14 +272,14 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
         if (userTrialsNumber != null &&
             int.parse(userTrialsNumber!.data[0].reportTrials) != 0) ...[
           FloatingActionButton.small(
-            heroTag: 'export_pdf',
+            heroTag: 'export_pdf_user1',
             onPressed: () => _exportToPDF(),
             backgroundColor: Colors.blue,
             child: const Icon(Icons.picture_as_pdf),
           ),
           const SizedBox(height: 8),
           FloatingActionButton.small(
-            heroTag: 'export_excel',
+            heroTag: 'export_excel_user1',
             onPressed: () => _exportToExcel(),
             backgroundColor: Colors.green,
             child: const Icon(Icons.table_chart),
@@ -289,7 +289,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
         if (userTrialsNumber != null &&
             int.parse(userTrialsNumber!.data[0].reportTrials) == 0) ...[
           FloatingActionButton.small(
-            heroTag: 'upgrade',
+            heroTag: 'upgrade_user1',
             onPressed: () => _showPremiumDialog(),
             backgroundColor: Colors.amber,
             child: const Icon(Icons.star),

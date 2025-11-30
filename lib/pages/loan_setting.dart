@@ -113,6 +113,10 @@ class _LoanSettingPageState extends State<LoanSettingPage> {
         foregroundColor: Colors.white,
         title: const Text('Mipangilio ya Mkopo'),
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

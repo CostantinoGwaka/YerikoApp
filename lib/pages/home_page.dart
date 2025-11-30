@@ -131,6 +131,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ],
               ),
               child: FloatingActionButton(
+                heroTag: 'home_fab',
                 onPressed: () {
                   setTabs(3);
                   setState(() {

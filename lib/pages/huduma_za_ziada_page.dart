@@ -324,6 +324,7 @@ class _HudumaZaZiadaPageState extends State<HudumaZaZiadaPage> {
                       ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'huduma_za_ziada_fab',
         onPressed: () {
           // Navigate to buy features page
           // This would be implemented in a future update

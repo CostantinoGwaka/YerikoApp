@@ -2024,21 +2024,21 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         if (userTrialsNumber != null &&
             int.parse(userTrialsNumber!.data[0].reportTrials) != 0) ...[
           FloatingActionButton.small(
-            heroTag: 'export_pdf',
+            heroTag: 'export_pdf_admin',
             onPressed: () => _exportToPDF(),
             backgroundColor: Colors.blue,
             child: const Icon(Icons.picture_as_pdf),
           ),
           const SizedBox(height: 8),
           FloatingActionButton.small(
-            heroTag: 'export_excel',
+            heroTag: 'export_excel_admin',
             onPressed: () => _exportToExcel(),
             backgroundColor: Colors.green,
             child: const Icon(Icons.table_chart),
           ),
           const SizedBox(height: 8),
           FloatingActionButton.small(
-            heroTag: 'detailed_report',
+            heroTag: 'detailed_report_admin',
             onPressed: () => _showDetailedReport(),
             backgroundColor: Colors.purple,
             child: const Icon(Icons.analytics),
@@ -2048,7 +2048,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
         if (userTrialsNumber != null &&
             int.parse(userTrialsNumber!.data[0].reportTrials) == 0) ...[
           FloatingActionButton.small(
-            heroTag: 'upgrade',
+            heroTag: 'upgrade_admin',
             onPressed: () => _showPremiumDialog(),
             backgroundColor: Colors.amber,
             child: const Icon(Icons.star),

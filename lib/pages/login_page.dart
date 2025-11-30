@@ -501,7 +501,7 @@ class _LoginPageState extends State<LoginPage> {
                   Align(
                     alignment: Alignment.bottomRight,
                     child: FloatingActionButton(
-                      heroTag: "helpDeskBtn",
+                      heroTag: 'help_desk_fab',
                       backgroundColor: mainFontColor,
                       onPressed: () {
                         showSnackBar(context, "📞 Help Desk: 0659515042");

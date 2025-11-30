@@ -196,6 +196,7 @@ class _SmsBandoListPageState extends State<SmsBandoListPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'sms_bando_add',
         onPressed: () {
           Navigator.push(
             context,

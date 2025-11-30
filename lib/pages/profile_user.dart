@@ -1037,6 +1037,20 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             Divider(height: 1, color: Colors.grey[200]),
                             _buildModernMenuItem(
+                              icon: Icons.attach_money,
+                              title: "Mikopo",
+                              subtitle: "Mpangilio wa mikopo ya watumiaji",
+                              onTap: () => Navigator.push(
+                                context,
+                                PageTransition(
+                                  type: PageTransitionType.rightToLeft,
+                                  child: const SendMessagePage(),
+                                ),
+                              ),
+                              color: green,
+                            ),
+                            Divider(height: 1, color: Colors.grey[200]),
+                            _buildModernMenuItem(
                               icon: Icons.category_rounded,
                               title: "Ongeza Aina ya Mchango",
                               subtitle: "Tengeneza mchango mpya",

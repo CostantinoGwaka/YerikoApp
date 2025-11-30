@@ -276,7 +276,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     return Scaffold(
       backgroundColor: surfaceColor,
       appBar: AppBar(
-        foregroundColor: Colors.white,
+        foregroundColor: mainFontColor,
         backgroundColor: surfaceColor,
         title: Text(
           'Maombi ya Mkopo',

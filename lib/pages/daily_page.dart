@@ -84,6 +84,7 @@ class _DailyPageState extends State<DailyPage> {
         _isLoadingLoans = false;
       });
       if (context.mounted) {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.red,
@@ -1026,7 +1027,7 @@ class _DailyPageState extends State<DailyPage> {
                               value: _isLoading
                                   ? null
                                   : (userTotalData != null)
-                                      ? "${NumberFormat.compact().format(userTotalData!.overallTotal)}/="
+                                      ? "${NumberFormat().format(userTotalData!.overallTotal)}/="
                                       : "0",
                               onTap: () => _navigateToCollections(),
                               isSmall: isSmallScreen,
@@ -1041,7 +1042,7 @@ class _DailyPageState extends State<DailyPage> {
                               value: _isLoading
                                   ? null
                                   : (userTotalData != null)
-                                      ? "${NumberFormat.compact().format(userTotalData!.currentYearTotal)}/="
+                                      ? "${NumberFormat().format(userTotalData!.currentYearTotal)}/="
                                       : "0",
                               onTap: () => _navigateToCollections(),
                               isSmall: isSmallScreen,
@@ -1056,7 +1057,7 @@ class _DailyPageState extends State<DailyPage> {
                               value: _isLoading
                                   ? null
                                   : (userTotalData != null)
-                                      ? "${NumberFormat.compact().format(userTotalData!.otherTotal)}/="
+                                      ? "${NumberFormat().format(userTotalData!.otherTotal)}/="
                                       : "0",
                               onTap: () => _navigateToOtherCollections(),
                               isSmall: isSmallScreen,
@@ -1318,7 +1319,7 @@ class _DailyPageState extends State<DailyPage> {
                                   icon: Icons.arrow_upward_rounded,
                                   label: "Uliochukuliwa",
                                   value:
-                                      "TZS ${NumberFormat.compact().format(loanStatistics?.totalLoanTaken ?? 0.0)}",
+                                      "TZS ${NumberFormat().format(loanStatistics?.totalLoanTaken ?? 0.0)}",
                                   color: Colors.blue[700]!,
                                   isSmall: isSmallScreen,
                                 ),
@@ -1329,7 +1330,7 @@ class _DailyPageState extends State<DailyPage> {
                                   icon: Icons.arrow_downward_rounded,
                                   label: "Umerudisha",
                                   value:
-                                      "TZS ${NumberFormat.compact().format(loanStatistics?.totalLoanRepaid ?? 0.0)}",
+                                      "TZS ${NumberFormat().format(loanStatistics?.totalLoanRepaid ?? 0.0)}",
                                   color: Colors.green[700]!,
                                   isSmall: isSmallScreen,
                                 ),
@@ -1379,7 +1380,7 @@ class _DailyPageState extends State<DailyPage> {
                                   ],
                                 ),
                                 Text(
-                                  "TZS ${NumberFormat.compact().format(loanStatistics?.remainingLoan ?? 0.0)}",
+                                  "TZS ${NumberFormat().format(loanStatistics?.remainingLoan ?? 0.0)}",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: isSmallScreen ? 14 : 16,
@@ -1489,7 +1490,7 @@ class _DailyPageState extends State<DailyPage> {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            "${NumberFormat.compact().format(int.parse(item.amount))}/=",
+                            "${NumberFormat().format(int.parse(item.amount))}/=",
                             style: TextStyle(
                               fontSize: isSmallScreen ? 11 : 12,
                               fontWeight: FontWeight.bold,

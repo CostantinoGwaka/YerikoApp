@@ -1037,22 +1037,24 @@ class _ProfilePageState extends State<ProfilePage> {
                               color: green,
                             ),
                             Divider(height: 1, color: Colors.grey[200]),
-                            _buildModernMenuItem(
-                              icon: Icons.attach_money,
-                              title: "Mikopo",
-                              subtitle: "Mpangilio wa mikopo ya watumiaji",
-                              onTap: () => Navigator.push(
-                                context,
-                                PageTransition(
-                                  type: PageTransitionType.rightToLeft,
-                                  child: LoanSettingPage(
-                                      jumuiyaId:
-                                          userData?.user.jumuiya_id ?? 0),
+                            if (userData?.user.role == "ADMIN") ...[
+                              _buildModernMenuItem(
+                                icon: Icons.attach_money,
+                                title: "Mikopo",
+                                subtitle: "Mpangilio wa mikopo ya watumiaji",
+                                onTap: () => Navigator.push(
+                                  context,
+                                  PageTransition(
+                                    type: PageTransitionType.rightToLeft,
+                                    child: LoanSettingPage(
+                                        jumuiyaId:
+                                            userData?.user.jumuiya_id ?? 0),
+                                  ),
                                 ),
+                                color: green,
                               ),
-                              color: green,
-                            ),
-                            Divider(height: 1, color: Colors.grey[200]),
+                              Divider(height: 1, color: Colors.grey[200]),
+                            ],
                             _buildModernMenuItem(
                               icon: Icons.category_rounded,
                               title: "Ongeza Aina ya Mchango",

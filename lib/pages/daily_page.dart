@@ -64,6 +64,7 @@ class _DailyPageState extends State<DailyPage> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print(data);
         if (data['status'] == "200") {
           setState(() {
             totalLoanTaken =

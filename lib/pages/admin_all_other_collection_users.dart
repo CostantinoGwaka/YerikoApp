@@ -148,6 +148,9 @@ class _AdminOtherAllUserCollectionsState
             backgroundColor: Colors.yellow,
             content: Text(
               "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
             ),
           ),
         );
@@ -262,7 +265,12 @@ class _AdminOtherAllUserCollectionsState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.yellow,
-            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti"),
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
           ),
         );
       }
@@ -321,9 +329,14 @@ class _AdminOtherAllUserCollectionsState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              backgroundColor: Colors.yellow,
-              content:
-                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+            backgroundColor: Colors.yellow,
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+          ),
         );
       }
     }
@@ -386,6 +399,9 @@ class _AdminOtherAllUserCollectionsState
             backgroundColor: Colors.yellow,
             content: Text(
               "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
             ),
           ),
         );
@@ -438,9 +454,14 @@ class _AdminOtherAllUserCollectionsState
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              backgroundColor: Colors.yellow,
-              content:
-                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+            backgroundColor: Colors.yellow,
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+          ),
         );
       }
     }
@@ -475,8 +496,14 @@ class _AdminOtherAllUserCollectionsState
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            backgroundColor: Colors.red,
-            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+          backgroundColor: Colors.yellow,
+          content: Text(
+            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+        ),
       );
     }
   }

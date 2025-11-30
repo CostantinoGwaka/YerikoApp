@@ -175,10 +175,14 @@ class _UserFeaturesPaymentPageState extends State<UserFeaturesPaymentPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Colors.red,
+          SnackBar(
+            backgroundColor: Colors.yellow,
             content: Text(
-                'Imeshindwa kutuma maombi. Tafadhali hakikisha umeunganishwa na intaneti.'),
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
           ),
         );
       }

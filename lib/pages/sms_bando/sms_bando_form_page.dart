@@ -160,7 +160,18 @@ class _SmsBandoFormPageState extends State<SmsBandoFormPage> {
         _showSnackBar("Failed to connect to server");
       }
     } catch (e) {
-      _showSnackBar("⚠️ Tafadhali hakikisha umeunganishwa na intaneti.");
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.yellow,
+          content: Text(
+            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() {

@@ -135,8 +135,13 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti"),
           backgroundColor: Colors.yellow,
+          content: Text(
+            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
         ),
       );
     }
@@ -251,9 +256,14 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              backgroundColor: Colors.yellow,
-              content:
-                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+            backgroundColor: Colors.yellow,
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+          ),
         );
       }
     }
@@ -318,9 +328,14 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              backgroundColor: Colors.yellow,
-              content:
-                  Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+            backgroundColor: Colors.yellow,
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+          ),
         );
       }
     }
@@ -376,6 +391,9 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
             backgroundColor: Colors.yellow,
             content: Text(
               "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
             ),
           ),
         );
@@ -460,9 +478,12 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.yellow,
             content: Text(
               "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
             ),
           ),
         );
@@ -521,6 +542,9 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
             backgroundColor: Colors.yellow,
             content: Text(
               "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
             ),
           ),
         );
@@ -574,9 +598,12 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.yellow,
             content: Text(
               "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
             ),
           ),
         );
@@ -619,8 +646,14 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            backgroundColor: Colors.red,
-            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+          backgroundColor: Colors.yellow,
+          content: Text(
+            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+        ),
       );
     }
   }

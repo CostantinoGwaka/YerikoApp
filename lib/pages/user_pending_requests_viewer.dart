@@ -68,7 +68,14 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+          backgroundColor: Colors.yellow,
+          content: Text(
+            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+        ),
       );
     }
   }
@@ -98,7 +105,14 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+          backgroundColor: Colors.yellow,
+          content: Text(
+            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+        ),
       );
     }
   }
@@ -145,7 +159,14 @@ class _UserPendingRequestsViewerState extends State<UserPendingRequestsViewer> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+          backgroundColor: Colors.yellow,
+          content: Text(
+            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+        ),
       );
     }
 

@@ -199,9 +199,16 @@ class _AddOtherMonthCollectionUserAdminState
         _isLoading = false;
       });
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(widget.rootContext).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("⚠️ Tafadhali hakikisha umeunganishwa na intaneti")),
+          backgroundColor: Colors.yellow,
+          content: Text(
+            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+        ),
       );
     }
   }

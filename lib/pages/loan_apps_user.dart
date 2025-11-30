@@ -163,52 +163,6 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     }
   }
 
-  Future<void> _submitLoanApplication() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final amount = double.parse(_amountController.text);
-    if (amount > eligibleAmount) {
-      _showError('Amount exceeds eligible loan amount');
-      return;
-    }
-
-    setState(() => _isSubmitting = true);
-
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/loans/loan_application.php'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'user_id': userData!.user.id,
-          'jumuiya_id': userData!.user.jumuiya_id,
-          'amount': amount,
-          'interest_rate': interestRate,
-          'total_amount': totalAmount,
-          'monthly_installment': monthlyInstallment,
-          'status': 'pending',
-          'loan_type': loanType,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['status'] == '200') {
-          _showSuccess('Ombi la mkopo limewasilishwa kikamilifu');
-          _amountController.clear();
-          _fetchUserLoans();
-        } else {
-          _showError(data['message']);
-        }
-      } else {
-        _showError('Failed to submit loan application');
-      }
-    } catch (e) {
-      _showError('Error: $e');
-    } finally {
-      setState(() => _isSubmitting = false);
-    }
-  }
-
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
@@ -229,33 +183,38 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.60,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
+      builder: (context) => StatefulBuilder(
+        builder: (BuildContext context, StateSetter setModalState) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.60,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom,
+            child: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 8),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-                child: _buildLoanApplicationForm(screenWidth, isTablet),
-              ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: _buildLoanApplicationForm(
+                        screenWidth, isTablet, setModalState),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -434,7 +393,8 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     );
   }
 
-  Widget _buildLoanApplicationForm(double screenWidth, bool isTablet) {
+  Widget _buildLoanApplicationForm(double screenWidth, bool isTablet,
+      [StateSetter? setModalState]) {
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: screenWidth * 0.04,
@@ -568,15 +528,106 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
               width: double.infinity,
               height: isTablet ? 60 : 50,
               child: ElevatedButton(
-                onPressed: _isSubmitting ? null : _submitLoanApplication,
+                onPressed: _isSubmitting
+                    ? null
+                    : () async {
+                        if (!_formKey.currentState!.validate()) return;
+
+                        final amount = double.parse(_amountController.text);
+                        if (amount > eligibleAmount) {
+                          _showError('Amount exceeds eligible loan amount');
+                          return;
+                        }
+
+                        if (setModalState != null) {
+                          setModalState(() => _isSubmitting = true);
+                        }
+                        setState(() => _isSubmitting = true);
+
+                        try {
+                          final response = await http.post(
+                            Uri.parse('$baseUrl/loans/loan_application.php'),
+                            headers: {'Content-Type': 'application/json'},
+                            body: json.encode({
+                              'user_id': userData!.user.id,
+                              'jumuiya_id': userData!.user.jumuiya_id,
+                              'amount': amount,
+                              'interest_rate': interestRate,
+                              'total_amount': totalAmount,
+                              'monthly_installment': monthlyInstallment,
+                              'status': 'pending',
+                              'loan_type': loanType,
+                            }),
+                          );
+
+                          if (response.statusCode == 200) {
+                            final data = json.decode(response.body);
+                            if (data['status'] == '200') {
+                              if (setModalState != null) {
+                                setModalState(() => _isSubmitting = false);
+                              }
+                              setState(() => _isSubmitting = false);
+                              Navigator.pop(context);
+                              _showSuccess(
+                                  'Ombi la mkopo limewasilishwa kikamilifu');
+                              _amountController.clear();
+                              _monthsController.text = maxMonths.toString();
+                              _fetchUserLoans();
+                            } else {
+                              if (setModalState != null) {
+                                setModalState(() => _isSubmitting = false);
+                              }
+                              setState(() => _isSubmitting = false);
+                              Navigator.pop(context);
+                              _showError(data['message']);
+                            }
+                          } else {
+                            if (setModalState != null) {
+                              setModalState(() => _isSubmitting = false);
+                            }
+                            setState(() => _isSubmitting = false);
+                            Navigator.pop(context);
+                            _showError('Failed to submit loan application');
+                          }
+                        } catch (e) {
+                          if (setModalState != null) {
+                            setModalState(() => _isSubmitting = false);
+                          }
+                          setState(() => _isSubmitting = false);
+                          Navigator.pop(context);
+                          _showError('Error: $e');
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[700],
+                  backgroundColor:
+                      _isSubmitting ? Colors.grey : Colors.blue[700],
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(screenWidth * 0.03),
                   ),
                 ),
                 child: _isSubmitting
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Inawasilisha...',
+                            style: TextStyle(
+                              fontSize: isTablet ? 18 : 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      )
                     : Text(
                         'Wasilisha Ombi',
                         style: TextStyle(
@@ -671,13 +722,24 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
               size: isTablet ? 80 : 64,
               color: Colors.grey[300],
             ),
-            SizedBox(height: screenWidth * 0.04),
+            SizedBox(height: screenWidth * 0.05),
             Text(
-              'Hakuna mikopo bado',
+              'Huna mkopo wowote',
               style: TextStyle(
-                fontSize: isTablet ? 18 : 16,
-                color: Colors.grey[600],
+                fontSize: isTablet ? 20 : 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[700],
               ),
+            ),
+            SizedBox(height: screenWidth * 0.02),
+            Text(
+              'Wakati huu huna mikopo iliyowekwa. Tafadhali wasilisha ombi la mkopo ili uone hapa.',
+              style: TextStyle(
+                fontSize: isTablet ? 16 : 14,
+                color: Colors.grey[600],
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

@@ -40,6 +40,8 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
   String loanType = '';
 
   List<UserLoan> userLoans = [];
+  List<UserLoan> filteredLoans = [];
+  String selectedStatus = 'all'; // Default to show all loans
 
   @override
   void initState() {
@@ -156,11 +158,23 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
 
         setState(() {
           userLoans = loansResponse.data;
+          _filterLoansByStatus();
         });
       }
     } catch (e) {
       _showError('Failed to load loans: $e');
     }
+  }
+
+  void _filterLoansByStatus() {
+    setState(() {
+      if (selectedStatus == 'all') {
+        filteredLoans = List.from(userLoans);
+      } else {
+        filteredLoans =
+            userLoans.where((loan) => loan.status == selectedStatus).toList();
+      }
+    });
   }
 
   void _showError(String message) {
@@ -679,25 +693,144 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Mikopo Yangu',
-            style: TextStyle(
-              fontSize: isTablet ? 24 : 20,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Mikopo Yangu',
+                style: TextStyle(
+                  fontSize: isTablet ? 24 : 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (userLoans.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${filteredLoans.length} of ${userLoans.length}',
+                    style: TextStyle(
+                      fontSize: isTablet ? 14 : 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue[700],
+                    ),
+                  ),
+                ),
+            ],
           ),
           SizedBox(height: screenWidth * 0.005),
-          userLoans.isEmpty
+          if (userLoans.isNotEmpty) ...[
+            SizedBox(height: screenWidth * 0.03),
+            // Status Filter Chips
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  // All loans chip
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      selected: selectedStatus == 'all',
+                      label: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.all_inclusive,
+                            size: 16,
+                            color: selectedStatus == 'all'
+                                ? Colors.white
+                                : Colors.grey[700],
+                          ),
+                          const SizedBox(width: 6),
+                          const Text('All'),
+                        ],
+                      ),
+                      selectedColor: Colors.grey[700],
+                      checkmarkColor: Colors.white,
+                      labelStyle: TextStyle(
+                        color: selectedStatus == 'all'
+                            ? Colors.white
+                            : Colors.black87,
+                        fontWeight: selectedStatus == 'all'
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() {
+                            selectedStatus = 'all';
+                          });
+                          _filterLoansByStatus();
+                        }
+                      },
+                    ),
+                  ),
+                  // Status chips
+                  ...LoanSettingService.statusList.map((status) {
+                    final isSelected = selectedStatus == status['value'];
+                    final count = userLoans
+                        .where((loan) => loan.status == status['value'])
+                        .length;
+
+                    if (count == 0) return const SizedBox.shrink();
+
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterChip(
+                        selected: isSelected,
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              status['icon'],
+                              size: 16,
+                              color:
+                                  isSelected ? Colors.white : status['color'],
+                            ),
+                            const SizedBox(width: 6),
+                            Text('${status['label']} ($count)'),
+                          ],
+                        ),
+                        selectedColor: status['color'],
+                        checkmarkColor: Colors.white,
+                        labelStyle: TextStyle(
+                          color: isSelected ? Colors.white : Colors.black87,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                        ),
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() {
+                              selectedStatus = status['value'];
+                            });
+                            _filterLoansByStatus();
+                          }
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ],
+              ),
+            ),
+          ],
+          SizedBox(height: screenWidth * 0.03),
+          filteredLoans.isEmpty
               ? _buildEmptyState(screenWidth, isTablet)
               : ListView.builder(
                   shrinkWrap: true,
                   padding: EdgeInsets.zero,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: userLoans.length,
+                  itemCount: filteredLoans.length,
                   itemBuilder: (context, index) => LoanCard(
-                    loan: userLoans[index],
+                    loan: filteredLoans[index],
                     statusColor: LoanSettingService.getStatusColor(
-                        userLoans[index].status),
+                        filteredLoans[index].status),
                     formatCurrency: LoanSettingService.formatCurrency,
                     formatDate: LoanSettingService.formatDate,
                   ),
@@ -708,6 +841,18 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
   }
 
   Widget _buildEmptyState(double screenWidth, bool isTablet) {
+    final isFiltered = selectedStatus != 'all';
+
+    // Get the label for the selected status
+    String statusLabel = selectedStatus;
+    if (isFiltered) {
+      final statusItem = LoanSettingService.statusList.firstWhere(
+        (status) => status['value'] == selectedStatus,
+        orElse: () => {'label': selectedStatus},
+      );
+      statusLabel = statusItem['label'] as String;
+    }
+
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.1),
       decoration: BoxDecoration(
@@ -718,13 +863,15 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         child: Column(
           children: [
             Icon(
-              Icons.receipt_long,
+              isFiltered ? Icons.filter_list_off : Icons.receipt_long,
               size: isTablet ? 80 : 64,
               color: Colors.grey[300],
             ),
             SizedBox(height: screenWidth * 0.05),
             Text(
-              'Huna mkopo wowote',
+              isFiltered
+                  ? 'Hakuna mikopo ya "$statusLabel"'
+                  : 'Huna mkopo wowote',
               style: TextStyle(
                 fontSize: isTablet ? 20 : 18,
                 fontWeight: FontWeight.bold,
@@ -733,7 +880,9 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
             ),
             SizedBox(height: screenWidth * 0.02),
             Text(
-              'Wakati huu huna mikopo iliyowekwa. Tafadhali wasilisha ombi la mkopo ili uone hapa.',
+              isFiltered
+                  ? 'Huna mikopo yenye hadhi ya "$statusLabel" kwa sasa.'
+                  : 'Wakati huu huna mikopo iliyowekwa. Tafadhali wasilisha ombi la mkopo ili uone hapa.',
               style: TextStyle(
                 fontSize: isTablet ? 16 : 14,
                 color: Colors.grey[600],
@@ -741,6 +890,19 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
               ),
               textAlign: TextAlign.center,
             ),
+            if (isFiltered) ...[
+              SizedBox(height: screenWidth * 0.04),
+              TextButton.icon(
+                onPressed: () {
+                  setState(() {
+                    selectedStatus = 'all';
+                  });
+                  _filterLoansByStatus();
+                },
+                icon: const Icon(Icons.clear),
+                label: const Text('Onyesha mikopo yote'),
+              ),
+            ],
           ],
         ),
       ),

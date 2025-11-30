@@ -14,18 +14,6 @@ class LoanSettingService {
       'icon': Icons.pending
     },
     {
-      'value': 'approved',
-      'label': 'Approved',
-      'color': Colors.green,
-      'icon': Icons.check_circle
-    },
-    {
-      'value': 'rejected',
-      'label': 'Rejected',
-      'color': Colors.red,
-      'icon': Icons.cancel
-    },
-    {
       'value': 'in-progress',
       'label': 'In Progress',
       'color': Colors.blue,
@@ -36,6 +24,18 @@ class LoanSettingService {
       'label': 'Completed',
       'color': Colors.teal,
       'icon': Icons.done_all
+    },
+    {
+      'value': 'approved',
+      'label': 'Approved',
+      'color': Colors.green,
+      'icon': Icons.check_circle
+    },
+    {
+      'value': 'rejected',
+      'label': 'Rejected',
+      'color': Colors.red,
+      'icon': Icons.cancel
     },
   ];
 

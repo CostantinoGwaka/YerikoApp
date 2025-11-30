@@ -1349,8 +1349,8 @@ class _DailyPageState extends State<DailyPage> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Colors.orange[400]!,
-                                  Colors.orange[600]!
+                                  mainFontColor,
+                                  mainFontColor.withValues(alpha: 0.85)
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(12),
@@ -1368,8 +1368,11 @@ class _DailyPageState extends State<DailyPage> {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(Icons.pending_actions_rounded,
-                                        color: Colors.white, size: 16),
+                                    Icon(
+                                      Icons.pending_actions_rounded,
+                                      color: Colors.white,
+                                      size: 16,
+                                    ),
                                     SizedBox(width: 8),
                                     Text(
                                       "Mkopo Uliobaki",

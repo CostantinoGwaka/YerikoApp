@@ -627,7 +627,6 @@ class LoanCard extends StatelessWidget {
                 );
               }
 
-              final loanData = historyResponse.loan;
               final statistics = historyResponse.statistics;
               final repayments = historyResponse.repayments;
 
@@ -874,9 +873,7 @@ class LoanCard extends StatelessWidget {
                   ),
                 ],
               );
-            } catch (e, stackTrace) {
-              print('Error: $e');
-              print('StackTrace: $stackTrace');
+            } catch (e) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

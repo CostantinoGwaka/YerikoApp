@@ -47,8 +47,8 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
   void initState() {
     super.initState();
     _loadInitialData();
-    _amountController.addListener(_calculateLoanDetails);
-    _monthsController.addListener(_calculateLoanDetails);
+    _amountController.addListener(() => _calculateLoanDetails(null));
+    _monthsController.addListener(() => _calculateLoanDetails(null));
   }
 
   @override
@@ -133,15 +133,26 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     }
   }
 
-  void _calculateLoanDetails() {
+  void _calculateLoanDetails([StateSetter? setModalState]) {
     final amount = double.tryParse(_amountController.text) ?? 0.0;
     final months = int.tryParse(_monthsController.text) ?? 1;
 
     if (amount > 0 && months > 0) {
+      final newTotalAmount = amount + (amount * interestRate / 100);
+      final newMonthlyInstallment = newTotalAmount / months;
+
+      // Update both main state and modal state
       setState(() {
-        totalAmount = amount + (amount * interestRate / 100);
-        monthlyInstallment = totalAmount / months;
+        totalAmount = newTotalAmount;
+        monthlyInstallment = newMonthlyInstallment;
       });
+
+      if (setModalState != null) {
+        setModalState(() {
+          totalAmount = newTotalAmount;
+          monthlyInstallment = newMonthlyInstallment;
+        });
+      }
     }
   }
 
@@ -193,12 +204,25 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
+    // Remove listeners before showing modal
+    _amountController.removeListener(_calculateLoanDetails);
+    _monthsController.removeListener(_calculateLoanDetails);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
         builder: (BuildContext context, StateSetter setModalState) {
+          // Add listeners with modal setState
+          void calculateWithModal() => _calculateLoanDetails(setModalState);
+
+          _amountController.removeListener(calculateWithModal);
+          _monthsController.removeListener(calculateWithModal);
+
+          _amountController.addListener(calculateWithModal);
+          _monthsController.addListener(calculateWithModal);
+
           return Container(
             height: MediaQuery.of(context).size.height * 0.60,
             decoration: const BoxDecoration(
@@ -222,7 +246,10 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                       bottom: MediaQuery.of(context).viewInsets.bottom,
                     ),
                     child: _buildLoanApplicationForm(
-                        screenWidth, isTablet, setModalState),
+                      screenWidth,
+                      isTablet,
+                      setModalState,
+                    ),
                   ),
                 ),
               ],
@@ -230,7 +257,13 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
           );
         },
       ),
-    );
+    ).whenComplete(() {
+      // Restore original listeners when modal closes
+      _amountController.removeListener(() => _calculateLoanDetails(null));
+      _monthsController.removeListener(() => _calculateLoanDetails(null));
+      _amountController.addListener(() => _calculateLoanDetails(null));
+      _monthsController.addListener(() => _calculateLoanDetails(null));
+    });
   }
 
   @override
@@ -241,18 +274,26 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     final maxWidth = isTablet ? 800.0 : screenWidth;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: surfaceColor,
       appBar: AppBar(
-        backgroundColor: mainFontColor,
         foregroundColor: Colors.white,
+        backgroundColor: surfaceColor,
         title: Text(
           'Maombi ya Mkopo',
-          style: TextStyle(fontSize: isTablet ? 22 : 18),
+          style: TextStyle(
+            fontSize: isTablet ? 22 : 18,
+            color: mainFontColor,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(
+              Icons.add,
+              color: mainFontColor,
+              fontWeight: FontWeight.bold,
+            ),
             onPressed: () => _showLoanApplicationBottomSheet(context),
           ),
         ],

@@ -942,8 +942,7 @@ class LoanCard extends StatelessWidget {
     final canApprove = loan.status == 'pending' && isAdmin;
     final canRepay =
         (loan.status == 'approved' || loan.status == 'in-progress') && isAdmin;
-    final completed =
-        (loan.status == 'completed' || loan.status == 'in-progress') && isAdmin;
+    final completed = (loan.status == 'completed');
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -1165,23 +1164,16 @@ class LoanCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () => _updateLoanStatus(
-                              context, loan.id, 'in-progress'),
-                          icon: const Icon(Icons.hourglass_empty, size: 18),
-                          label: const Text('In Progress'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
-                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () =>
-                              _updateLoanStatus(context, loan.id, 'approved'),
+                          onPressed: () => _updateLoanStatus(
+                            context,
+                            loan.id,
+                            'in-progress',
+                          ),
+                          // onPressed: () =>
+                          //     _updateLoanStatus(context, loan.id, 'approved'),
                           icon: const Icon(Icons.check_circle, size: 18),
                           label: const Text('Kubali'),
                           style: ElevatedButton.styleFrom(

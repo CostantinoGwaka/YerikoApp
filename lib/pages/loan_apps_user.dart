@@ -221,6 +221,45 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     );
   }
 
+  void _showLoanApplicationBottomSheet(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.60,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 8),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: _buildLoanApplicationForm(screenWidth, isTablet),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -238,25 +277,29 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
           style: TextStyle(fontSize: isTablet ? 22 : 18),
         ),
         elevation: 0,
-        actions: [],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => _showLoanApplicationBottomSheet(context),
+          ),
+        ],
       ),
       body: _isLoadingSettings
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: _loadInitialData,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: maxWidth),
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      children: [
-                        _buildSavingsCard(screenWidth, isTablet),
-                        _buildUserLoansSection(screenWidth, isTablet),
-                        _buildLoanApplicationForm(screenWidth, isTablet),
-                        SizedBox(height: screenHeight * 0.02),
-                      ],
-                    ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: maxWidth),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      _buildSavingsCard(screenWidth, isTablet),
+                      _buildUserLoansSection(screenWidth, isTablet),
+                      SizedBox(height: screenHeight * 0.02),
+                    ],
                   ),
                 ),
               ),
@@ -290,6 +333,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

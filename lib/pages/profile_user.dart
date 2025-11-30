@@ -19,7 +19,6 @@ import 'package:jumuiya_yangu/pages/login_page.dart';
 import 'package:jumuiya_yangu/pages/sms_bando/sms_bando_list_page.dart';
 import 'package:jumuiya_yangu/pages/send_message_page.dart';
 import 'package:jumuiya_yangu/shared/localstorage/index.dart';
-import 'package:jumuiya_yangu/shared/components/modern_widgets.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;

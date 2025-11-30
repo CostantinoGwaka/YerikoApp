@@ -23,13 +23,45 @@ class LoanFromAllUsersPage extends StatefulWidget {
 class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
   String selectedStatus = 'pending';
   List<UserLoan> loans = [];
+  List<UserLoan> filteredLoans = [];
   bool isLoading = false;
   String errorMessage = '';
+  final TextEditingController _searchController = TextEditingController();
+  String searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     fetchLoans();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      searchQuery = _searchController.text.toLowerCase();
+      _filterLoans();
+    });
+  }
+
+  void _filterLoans() {
+    setState(() {
+      if (searchQuery.isEmpty) {
+        filteredLoans = List.from(loans);
+      } else {
+        filteredLoans = loans.where((loan) {
+          final userName = loan.user.userFullName.toLowerCase();
+          final loanType = loan.loanType.toLowerCase();
+          return userName.contains(searchQuery) ||
+              loanType.contains(searchQuery);
+        }).toList();
+      }
+    });
   }
 
   Future<void> fetchLoans() async {
@@ -50,12 +82,13 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['status'] == '200') {
+          final loansResponse = UserLoansResponse.fromJson(data);
           setState(() {
-            final loansResponse = UserLoansResponse.fromJson(data);
-
             loans = loansResponse.data;
+            filteredLoans = List.from(loans);
             isLoading = false;
           });
+          _filterLoans(); // Apply filter after loading
         } else {
           setState(() {
             errorMessage = data['message'] ?? 'Failed to load loans';
@@ -70,7 +103,7 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
       }
     } catch (e) {
       setState(() {
-        errorMessage = 'Error: $e';
+        errorMessage = '⚠️ Tafadhali hakikisha umeunganishwa na intaneti';
         isLoading = false;
       });
     }
@@ -105,6 +138,46 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
       ),
       body: Column(
         children: [
+          // Search Bar
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search by name or loan type...',
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                suffixIcon: searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, color: Colors.grey),
+                        onPressed: () {
+                          _searchController.clear();
+                        },
+                      )
+                    : null,
+                filled: true,
+                fillColor: Colors.grey[100],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
+            ),
+          ),
+
           // Status Filter Chips
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
@@ -161,6 +234,33 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
             ),
           ),
 
+          // Results Count
+          if (!isLoading && errorMessage.isEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${filteredLoans.length} loan${filteredLoans.length != 1 ? 's' : ''} found',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  if (searchQuery.isNotEmpty)
+                    Text(
+                      'of ${loans.length} total',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
           // Loans List
           Expanded(
             child: isLoading
@@ -184,7 +284,7 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
                           ],
                         ),
                       )
-                    : loans.isEmpty
+                    : filteredLoans.isEmpty
                         ? Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -193,11 +293,23 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
                                     size: 80, color: Colors.grey.shade300),
                                 const SizedBox(height: 16),
                                 Text(
-                                  'No $selectedStatus loans found',
+                                  searchQuery.isNotEmpty
+                                      ? 'No loans match your search'
+                                      : 'No $selectedStatus loans found',
                                   style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.grey.shade600),
                                 ),
+                                if (searchQuery.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  TextButton.icon(
+                                    onPressed: () {
+                                      _searchController.clear();
+                                    },
+                                    icon: const Icon(Icons.clear),
+                                    label: const Text('Clear search'),
+                                  ),
+                                ],
                               ],
                             ),
                           )
@@ -205,9 +317,9 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
                             onRefresh: fetchLoans,
                             child: ListView.builder(
                               padding: const EdgeInsets.all(12),
-                              itemCount: loans.length,
+                              itemCount: filteredLoans.length,
                               itemBuilder: (context, index) {
-                                final loan = loans[index];
+                                final loan = filteredLoans[index];
                                 return LoanCard(
                                   loan: loan,
                                   statusColor:
@@ -216,6 +328,7 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
                                   formatCurrency:
                                       LoanSettingService.formatCurrency,
                                   formatDate: LoanSettingService.formatDate,
+                                  searchQuery: searchQuery,
                                 );
                               },
                             ),
@@ -232,6 +345,7 @@ class LoanCard extends StatelessWidget {
   final Color statusColor;
   final String Function(dynamic) formatCurrency;
   final String Function(String?) formatDate;
+  final String searchQuery;
 
   const LoanCard({
     super.key,
@@ -239,7 +353,45 @@ class LoanCard extends StatelessWidget {
     required this.statusColor,
     required this.formatCurrency,
     required this.formatDate,
+    this.searchQuery = '',
   });
+
+  TextSpan _highlightText(String text, String query) {
+    if (query.isEmpty) {
+      return TextSpan(text: text);
+    }
+
+    final lowerText = text.toLowerCase();
+    final lowerQuery = query.toLowerCase();
+    final matches = <TextSpan>[];
+    int start = 0;
+
+    while (start < text.length) {
+      final index = lowerText.indexOf(lowerQuery, start);
+      if (index == -1) {
+        matches.add(TextSpan(text: text.substring(start)));
+        break;
+      }
+
+      if (index > start) {
+        matches.add(TextSpan(text: text.substring(start, index)));
+      }
+
+      matches.add(
+        TextSpan(
+          text: text.substring(index, index + query.length),
+          style: const TextStyle(
+            backgroundColor: Colors.yellow,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+
+      start = index + query.length;
+    }
+
+    return TextSpan(children: matches);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -265,11 +417,17 @@ class LoanCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          loan.user.userFullName,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                        RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                            children: [
+                              _highlightText(
+                                  loan.user.userFullName, searchQuery),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -361,10 +519,18 @@ class LoanCard extends StatelessWidget {
                             Icon(Icons.category,
                                 size: 16, color: Colors.grey.shade600),
                             const SizedBox(width: 6),
-                            Text(
-                              'Type: ${loan.loanType}',
-                              style: TextStyle(
-                                  fontSize: 13, color: Colors.grey.shade700),
+                            Flexible(
+                              child: RichText(
+                                text: TextSpan(
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey.shade700),
+                                  children: [
+                                    const TextSpan(text: 'Type: '),
+                                    _highlightText(loan.loanType, searchQuery),
+                                  ],
+                                ),
+                              ),
                             ),
                           ],
                         ),

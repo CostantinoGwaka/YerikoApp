@@ -221,12 +221,20 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isTablet = screenWidth > 600;
+    final maxWidth = isTablet ? 800.0 : screenWidth;
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: mainFontColor,
         foregroundColor: Colors.white,
-        title: const Text('Maombi ya Mkopo'),
+        title: Text(
+          'Maombi ya Mkopo',
+          style: TextStyle(fontSize: isTablet ? 22 : 18),
+        ),
         elevation: 0,
         actions: [],
       ),
@@ -234,31 +242,43 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: _loadInitialData,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  children: [
-                    _buildSavingsCard(),
-                    _buildUserLoansSection(),
-                    _buildLoanApplicationForm(),
-                  ],
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: maxWidth),
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        _buildSavingsCard(screenWidth, isTablet),
+                        _buildUserLoansSection(screenWidth, isTablet),
+                        _buildLoanApplicationForm(screenWidth, isTablet),
+                        SizedBox(height: screenHeight * 0.02),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
     );
   }
 
-  Widget _buildSavingsCard() {
+  Widget _buildSavingsCard(double screenWidth, bool isTablet) {
+    final horizontalPadding = screenWidth * 0.04;
+    final verticalPadding = screenWidth * 0.05;
+
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.all(screenWidth * 0.04),
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [Colors.blue[700]!, Colors.blue[500]!],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(screenWidth * 0.04),
         boxShadow: [
           BoxShadow(
             color: mainFontColor.withOpacity(0.3),
@@ -272,62 +292,93 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Jumla ya Akiba',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    NumberFormat.currency(symbol: 'TSh ').format(totalSavings),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Jumla ya Akiba',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: isTablet ? 16 : 14,
+                      ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: screenWidth * 0.01),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        NumberFormat.currency(symbol: 'TSh ')
+                            .format(totalSavings),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isTablet ? 28 : 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const Icon(Icons.savings, color: Colors.white70, size: 40),
+              Icon(
+                Icons.savings,
+                color: Colors.white70,
+                size: isTablet ? 50 : 40,
+              ),
             ],
           ),
-          const Divider(color: Colors.white24, height: 32),
+          Divider(
+            color: Colors.white24,
+            height: screenWidth * 0.08,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Mkopo Unaostahili',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    NumberFormat.currency(symbol: 'TSh ')
-                        .format(eligibleAmount),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Mkopo Unaostahili',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: isTablet ? 16 : 14,
+                      ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: screenWidth * 0.01),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        NumberFormat.currency(symbol: 'TSh ')
+                            .format(eligibleAmount),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isTablet ? 24 : 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.03,
+                  vertical: screenWidth * 0.015,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white24,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(screenWidth * 0.05),
                 ),
                 child: Text(
                   loanType == 'multiplier'
                       ? '${loanSettings?.multiplier}x mara'
                       : '${loanSettings?.percentage}% ya akiba',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: isTablet ? 14 : 12,
+                  ),
                 ),
               ),
             ],
@@ -337,13 +388,16 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     );
   }
 
-  Widget _buildLoanApplicationForm() {
+  Widget _buildLoanApplicationForm(double screenWidth, bool isTablet) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.04,
+        vertical: screenWidth * 0.005,
+      ),
+      padding: EdgeInsets.all(screenWidth * 0.05),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(screenWidth * 0.04),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -357,22 +411,32 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Omba Mkopo',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: isTablet ? 24 : 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: screenWidth * 0.05),
             TextFormField(
               controller: _amountController,
               decoration: InputDecoration(
                 labelText: 'Kiasi cha Mkopo',
+                labelStyle: TextStyle(fontSize: isTablet ? 16 : 14),
                 hintText: 'Weka kiasi',
-                prefixIcon: const Icon(Icons.money),
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                prefixIcon: Icon(Icons.money, size: isTablet ? 28 : 24),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                ),
                 filled: true,
                 fillColor: Colors.grey[50],
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04,
+                  vertical: screenWidth * 0.04,
+                ),
               ),
+              style: TextStyle(fontSize: isTablet ? 18 : 16),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               validator: (value) {
@@ -389,18 +453,26 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                 return null;
               },
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: screenWidth * 0.04),
             TextFormField(
               controller: _monthsController,
               decoration: InputDecoration(
                 labelText: 'Muda wa Malipo (Miezi)',
+                labelStyle: TextStyle(fontSize: isTablet ? 16 : 14),
                 hintText: 'Weka miezi',
-                prefixIcon: const Icon(Icons.calendar_today),
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                prefixIcon:
+                    Icon(Icons.calendar_today, size: isTablet ? 28 : 24),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                ),
                 filled: true,
                 fillColor: Colors.grey[50],
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04,
+                  vertical: screenWidth * 0.04,
+                ),
               ),
+              style: TextStyle(fontSize: isTablet ? 18 : 16),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               validator: (value) {
@@ -417,51 +489,52 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                 return null;
               },
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: screenWidth * 0.05),
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(screenWidth * 0.04),
               decoration: BoxDecoration(
                 color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(screenWidth * 0.03),
               ),
               child: Column(
                 children: [
-                  _buildDetailRow('Riba', '$interestRate%'),
-                  const Divider(height: 20),
+                  _buildDetailRow('Riba', '$interestRate%', isTablet),
+                  Divider(height: screenWidth * 0.05),
                   _buildDetailRow(
                     'Jumla ya Malipo',
                     NumberFormat.currency(symbol: 'TSh ').format(totalAmount),
+                    isTablet,
                     bold: true,
                   ),
-                  const Divider(height: 20),
+                  Divider(height: screenWidth * 0.05),
                   _buildDetailRow(
                     'Malipo ya Kila Mwezi',
-                    NumberFormat.currency(
-                      symbol: 'TSh ',
-                    ).format(monthlyInstallment),
+                    NumberFormat.currency(symbol: 'TSh ')
+                        .format(monthlyInstallment),
+                    isTablet,
                     color: Colors.blue[700],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: screenWidth * 0.06),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: isTablet ? 60 : 50,
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : _submitLoanApplication,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[700],
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(screenWidth * 0.03),
                   ),
                 ),
                 child: _isSubmitting
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text(
+                    : Text(
                         'Wasilisha Ombi',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: isTablet ? 18 : 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -474,43 +547,51 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value,
+  Widget _buildDetailRow(String label, String value, bool isTablet,
       {bool bold = false, Color? color}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[700],
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: isTablet ? 16 : 14,
+              color: Colors.grey[700],
+            ),
           ),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-            color: color ?? Colors.black87,
+        Flexible(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: isTablet ? 18 : 16,
+              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+              color: color ?? Colors.black87,
+            ),
+            textAlign: TextAlign.right,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildUserLoansSection() {
+  Widget _buildUserLoansSection(double screenWidth, bool isTablet) {
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: EdgeInsets.all(screenWidth * 0.04),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Mikopo Yangu',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: isTablet ? 24 : 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(height: 2),
+          SizedBox(height: screenWidth * 0.005),
           userLoans.isEmpty
-              ? _buildEmptyState()
+              ? _buildEmptyState(screenWidth, isTablet)
               : ListView.builder(
                   shrinkWrap: true,
                   padding: EdgeInsets.zero,
@@ -518,6 +599,8 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                   itemCount: userLoans.length,
                   itemBuilder: (context, index) => _buildLoanCard(
                     userLoans[index],
+                    screenWidth,
+                    isTablet,
                   ),
                 ),
         ],
@@ -525,21 +608,28 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(double screenWidth, bool isTablet) {
     return Container(
-      padding: const EdgeInsets.all(40),
+      padding: EdgeInsets.all(screenWidth * 0.1),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(screenWidth * 0.04),
       ),
       child: Center(
         child: Column(
           children: [
-            Icon(Icons.receipt_long, size: 64, color: Colors.grey[300]),
-            const SizedBox(height: 16),
+            Icon(
+              Icons.receipt_long,
+              size: isTablet ? 80 : 64,
+              color: Colors.grey[300],
+            ),
+            SizedBox(height: screenWidth * 0.04),
             Text(
               'Hakuna mikopo bado',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: isTablet ? 18 : 16,
+                color: Colors.grey[600],
+              ),
             ),
           ],
         ),
@@ -547,7 +637,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     );
   }
 
-  Widget _buildLoanCard(UserLoan loan) {
+  Widget _buildLoanCard(UserLoan loan, double screenWidth, bool isTablet) {
     final status = loan.status;
     final statusColor = status == 'approved'
         ? Colors.green
@@ -556,11 +646,11 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
             : Colors.orange;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: screenWidth * 0.03),
+      padding: EdgeInsets.all(screenWidth * 0.04),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(screenWidth * 0.03),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -575,21 +665,29 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                NumberFormat.currency(symbol: 'TSh ').format(
-                  double.parse(loan.amount),
-                ),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    NumberFormat.currency(symbol: 'TSh ').format(
+                      double.parse(loan.amount),
+                    ),
+                    style: TextStyle(
+                      fontSize: isTablet ? 24 : 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.03,
+                  vertical: screenWidth * 0.015,
+                ),
                 decoration: BoxDecoration(
                   color: statusColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(screenWidth * 0.05),
                 ),
                 child: Text(
                   status == 'approved'
@@ -600,17 +698,19 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                   style: TextStyle(
                     color: statusColor,
                     fontWeight: FontWeight.bold,
-                    fontSize: 12,
+                    fontSize: isTablet ? 14 : 12,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: screenWidth * 0.03),
           _buildLoanDetailRow(
             Icons.percent,
             'Riba',
             '${loan.interestRate}%',
+            screenWidth,
+            isTablet,
           ),
           _buildLoanDetailRow(
             Icons.account_balance_wallet,
@@ -618,6 +718,8 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
             NumberFormat.currency(symbol: 'TSh ').format(
               double.parse(loan.totalAmount),
             ),
+            screenWidth,
+            isTablet,
           ),
           _buildLoanDetailRow(
             Icons.payment,
@@ -625,37 +727,60 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
             NumberFormat.currency(symbol: 'TSh ').format(
               double.parse(loan.monthlyInstallment),
             ),
+            screenWidth,
+            isTablet,
           ),
           _buildLoanDetailRow(
             Icons.calendar_today,
             'Tarehe ya Ombi',
             _formatDate(loan.requestedAt),
+            screenWidth,
+            isTablet,
           ),
           if (loan.approvedAt != null)
             _buildLoanDetailRow(
               Icons.check_circle,
               'Imeidhinishwa',
               _formatDate(loan.approvedAt),
+              screenWidth,
+              isTablet,
             ),
         ],
       ),
     );
   }
 
-  Widget _buildLoanDetailRow(IconData icon, String label, String value) {
+  Widget _buildLoanDetailRow(
+    IconData icon,
+    String label,
+    String value,
+    double screenWidth,
+    bool isTablet,
+  ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: EdgeInsets.symmetric(vertical: screenWidth * 0.01),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.grey[600]),
-          const SizedBox(width: 8),
-          Text(
-            '$label: ',
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          Icon(icon, size: isTablet ? 18 : 16, color: Colors.grey[600]),
+          SizedBox(width: screenWidth * 0.02),
+          Expanded(
+            child: Text(
+              '$label: ',
+              style: TextStyle(
+                fontSize: isTablet ? 16 : 14,
+                color: Colors.grey[600],
+              ),
+            ),
           ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          Flexible(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: isTablet ? 16 : 14,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.right,
+            ),
           ),
         ],
       ),

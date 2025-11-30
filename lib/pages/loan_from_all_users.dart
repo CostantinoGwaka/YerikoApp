@@ -942,6 +942,8 @@ class LoanCard extends StatelessWidget {
     final canApprove = loan.status == 'pending' && isAdmin;
     final canRepay =
         (loan.status == 'approved' || loan.status == 'in-progress') && isAdmin;
+    final completed =
+        (loan.status == 'completed' || loan.status == 'in-progress') && isAdmin;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -1219,6 +1221,25 @@ class LoanCard extends StatelessWidget {
                           ),
                         ),
                       ),
+                    ],
+                  ),
+                ],
+                // History Buttons (for approved/in-progress loans)
+                if (completed) ...[
+                  const Divider(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _showRepaymentHistory(context, loan),
+                          icon: const Icon(Icons.history, size: 18),
+                          label: const Text('Historia'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.blue.shade700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
                     ],
                   ),
                 ],

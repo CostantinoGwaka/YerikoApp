@@ -18,6 +18,7 @@ import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
 import 'package:restart_app/restart_app.dart';
+import 'package:jumuiya_yangu/models/loan_statistics_model.dart';
 
 class DailyPage extends StatefulWidget {
   const DailyPage({super.key});
@@ -35,9 +36,7 @@ class _DailyPageState extends State<DailyPage> {
   List<Map<String, dynamic>> jumuiyaData = [];
 
   // Add loan statistics variables
-  double totalLoanTaken = 0.0;
-  double totalLoanRepaid = 0.0;
-  double remainingLoan = 0.0;
+  LoanStatisticsData? loanStatistics;
   bool _isLoadingLoans = false;
 
   @override
@@ -64,15 +63,10 @@ class _DailyPageState extends State<DailyPage> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print(data);
         if (data['status'] == "200") {
+          final loanStatsResponse = LoanStatisticsResponse.fromJson(data);
           setState(() {
-            totalLoanTaken =
-                double.tryParse(data['total_loan_taken'].toString()) ?? 0.0;
-            totalLoanRepaid =
-                double.tryParse(data['total_loan_repaid'].toString()) ?? 0.0;
-            remainingLoan =
-                double.tryParse(data['remaining_loan'].toString()) ?? 0.0;
+            loanStatistics = loanStatsResponse.data;
             _isLoadingLoans = false;
           });
         } else {
@@ -90,7 +84,6 @@ class _DailyPageState extends State<DailyPage> {
         _isLoadingLoans = false;
       });
       if (context.mounted) {
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.red,
@@ -1325,7 +1318,7 @@ class _DailyPageState extends State<DailyPage> {
                                   icon: Icons.arrow_upward_rounded,
                                   label: "Uliochukuliwa",
                                   value:
-                                      "TZS ${NumberFormat.compact().format(totalLoanTaken)}",
+                                      "TZS ${NumberFormat.compact().format(loanStatistics?.totalLoanTaken ?? 0.0)}",
                                   color: Colors.blue[700]!,
                                   isSmall: isSmallScreen,
                                 ),
@@ -1336,7 +1329,7 @@ class _DailyPageState extends State<DailyPage> {
                                   icon: Icons.arrow_downward_rounded,
                                   label: "Umerudisha",
                                   value:
-                                      "TZS ${NumberFormat.compact().format(totalLoanRepaid)}",
+                                      "TZS ${NumberFormat.compact().format(loanStatistics?.totalLoanRepaid ?? 0.0)}",
                                   color: Colors.green[700]!,
                                   isSmall: isSmallScreen,
                                 ),
@@ -1386,7 +1379,7 @@ class _DailyPageState extends State<DailyPage> {
                                   ],
                                 ),
                                 Text(
-                                  "TZS ${NumberFormat.compact().format(remainingLoan)}",
+                                  "TZS ${NumberFormat.compact().format(loanStatistics?.remainingLoan ?? 0.0)}",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: isSmallScreen ? 14 : 16,

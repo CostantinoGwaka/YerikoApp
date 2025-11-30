@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:jumuiya_yangu/main.dart';
 import 'package:jumuiya_yangu/models/loan_setting.dart';
 import 'package:jumuiya_yangu/models/user_total_model.dart';
+import 'package:jumuiya_yangu/models/user_loan_model.dart';
 import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 
@@ -36,7 +37,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
   int maxMonths = 12;
   String loanType = '';
 
-  List<Map<String, dynamic>> userLoans = [];
+  List<UserLoan> userLoans = [];
 
   @override
   void initState() {
@@ -142,15 +143,17 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
 
   Future<void> _fetchUserLoans() async {
     try {
-      final userId = 1; // Get from user session/provider
       final response = await http.get(
-        Uri.parse('$baseUrl/loans/get_user_loans.php?user_id=$userId'),
+        Uri.parse(
+            '$baseUrl/loans/get_loans_application_by_user_id.php?user_id=${userData!.user.id}'),
       );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        final loansResponse = UserLoansResponse.fromJson(data);
+
         setState(() {
-          userLoans = List<Map<String, dynamic>>.from(data['loans'] ?? []);
+          userLoans = loansResponse.data;
         });
       }
     } catch (e) {
@@ -186,9 +189,14 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
       );
 
       if (response.statusCode == 200) {
-        _showSuccess('Loan application submitted successfully');
-        _amountController.clear();
-        _fetchUserLoans();
+        final data = json.decode(response.body);
+        if (data['status'] == '200') {
+          _showSuccess('Ombi la mkopo limewasilishwa kikamilifu');
+          _amountController.clear();
+          _fetchUserLoans();
+        } else {
+          _showError(data['message']);
+        }
       } else {
         _showError('Failed to submit loan application');
       }
@@ -231,8 +239,8 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                 child: Column(
                   children: [
                     _buildSavingsCard(),
-                    _buildLoanApplicationForm(),
                     _buildUserLoansSection(),
+                    _buildLoanApplicationForm(),
                   ],
                 ),
               ),
@@ -268,7 +276,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Total Savings',
+                    'Jumla ya Akiba',
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   const SizedBox(height: 4),
@@ -293,7 +301,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Eligible Loan Amount',
+                    'Mkopo Unaostahili',
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   const SizedBox(height: 4),
@@ -317,8 +325,8 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                 ),
                 child: Text(
                   loanType == 'multiplier'
-                      ? '${loanSettings?.multiplier} x multiplier'
-                      : '${loanSettings?.percentage}% of savings',
+                      ? '${loanSettings?.multiplier}x mara'
+                      : '${loanSettings?.percentage}% ya akiba',
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ),
@@ -331,7 +339,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
 
   Widget _buildLoanApplicationForm() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -350,15 +358,15 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Apply for a Loan',
+              'Omba Mkopo',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             TextFormField(
               controller: _amountController,
               decoration: InputDecoration(
-                labelText: 'Loan Amount',
-                hintText: 'Enter amount',
+                labelText: 'Kiasi cha Mkopo',
+                hintText: 'Weka kiasi',
                 prefixIcon: const Icon(Icons.money),
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -369,14 +377,14 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter an amount';
+                  return 'Tafadhali weka kiasi';
                 }
                 final amount = double.tryParse(value);
                 if (amount == null || amount <= 0) {
-                  return 'Please enter a valid amount';
+                  return 'Tafadhali weka kiasi sahihi';
                 }
                 if (amount > eligibleAmount) {
-                  return 'Amount exceeds eligible limit';
+                  return 'Kiasi kimezidi kikomo';
                 }
                 return null;
               },
@@ -385,8 +393,8 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
             TextFormField(
               controller: _monthsController,
               decoration: InputDecoration(
-                labelText: 'Repayment Period (Months)',
-                hintText: 'Enter months',
+                labelText: 'Muda wa Malipo (Miezi)',
+                hintText: 'Weka miezi',
                 prefixIcon: const Icon(Icons.calendar_today),
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -397,14 +405,14 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter repayment period';
+                  return 'Tafadhali weka muda wa malipo';
                 }
                 final months = int.tryParse(value);
                 if (months == null || months <= 0) {
-                  return 'Please enter a valid period';
+                  return 'Tafadhali weka muda sahihi';
                 }
                 if (months > maxMonths) {
-                  return 'Maximum period is $maxMonths months';
+                  return 'Muda wa juu ni miezi $maxMonths';
                 }
                 return null;
               },
@@ -418,16 +426,16 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
               ),
               child: Column(
                 children: [
-                  _buildDetailRow('Interest Rate', '$interestRate%'),
+                  _buildDetailRow('Riba', '$interestRate%'),
                   const Divider(height: 20),
                   _buildDetailRow(
-                    'Total Amount',
+                    'Jumla ya Malipo',
                     NumberFormat.currency(symbol: 'TSh ').format(totalAmount),
                     bold: true,
                   ),
                   const Divider(height: 20),
                   _buildDetailRow(
-                    'Monthly Installment',
+                    'Malipo ya Kila Mwezi',
                     NumberFormat.currency(symbol: 'TSh ')
                         .format(monthlyInstallment),
                     color: Colors.blue[700],
@@ -450,7 +458,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                 child: _isSubmitting
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
-                        'Submit Application',
+                        'Wasilisha Ombi',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -496,18 +504,20 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'My Loans',
+            'Mikopo Yangu',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 2),
           userLoans.isEmpty
               ? _buildEmptyState()
               : ListView.builder(
                   shrinkWrap: true,
+                  padding: EdgeInsets.zero,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: userLoans.length,
-                  itemBuilder: (context, index) =>
-                      _buildLoanCard(userLoans[index]),
+                  itemBuilder: (context, index) => _buildLoanCard(
+                    userLoans[index],
+                  ),
                 ),
         ],
       ),
@@ -527,7 +537,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
             Icon(Icons.receipt_long, size: 64, color: Colors.grey[300]),
             const SizedBox(height: 16),
             Text(
-              'No loans yet',
+              'Hakuna mikopo bado',
               style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
           ],
@@ -536,8 +546,8 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     );
   }
 
-  Widget _buildLoanCard(Map<String, dynamic> loan) {
-    final status = loan['status'] ?? 'pending';
+  Widget _buildLoanCard(UserLoan loan) {
+    final status = loan.status;
     final statusColor = status == 'approved'
         ? Colors.green
         : status == 'rejected'
@@ -566,7 +576,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
             children: [
               Text(
                 NumberFormat.currency(symbol: 'TSh ').format(
-                  double.parse(loan['amount'].toString()),
+                  double.parse(loan.amount),
                 ),
                 style: const TextStyle(
                   fontSize: 20,
@@ -581,7 +591,11 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  status.toUpperCase(),
+                  status == 'approved'
+                      ? 'IMEIDHINISHWA'
+                      : status == 'rejected'
+                          ? 'IMEKATALIWA'
+                          : 'INASUBIRI',
                   style: TextStyle(
                     color: statusColor,
                     fontWeight: FontWeight.bold,
@@ -594,33 +608,33 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
           const SizedBox(height: 12),
           _buildLoanDetailRow(
             Icons.percent,
-            'Interest Rate',
-            '${loan['interest_rate']}%',
+            'Riba',
+            '${loan.interestRate}%',
           ),
           _buildLoanDetailRow(
             Icons.account_balance_wallet,
-            'Total Amount',
+            'Jumla ya Malipo',
             NumberFormat.currency(symbol: 'TSh ').format(
-              double.parse(loan['total_amount'].toString()),
+              double.parse(loan.totalAmount),
             ),
           ),
           _buildLoanDetailRow(
             Icons.payment,
-            'Monthly Installment',
+            'Malipo ya Kila Mwezi',
             NumberFormat.currency(symbol: 'TSh ').format(
-              double.parse(loan['monthly_installment'].toString()),
+              double.parse(loan.monthlyInstallment),
             ),
           ),
           _buildLoanDetailRow(
             Icons.calendar_today,
-            'Requested',
-            _formatDate(loan['requested_at']),
+            'Tarehe ya Ombi',
+            _formatDate(loan.requestedAt),
           ),
-          if (loan['approved_at'] != null)
+          if (loan.approvedAt != null)
             _buildLoanDetailRow(
               Icons.check_circle,
-              'Approved',
-              _formatDate(loan['approved_at']),
+              'Imeidhinishwa',
+              _formatDate(loan.approvedAt),
             ),
         ],
       ),

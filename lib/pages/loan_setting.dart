@@ -66,15 +66,28 @@ class _LoanSettingPageState extends State<LoanSettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: mainFontColor,
         foregroundColor: Colors.white,
-        title: const Text('Mipangilio ya Mikopo'),
+        title: const Text(
+          'Mipangilio ya Mikopo',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadAllSettings,
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              icon: const Icon(Icons.refresh_rounded),
+              onPressed: _loadAllSettings,
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.white.withOpacity(0.2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -85,19 +98,20 @@ class _LoanSettingPageState extends State<LoanSettingPage> {
               : _buildSettingsList(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddEditBottomSheet(),
-        icon: const Icon(
-          Icons.add,
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
+        icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: const Text(
           'Ongeza Mpango',
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
           ),
         ),
         backgroundColor: mainFontColor,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
     );
   }
@@ -107,16 +121,34 @@ class _LoanSettingPageState extends State<LoanSettingPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.settings_suggest, size: 100, color: Colors.grey[300]),
-          const SizedBox(height: 16),
-          Text(
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.settings_suggest_rounded,
+              size: 80,
+              color: Colors.grey[400],
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
             'Hakuna mipangilio ya mikopo',
-            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             'Bonyeza kitufe cha chini kuongeza',
-            style: TextStyle(color: Colors.grey[500]),
+            style: TextStyle(
+              fontSize: 15,
+              color: Colors.grey[600],
+            ),
           ),
         ],
       ),
@@ -129,85 +161,251 @@ class _LoanSettingPageState extends State<LoanSettingPage> {
       itemCount: _loanSettings.length,
       itemBuilder: (context, index) {
         final setting = _loanSettings[index];
-        return _buildSettingCard(setting);
+        return _buildSettingCard(setting, index);
       },
     );
   }
 
-  Widget _buildSettingCard(LoanSetting setting) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: () => _showAddEditBottomSheet(setting: setting),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      setting.name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+  Widget _buildSettingCard(LoanSetting setting, int index) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[200]!, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _showAddEditBottomSheet(setting: setting),
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: mainFontColor,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: mainFontColor.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        '${index + 1}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
                       ),
                     ),
-                  ),
-                  Icon(Icons.edit, color: mainFontColor),
-                ],
-              ),
-              const Divider(height: 16),
-              _buildInfoRow(
-                  Icons.account_balance, 'Msingi', setting.shareSaving),
-              _buildInfoRow(
-                  Icons.trending_up, 'Riba', '${setting.interestRate}%'),
-              if (setting.multiplier != null)
-                _buildInfoRow(
-                    Icons.close, 'Mzidishaji', 'x${setting.multiplier}'),
-              if (setting.percentage != null)
-                _buildInfoRow(
-                    Icons.percent, 'Asilimia', '${setting.percentage}%'),
-              _buildInfoRow(Icons.calendar_month, 'Kipindi',
-                  '${setting.maxPeriodMonths} miezi'),
-              if (setting.minAmounts != null || setting.maxAmounts != null)
-                _buildInfoRow(
-                  Icons.money,
-                  'Kikomo',
-                  '${setting.minAmounts ?? 0} - ${setting.maxAmounts ?? 'Hakuna'}',
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            setting.name,
+                            style: const TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: setting.shareSaving == 'SHARE'
+                                  ? Colors.blue.withOpacity(0.15)
+                                  : Colors.green.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              setting.shareSaving == 'SHARE' ? 'Hisa' : 'Akiba',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: setting.shareSaving == 'SHARE'
+                                    ? Colors.blue[800]
+                                    : Colors.green[800],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: mainFontColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.edit_rounded,
+                        color: mainFontColor,
+                        size: 20,
+                      ),
+                    ),
+                  ],
                 ),
-              if (setting.sharePrice != null)
-                _buildInfoRow(Icons.price_change, 'Bei ya Hisa',
-                    'Tsh ${setting.sharePrice}'),
-            ],
+                const SizedBox(height: 16),
+                Divider(color: Colors.grey[300], height: 1),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    _buildInfoChip(
+                      Icons.trending_up_rounded,
+                      'Riba',
+                      '${setting.interestRate}%',
+                      Colors.orange,
+                    ),
+                    if (setting.multiplier != null)
+                      _buildInfoChip(
+                        Icons.close_rounded,
+                        'Mzidishaji',
+                        'x${setting.multiplier}',
+                        Colors.purple,
+                      ),
+                    if (setting.percentage != null)
+                      _buildInfoChip(
+                        Icons.percent_rounded,
+                        'Asilimia',
+                        '${setting.percentage}%',
+                        Colors.blue,
+                      ),
+                    _buildInfoChip(
+                      Icons.calendar_month_rounded,
+                      'Miezi',
+                      '${setting.maxPeriodMonths}',
+                      Colors.teal,
+                    ),
+                  ],
+                ),
+                if (setting.minAmounts != null ||
+                    setting.maxAmounts != null ||
+                    setting.sharePrice != null) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[200]!),
+                    ),
+                    child: Column(
+                      children: [
+                        if (setting.minAmounts != null ||
+                            setting.maxAmounts != null)
+                          _buildDetailRow(
+                            Icons.attach_money_rounded,
+                            'Kikomo',
+                            'Tsh ${setting.minAmounts ?? 0} - ${setting.maxAmounts ?? '∞'}',
+                          ),
+                        if (setting.sharePrice != null) ...[
+                          if (setting.minAmounts != null ||
+                              setting.maxAmounts != null)
+                            const SizedBox(height: 8),
+                          _buildDetailRow(
+                            Icons.price_change_rounded,
+                            'Bei ya Hisa',
+                            'Tsh ${setting.sharePrice}',
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+  Widget _buildInfoChip(
+      IconData icon, String label, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withOpacity(0.4)),
+      ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: Colors.grey[600]),
-          const SizedBox(width: 8),
+          Icon(icon, size: 16, color: Colors.black),
+          const SizedBox(width: 6),
           Text(
-            '$label: ',
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[800],
+              fontWeight: FontWeight.w500,
+            ),
           ),
+          const SizedBox(width: 4),
           Text(
             value,
-            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: Colors.grey[700]),
+        const SizedBox(width: 8),
+        Text(
+          '$label: ',
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey[700],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+            textAlign: TextAlign.right,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -334,67 +532,128 @@ class _LoanSettingFormState extends State<LoanSettingForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 20),
-              _buildNameField(),
-              const SizedBox(height: 16),
-              _buildMinMaxSwitch(),
-              if (_hasMinMaxAmounts) ...[
-                const SizedBox(height: 16),
-                _buildMinAmountField(),
-                const SizedBox(height: 16),
-                _buildMaxAmountField(),
-              ],
-              const SizedBox(height: 16),
-              _buildShareSavingSelector(),
-              if (_shareSaving == 'SHARE') ...[
-                const SizedBox(height: 16),
-                _buildSharePriceField(),
-              ],
-              const SizedBox(height: 16),
-              _buildLoanTypeSelector(),
-              const SizedBox(height: 16),
-              _buildInterestRateField(),
-              const SizedBox(height: 16),
-              if (_isMultiplier) _buildMultiplierField(),
-              if (!_isMultiplier) _buildPercentageField(),
-              const SizedBox(height: 16),
-              _buildMaxPeriodField(),
-              const SizedBox(height: 24),
-              _buildSaveButton(),
-            ],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-        ),
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: 24),
+                    _buildNameField(),
+                    const SizedBox(height: 20),
+                    _buildMinMaxSwitch(),
+                    if (_hasMinMaxAmounts) ...[
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(child: _buildMinAmountField()),
+                          const SizedBox(width: 12),
+                          Expanded(child: _buildMaxAmountField()),
+                        ],
+                      ),
+                    ],
+                    const SizedBox(height: 20),
+                    _buildShareSavingSelector(),
+                    if (_shareSaving == 'SHARE') ...[
+                      const SizedBox(height: 16),
+                      _buildSharePriceField(),
+                    ],
+                    const SizedBox(height: 20),
+                    _buildLoanTypeSelector(),
+                    const SizedBox(height: 20),
+                    _buildInterestRateField(),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        if (_isMultiplier)
+                          Expanded(child: _buildMultiplierField()),
+                        if (!_isMultiplier)
+                          Expanded(child: _buildPercentageField()),
+                        const SizedBox(width: 12),
+                        Expanded(child: _buildMaxPeriodField()),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
+                    _buildSaveButton(),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildHeader() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          widget.existingSetting != null ? 'Hariri Mpango' : 'Mpango Mpya',
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [mainFontColor, mainFontColor.withOpacity(0.7)],
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            widget.existingSetting != null
+                ? Icons.edit_rounded
+                : Icons.add_rounded,
+            color: Colors.white,
+            size: 24,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            widget.existingSetting != null ? 'Hariri Mpango' : 'Mpango Mpya',
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
         IconButton(
-          icon: const Icon(Icons.close),
+          icon: const Icon(Icons.close_rounded),
           onPressed: () => Navigator.pop(context),
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.grey[100],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
         ),
       ],
     );
@@ -419,12 +678,26 @@ class _LoanSettingFormState extends State<LoanSettingForm> {
   }
 
   Widget _buildMinMaxSwitch() {
-    return SwitchListTile(
-      title: const Text('Weka Kikomo cha Kiasi'),
-      subtitle: const Text('Kikomo cha chini na juu cha mkopo'),
-      value: _hasMinMaxAmounts,
-      onChanged: (value) => setState(() => _hasMinMaxAmounts = value),
-      activeColor: mainFontColor,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: SwitchListTile(
+        title: const Text(
+          'Weka Kikomo cha Kiasi',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        subtitle: const Text(
+          'Kikomo cha chini na juu cha mkopo',
+          style: TextStyle(fontSize: 13),
+        ),
+        value: _hasMinMaxAmounts,
+        onChanged: (value) => setState(() => _hasMinMaxAmounts = value),
+        activeColor: mainFontColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
     );
   }
 
@@ -432,17 +705,23 @@ class _LoanSettingFormState extends State<LoanSettingForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Msingi wa Mkopo',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
+        const Text(
+          'Msingi wa Mkopo',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
+          ),
+        ),
+        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
-              child: _buildRadioOption('SAVING', 'Akiba', Icons.savings),
+              child:
+                  _buildRadioOption('SAVING', 'Akiba', Icons.savings_rounded),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _buildRadioOption('SHARE', 'Hisa', Icons.share),
+              child: _buildRadioOption('SHARE', 'Hisa', Icons.share_rounded),
             ),
           ],
         ),
@@ -454,21 +733,48 @@ class _LoanSettingFormState extends State<LoanSettingForm> {
     final isSelected = _shareSaving == value;
     return InkWell(
       onTap: () => setState(() => _shareSaving = value),
-      child: Container(
-        padding: const EdgeInsets.all(12),
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
-          color: isSelected ? mainFontColor.withOpacity(0.1) : Colors.grey[100],
-          border:
-              Border.all(color: isSelected ? mainFontColor : Colors.grey[300]!),
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [mainFontColor, mainFontColor.withOpacity(0.8)],
+                )
+              : null,
+          color: isSelected ? null : Colors.grey[100],
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? mainFontColor : Colors.grey[300]!,
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: mainFontColor.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           children: [
-            Icon(icon, color: isSelected ? mainFontColor : Colors.grey),
-            const SizedBox(height: 4),
-            Text(label,
-                style: TextStyle(
-                    color: isSelected ? mainFontColor : Colors.grey[700])),
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : Colors.grey[600],
+              size: 28,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.grey[700],
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
           ],
         ),
       ),
@@ -479,17 +785,22 @@ class _LoanSettingFormState extends State<LoanSettingForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Aina ya Kikomo',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
+        const Text(
+          'Aina ya Kikomo',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
+          ),
+        ),
+        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
-              child: _buildTypeOption(true, 'Mzidishaji', Icons.calculate),
+              child: _buildTypeOption(true, 'Mzidishaji', Icons.close_rounded),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _buildTypeOption(false, 'Asilimia', Icons.percent),
+              child: _buildTypeOption(false, 'Asilimia', Icons.percent_rounded),
             ),
           ],
         ),
@@ -501,21 +812,48 @@ class _LoanSettingFormState extends State<LoanSettingForm> {
     final isSelected = _isMultiplier == isMultiplier;
     return InkWell(
       onTap: () => setState(() => _isMultiplier = isMultiplier),
-      child: Container(
-        padding: const EdgeInsets.all(12),
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
-          color: isSelected ? mainFontColor.withOpacity(0.1) : Colors.grey[100],
-          border:
-              Border.all(color: isSelected ? mainFontColor : Colors.grey[300]!),
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [mainFontColor, mainFontColor.withOpacity(0.8)],
+                )
+              : null,
+          color: isSelected ? null : Colors.grey[100],
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? mainFontColor : Colors.grey[300]!,
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: mainFontColor.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           children: [
-            Icon(icon, color: isSelected ? mainFontColor : Colors.grey),
-            const SizedBox(height: 4),
-            Text(label,
-                style: TextStyle(
-                    color: isSelected ? mainFontColor : Colors.grey[700])),
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : Colors.grey[600],
+              size: 28,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.grey[700],
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
           ],
         ),
       ),
@@ -536,11 +874,38 @@ class _LoanSettingFormState extends State<LoanSettingForm> {
         FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
       ],
       validator: validator,
+      style: const TextStyle(fontWeight: FontWeight.w600),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+        prefixIcon: Container(
+          margin: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: mainFontColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: mainFontColor, size: 20),
+        ),
+        filled: true,
+        fillColor: Colors.grey[50],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: mainFontColor, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
       ),
     );
   }
@@ -623,23 +988,49 @@ class _LoanSettingFormState extends State<LoanSettingForm> {
   }
 
   Widget _buildSaveButton() {
-    return ElevatedButton.icon(
-      onPressed: _isLoading ? null : _saveLoanSetting,
-      icon: _isLoading
-          ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
-            )
-          : const Icon(Icons.save),
-      label: Text(_isLoading ? 'Inahifadhi...' : 'Hifadhi Mipangilio'),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: mainFontColor,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: LinearGradient(
+          colors: [mainFontColor, mainFontColor.withOpacity(0.8)],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: mainFontColor.withOpacity(0.4),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ElevatedButton.icon(
+        onPressed: _isLoading ? null : _saveLoanSetting,
+        icon: _isLoading
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : const Icon(Icons.save_rounded, size: 22),
+        label: Text(
+          _isLoading ? 'Inahifadhi...' : 'Hifadhi Mipangilio',
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(vertical: 18),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
       ),
     );
   }

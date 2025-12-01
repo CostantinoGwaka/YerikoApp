@@ -33,11 +33,14 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
   List<LoanStatistic> statistics = [];
   bool isLoadingStatistics = false;
 
+  Map<String, dynamic>? loanStatistics;
+  bool isLoadingStats = false;
+
   @override
   void initState() {
     super.initState();
     fetchLoans();
-    fetchStatistics();
+    fetchLoanStatistics();
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -110,6 +113,42 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
       setState(() {
         errorMessage = '⚠️ Tafadhali hakikisha umeunganishwa na intaneti';
         isLoading = false;
+      });
+    }
+  }
+
+  Future<void> fetchLoanStatistics() async {
+    setState(() {
+      isLoadingStats = true;
+    });
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+            '$baseUrl/loans/get_loan_statistics_katibu.php?jumuiya_id=${widget.jumuiyaId}'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 200 || data['status'] == '200') {
+          setState(() {
+            loanStatistics = data['data'];
+            isLoadingStats = false;
+          });
+        } else {
+          setState(() {
+            isLoadingStats = false;
+          });
+        }
+      } else {
+        setState(() {
+          isLoadingStats = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoadingStats = false;
       });
     }
   }
@@ -223,6 +262,144 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
           ),
 
           // Statistics Section
+          if (isLoadingStats)
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else if (loanStatistics != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                    child: Text(
+                      'Takwimu za Mikopo',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  // Loan Statistics Row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _MiniStatCard(
+                          icon: Icons.account_balance_rounded,
+                          label: 'Jumla ya Mikopo',
+                          value:
+                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['loan_statistics']['totalLoanGiven'])}',
+                          color: Colors.blue,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _MiniStatCard(
+                          icon: Icons.trending_up_rounded,
+                          label: 'Riba Inayotarajiwa',
+                          value:
+                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['loan_statistics']['totalInterestExpected'])}',
+                          color: Colors.orange,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _MiniStatCard(
+                          icon: Icons.payments_rounded,
+                          label: 'Jumla ya Kukusanya',
+                          value:
+                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['loan_statistics']['totalExpectedToBeCollected'])}',
+                          color: Colors.purple,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _MiniStatCard(
+                          icon: Icons.numbers_rounded,
+                          label: 'Idadi ya Mikopo',
+                          value:
+                              '${loanStatistics!['loan_statistics']['totalLoansCount']}',
+                          color: Colors.teal,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // Collection Statistics Row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _MiniStatCard(
+                          icon: Icons.check_circle_rounded,
+                          label: 'Imekusanywa',
+                          value:
+                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['collection_statistics']['totalCollected'])}',
+                          color: Colors.green,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _MiniStatCard(
+                          icon: Icons.pending_actions_rounded,
+                          label: 'Baki',
+                          value:
+                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['collection_statistics']['remainingBalance'])}',
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // User Statistics Row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _MiniUserStatCard(
+                          icon: Icons.arrow_upward_rounded,
+                          label: 'Mkopo Mkubwa',
+                          userName: loanStatistics!['biggest_loan_user']
+                              ['user_name'],
+                          value:
+                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['biggest_loan_user']['totalLoan'])}',
+                          color: Colors.indigo,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _MiniUserStatCard(
+                          icon: Icons.arrow_downward_rounded,
+                          label: 'Mkopo Mdogo',
+                          userName: loanStatistics!['smallest_loan_user']
+                              ['user_name'],
+                          value:
+                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['smallest_loan_user']['totalLoan'])}',
+                          color: Colors.pink,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
 
           // Status Filter Chips
           Container(
@@ -1381,6 +1558,155 @@ class _DetailItem extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// Mini Statistics Card Widget
+class _MiniStatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _MiniStatCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 16, color: color),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Mini User Statistics Card Widget
+class _MiniUserStatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String userName;
+  final String value;
+  final Color color;
+
+  const _MiniUserStatCard({
+    required this.icon,
+    required this.label,
+    required this.userName,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 16, color: color),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            userName,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 }

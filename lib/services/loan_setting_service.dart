@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -72,6 +73,31 @@ class LoanSettingService {
       return null;
     } catch (e) {
       throw Exception('Failed to get loan setting: $e');
+    }
+  }
+
+  Future<List<LoanSetting>> getAllLoanSettingsByJumuiyaId(
+      dynamic jumuiyaId) async {
+    try {
+      String myApi =
+          "$baseUrl/loans/get_loan_setting_by_jumuiya_id.php?jumuiya_id=$jumuiyaId";
+      final response = await http.get(
+        Uri.parse(myApi),
+        headers: {'Accept': 'application/json'},
+      );
+
+      var jsonResponse = json.decode(response.body);
+
+      if (response.statusCode == 200 && jsonResponse['status'] == 200) {
+        List<dynamic> data = jsonResponse['data'];
+        return data.map((json) => LoanSetting.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error fetching loan settings: $e");
+      }
+      return [];
     }
   }
 

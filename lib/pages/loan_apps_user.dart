@@ -33,6 +33,10 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
   List<LoanSetting> availableLoanSettings = [];
   String selectedStatus = 'all';
 
+  Map<String, dynamic>? userLoanStatistics;
+  bool isLoadingUserStats = false;
+  bool _showStatistics = false;
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +49,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
       _fetchUserSavings(),
       _fetchAvailableLoanSettings(),
       _fetchUserLoans(),
+      _fetchUserLoanStatistics(),
     ]);
     setState(() => _isLoadingSettings = false);
   }
@@ -112,6 +117,42 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
       }
     } catch (e) {
       _showError('Imeshindwa kupakia mikopo: $e');
+    }
+  }
+
+  Future<void> _fetchUserLoanStatistics() async {
+    setState(() {
+      isLoadingUserStats = true;
+    });
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+            '$baseUrl/loans/get_loan_statistics_by_user.php?user_id=${userData!.user.id}'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 200 || data['status'] == '200') {
+          setState(() {
+            userLoanStatistics = data['data'];
+            isLoadingUserStats = false;
+          });
+        } else {
+          setState(() {
+            isLoadingUserStats = false;
+          });
+        }
+      } else {
+        setState(() {
+          isLoadingUserStats = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoadingUserStats = false;
+      });
     }
   }
 
@@ -1077,6 +1118,192 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          //show my statistics
+          if (isLoadingUserStats)
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else if (userLoanStatistics != null)
+            Column(
+              children: [
+                // Toggle Button
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey[200]!),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _showStatistics = !_showStatistics;
+                      });
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Takwimu Zangu za Mikopo',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Icon(
+                          _showStatistics
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          color: mainFontColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Statistics Content (collapsible)
+                if (_showStatistics)
+                  Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[200]!),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Loan Statistics Row
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _MiniStatCard(
+                                icon: Icons.account_balance_rounded,
+                                label: 'Jumla ya Mikopo',
+                                value:
+                                    'Tsh ${LoanSettingService.formatCurrency(userLoanStatistics!['loan_statistics']['totalLoanGiven'])}',
+                                color: Colors.blue,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _MiniStatCard(
+                                icon: Icons.trending_up_rounded,
+                                label: 'Riba Inayotarajiwa',
+                                value:
+                                    'Tsh ${LoanSettingService.formatCurrency(userLoanStatistics!['loan_statistics']['totalInterestExpected'])}',
+                                color: Colors.orange,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _MiniStatCard(
+                                icon: Icons.payments_rounded,
+                                label: 'Jumla ya Kulipa',
+                                value:
+                                    'Tsh ${LoanSettingService.formatCurrency(userLoanStatistics!['loan_statistics']['totalExpectedToBeCollected'])}',
+                                color: Colors.purple,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _MiniStatCard(
+                                icon: Icons.numbers_rounded,
+                                label: 'Idadi ya Mikopo',
+                                value:
+                                    '${userLoanStatistics!['loan_statistics']['totalLoansCount']}',
+                                color: Colors.teal,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        // Collection Statistics Row
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _MiniStatCard(
+                                icon: Icons.check_circle_rounded,
+                                label: 'Umelipa',
+                                value:
+                                    'Tsh ${LoanSettingService.formatCurrency(userLoanStatistics!['collection_statistics']['totalCollected'])}',
+                                color: Colors.green,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _MiniStatCard(
+                                icon: Icons.pending_actions_rounded,
+                                label: 'Baki',
+                                value:
+                                    'Tsh ${LoanSettingService.formatCurrency(userLoanStatistics!['collection_statistics']['remainingBalance'])}',
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        // Loan Details Row
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _MiniLoanCard(
+                                icon: Icons.arrow_upward_rounded,
+                                label: 'Mkopo Mkubwa',
+                                amount: userLoanStatistics!['biggest_loan']
+                                    ['amount'],
+                                totalAmount: userLoanStatistics!['biggest_loan']
+                                    ['total_amount'],
+                                color: Colors.indigo,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _MiniLoanCard(
+                                icon: Icons.arrow_downward_rounded,
+                                label: 'Mkopo Mdogo',
+                                amount: userLoanStatistics!['smallest_loan']
+                                    ['amount'],
+                                totalAmount:
+                                    userLoanStatistics!['smallest_loan']
+                                        ['total_amount'],
+                                color: Colors.pink,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+
+          const SizedBox(height: 16),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1289,6 +1516,155 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+// Mini Statistics Card Widget
+class _MiniStatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _MiniStatCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 16, color: color),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Mini Loan Card Widget
+class _MiniLoanCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final dynamic amount;
+  final dynamic totalAmount;
+  final Color color;
+
+  const _MiniLoanCard({
+    required this.icon,
+    required this.label,
+    required this.amount,
+    required this.totalAmount,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 16, color: color),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Mkopo: Tsh ${LoanSettingService.formatCurrency(amount)}',
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'Jumla: Tsh ${LoanSettingService.formatCurrency(totalAmount)}',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }

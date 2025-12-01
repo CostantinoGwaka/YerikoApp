@@ -10,31 +10,31 @@ class LoanSettingService {
   static List<Map<String, dynamic>> statusList = [
     {
       'value': 'pending',
-      'label': 'Pending',
+      'label': 'Inasubiri',
       'color': Colors.orange,
       'icon': Icons.pending
     },
     {
       'value': 'in-progress',
-      'label': 'In Progress',
+      'label': 'Inaendelea',
       'color': Colors.blue,
       'icon': Icons.hourglass_empty
     },
     {
       'value': 'completed',
-      'label': 'Completed',
+      'label': 'Imekamilika',
       'color': Colors.teal,
       'icon': Icons.done_all
     },
     {
       'value': 'approved',
-      'label': 'Approved',
+      'label': 'Imeidhinishwa',
       'color': Colors.green,
       'icon': Icons.check_circle
     },
     {
       'value': 'rejected',
-      'label': 'Rejected',
+      'label': 'Imekataliwa',
       'color': Colors.red,
       'icon': Icons.cancel
     },
@@ -104,6 +104,11 @@ class LoanSettingService {
   static Color getStatusColor(String status) {
     return statusList.firstWhere((s) => s['value'] == status,
         orElse: () => statusList[0])['color'];
+  }
+
+  static String getStatusLabel(String status) {
+    return statusList.firstWhere((s) => s['value'] == status,
+        orElse: () => statusList[0])['label'];
   }
 
   static String formatCurrency(dynamic amount) {

@@ -1287,7 +1287,7 @@ class LoanCard extends StatelessWidget {
                       border: Border.all(color: statusColor, width: 1.5),
                     ),
                     child: Text(
-                      loan.status.toUpperCase(),
+                      LoanSettingService.getStatusLabel(loan.status),
                       style: TextStyle(
                         color: statusColor,
                         fontWeight: FontWeight.bold,
@@ -1306,7 +1306,7 @@ class LoanCard extends StatelessWidget {
                   Expanded(
                     child: _DetailItem(
                       icon: Icons.account_balance_wallet,
-                      label: 'Amount',
+                      label: 'Kiasi',
                       value: 'TZS ${formatCurrency(loan.amount)}',
                       color: Colors.blue,
                     ),
@@ -1314,7 +1314,7 @@ class LoanCard extends StatelessWidget {
                   Expanded(
                     child: _DetailItem(
                       icon: Icons.percent,
-                      label: 'Interest',
+                      label: 'Riba',
                       value: '${loan.interestRate}%',
                       color: Colors.orange,
                     ),
@@ -1327,7 +1327,7 @@ class LoanCard extends StatelessWidget {
                   Expanded(
                     child: _DetailItem(
                       icon: Icons.payments,
-                      label: 'Total Amount',
+                      label: 'Jumla',
                       value: 'TZS ${formatCurrency(loan.totalAmount)}',
                       color: Colors.green,
                     ),
@@ -1335,7 +1335,7 @@ class LoanCard extends StatelessWidget {
                   Expanded(
                     child: _DetailItem(
                       icon: Icons.calendar_today,
-                      label: 'Monthly',
+                      label: 'Kwa Mwezi',
                       value: 'TZS ${formatCurrency(loan.monthlyInstallment)}',
                       color: Colors.purple,
                     ),
@@ -1365,7 +1365,7 @@ class LoanCard extends StatelessWidget {
                                       fontSize: 13,
                                       color: Colors.grey.shade700),
                                   children: [
-                                    const TextSpan(text: 'Type: '),
+                                    const TextSpan(text: 'Aina: '),
                                     _highlightText(loan.loanType, searchQuery),
                                   ],
                                 ),
@@ -1401,7 +1401,7 @@ class LoanCard extends StatelessWidget {
                               size: 16, color: Colors.grey.shade600),
                           const SizedBox(width: 6),
                           Text(
-                            'Requested',
+                            'Imeombwa',
                             style: TextStyle(
                                 fontSize: 12, color: Colors.grey.shade600),
                           ),
@@ -1425,7 +1425,7 @@ class LoanCard extends StatelessWidget {
                         size: 16, color: Colors.green.shade600),
                     const SizedBox(width: 6),
                     Text(
-                      'Approved: ${formatDate(loan.approvedAt.toString())}',
+                      'Imekubaliwa: ${formatDate(loan.approvedAt.toString())}',
                       style:
                           TextStyle(fontSize: 12, color: Colors.grey.shade700),
                     ),

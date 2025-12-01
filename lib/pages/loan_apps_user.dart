@@ -22,55 +22,35 @@ class LoanAppsUserPage extends StatefulWidget {
 }
 
 class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _amountController = TextEditingController();
-  final _monthsController = TextEditingController();
-
   bool _isLoadingSettings = true;
-  bool _isSubmitting = false;
 
-  LoanSetting? loanSettings;
   UserTotalsResponse? userTotalData;
   double totalSavings = 0.0;
-  double eligibleAmount = 0.0;
-  double interestRate = 0.0;
-  double totalAmount = 0.0;
-  double monthlyInstallment = 0.0;
-  int maxMonths = 12;
-  String loanType = '';
+  int totalShares = 0;
 
   List<UserLoan> userLoans = [];
   List<UserLoan> filteredLoans = [];
-  String selectedStatus = 'all'; // Default to show all loans
+  List<LoanSetting> availableLoanSettings = [];
+  String selectedStatus = 'all';
 
   @override
   void initState() {
     super.initState();
     _loadInitialData();
-    _amountController.addListener(() => _calculateLoanDetails(null));
-    _monthsController.addListener(() => _calculateLoanDetails(null));
-  }
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    _monthsController.dispose();
-    super.dispose();
   }
 
   Future<void> _loadInitialData() async {
     setState(() => _isLoadingSettings = true);
     await Future.wait([
-      _fetchLoanSettings(),
       _fetchUserSavings(),
+      _fetchAvailableLoanSettings(),
       _fetchUserLoans(),
     ]);
     setState(() => _isLoadingSettings = false);
   }
 
-  Future<void> _fetchLoanSettings() async {
+  Future<void> _fetchAvailableLoanSettings() async {
     try {
-      // Replace with your actual user data source
       final response = await http.get(
         Uri.parse(
             '$baseUrl/loans/get_loan_setting_by_jumuiya_id.php?jumuiya_id=${userData!.user.jumuiya_id}'),
@@ -78,25 +58,17 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final loanSetting = LoanSetting.fromJson(data['data']);
-        setState(() {
-          loanSettings = loanSetting;
-          interestRate = double.parse(loanSetting.interestRate.toString());
-          maxMonths = int.parse(loanSetting.maxPeriodMonths.toString());
-
-          // Determine loan type
-          if (loanSetting.multiplier != null && loanSetting.multiplier != '0') {
-            loanType = 'multiplier';
-          } else if (loanSetting.percentage != null &&
-              loanSetting.percentage != '0') {
-            loanType = 'percentage';
-          }
-
-          _monthsController.text = maxMonths.toString();
-        });
+        if (data['status'] == 200) {
+          final List<dynamic> settingsData = data['data'];
+          setState(() {
+            availableLoanSettings = settingsData
+                .map((setting) => LoanSetting.fromJson(setting))
+                .toList();
+          });
+        }
       }
     } catch (e) {
-      _showError('Failed to load loan settings: $e');
+      _showError('Imeshindwa kupakia mipangilio ya mikopo: $e');
     }
   }
 
@@ -113,46 +85,12 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         userTotalData = UserTotalsResponse.fromJson(data);
         setState(() {
           totalSavings = double.parse(userTotalData!.overallTotal.toString());
-          _calculateEligibleAmount();
+          // Calculate total shares if needed
+          totalShares = (totalSavings / 1000).floor(); // Example calculation
         });
       }
     } catch (e) {
-      _showError('Failed to load savings: $e');
-    }
-  }
-
-  void _calculateEligibleAmount() {
-    if (loanSettings == null) return;
-
-    if (loanType == 'multiplier') {
-      final multiplier = double.parse(loanSettings!.multiplier.toString());
-      eligibleAmount = totalSavings * multiplier;
-    } else if (loanType == 'percentage') {
-      final percentage = double.parse(loanSettings!.percentage.toString());
-      eligibleAmount = totalSavings * (percentage / 100);
-    }
-  }
-
-  void _calculateLoanDetails([StateSetter? setModalState]) {
-    final amount = double.tryParse(_amountController.text) ?? 0.0;
-    final months = int.tryParse(_monthsController.text) ?? 1;
-
-    if (amount > 0 && months > 0) {
-      final newTotalAmount = amount + (amount * interestRate / 100);
-      final newMonthlyInstallment = newTotalAmount / months;
-
-      // Update both main state and modal state
-      setState(() {
-        totalAmount = newTotalAmount;
-        monthlyInstallment = newMonthlyInstallment;
-      });
-
-      if (setModalState != null) {
-        setModalState(() {
-          totalAmount = newTotalAmount;
-          monthlyInstallment = newMonthlyInstallment;
-        });
-      }
+      _showError('Imeshindwa kupakia akiba: $e');
     }
   }
 
@@ -173,7 +111,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         });
       }
     } catch (e) {
-      _showError('Failed to load loans: $e');
+      _showError('Imeshindwa kupakia mikopo: $e');
     }
   }
 
@@ -200,13 +138,360 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     );
   }
 
-  void _showLoanApplicationBottomSheet(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
+  void _showLoanSelectionBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.75,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [mainFontColor, mainFontColor.withOpacity(0.7)],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.account_balance_wallet_rounded,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Text(
+                      'Chagua Aina ya Mkopo',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.pop(context),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.grey[100],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: availableLoanSettings.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.settings_suggest_rounded,
+                            size: 80,
+                            color: Colors.grey[300],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Hakuna mipangilio ya mikopo',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: availableLoanSettings.length,
+                      itemBuilder: (context, index) {
+                        final loanSetting = availableLoanSettings[index];
+                        return _buildLoanSettingCard(loanSetting);
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-    // Remove listeners before showing modal
-    _amountController.removeListener(_calculateLoanDetails);
-    _monthsController.removeListener(_calculateLoanDetails);
+  Widget _buildLoanSettingCard(LoanSetting loanSetting) {
+    // Calculate eligible amount based on settings
+    double eligibleAmount = 0.0;
+    double baseAmount = 0.0;
+
+    if (loanSetting.shareSaving == 'SAVING') {
+      baseAmount = totalSavings;
+    } else if (loanSetting.shareSaving == 'SHARE' &&
+        loanSetting.sharePrice != null) {
+      baseAmount = (totalSavings / loanSetting.sharePrice!).floor() *
+          loanSetting.sharePrice!;
+    }
+
+    if (loanSetting.multiplier != null && loanSetting.multiplier! > 0) {
+      eligibleAmount = baseAmount * loanSetting.multiplier!;
+    } else if (loanSetting.percentage != null && loanSetting.percentage! > 0) {
+      eligibleAmount = baseAmount * (loanSetting.percentage! / 100);
+    }
+
+    // Apply min/max constraints
+    if (loanSetting.minAmounts != null &&
+        eligibleAmount < loanSetting.minAmounts!) {
+      eligibleAmount = loanSetting.minAmounts!;
+    }
+    if (loanSetting.maxAmounts != null &&
+        eligibleAmount > loanSetting.maxAmounts!) {
+      eligibleAmount = loanSetting.maxAmounts!;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+            _showLoanApplicationForm(loanSetting, eligibleAmount, baseAmount);
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: mainFontColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.account_balance_rounded,
+                        color: mainFontColor,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            loanSetting.name,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: loanSetting.shareSaving == 'SHARE'
+                                  ? Colors.blue.withOpacity(0.15)
+                                  : Colors.green.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              loanSetting.shareSaving == 'SHARE'
+                                  ? 'Hisa'
+                                  : 'Akiba',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: loanSetting.shareSaving == 'SHARE'
+                                    ? Colors.blue[800]
+                                    : Colors.green[800],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 20,
+                      color: Colors.grey[400],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Divider(color: Colors.grey[200], height: 1),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildInfoItem(
+                        Icons.trending_up_rounded,
+                        'Riba',
+                        '${loanSetting.interestRate}%',
+                        Colors.orange,
+                      ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 40,
+                      color: Colors.grey[200],
+                    ),
+                    Expanded(
+                      child: _buildInfoItem(
+                        Icons.calendar_month_rounded,
+                        'Muda',
+                        '${loanSetting.maxPeriodMonths} miezi',
+                        Colors.teal,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.blue[50]!,
+                        Colors.blue[100]!.withOpacity(0.3),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Unastahili:',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      Text(
+                        NumberFormat.currency(symbol: 'TSh ')
+                            .format(eligibleAmount),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.blue[700],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (loanSetting.minAmounts != null ||
+                    loanSetting.maxAmounts != null) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.info_outline,
+                          size: 14, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Kikomo: Tsh ${loanSetting.minAmounts ?? 0} - ${loanSetting.maxAmounts != null ? NumberFormat().format(loanSetting.maxAmounts) : '∞'}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoItem(
+      IconData icon, String label, String value, Color color) {
+    return Column(
+      children: [
+        Icon(icon, size: 20, color: color),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showLoanApplicationForm(
+      LoanSetting loanSetting, double eligibleAmount, double baseAmount) {
+    final formKey = GlobalKey<FormState>();
+    final amountController = TextEditingController();
+    final monthsController =
+        TextEditingController(text: loanSetting.maxPeriodMonths.toString());
+
+    double totalAmount = 0.0;
+    double monthlyInstallment = 0.0;
+    bool isSubmitting = false;
+
+    void calculateLoanDetails(StateSetter setModalState) {
+      final amount = double.tryParse(amountController.text) ?? 0.0;
+      final months = int.tryParse(monthsController.text) ?? 1;
+
+      if (amount > 0 && months > 0) {
+        totalAmount = amount + (amount * loanSetting.interestRate / 100);
+        monthlyInstallment = totalAmount / months;
+        setModalState(() {});
+      }
+    }
 
     showModalBottomSheet(
       context: context,
@@ -214,25 +499,21 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
       backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
         builder: (BuildContext context, StateSetter setModalState) {
-          // Add listeners with modal setState
-          void calculateWithModal() => _calculateLoanDetails(setModalState);
-
-          _amountController.removeListener(calculateWithModal);
-          _monthsController.removeListener(calculateWithModal);
-
-          _amountController.addListener(calculateWithModal);
-          _monthsController.addListener(calculateWithModal);
+          amountController
+              .addListener(() => calculateLoanDetails(setModalState));
+          monthsController
+              .addListener(() => calculateLoanDetails(setModalState));
 
           return Container(
-            height: MediaQuery.of(context).size.height * 0.60,
+            height: MediaQuery.of(context).size.height * 0.85,
             decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Column(
               children: [
                 Container(
-                  margin: const EdgeInsets.only(top: 8),
+                  margin: const EdgeInsets.only(top: 12),
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
@@ -243,12 +524,460 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                      left: 20,
+                      right: 20,
+                      top: 20,
                     ),
-                    child: _buildLoanApplicationForm(
-                      screenWidth,
-                      isTablet,
-                      setModalState,
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Header
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      mainFontColor,
+                                      mainFontColor.withOpacity(0.7)
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(
+                                  Icons.request_quote_rounded,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      loanSetting.name,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Omba Mkopo',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close_rounded),
+                                onPressed: () => Navigator.pop(context),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.grey[100],
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          // Savings/Share Info Card
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  loanSetting.shareSaving == 'SHARE'
+                                      ? Colors.blue[50]!
+                                      : Colors.green[50]!,
+                                  Colors.white,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: loanSetting.shareSaving == 'SHARE'
+                                    ? Colors.blue[200]!
+                                    : Colors.green[200]!,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          loanSetting.shareSaving == 'SHARE'
+                                              ? 'Jumla ya Hisa'
+                                              : 'Jumla ya Akiba',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          NumberFormat.currency(symbol: 'TSh ')
+                                              .format(baseAmount),
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Icon(
+                                      loanSetting.shareSaving == 'SHARE'
+                                          ? Icons.share_rounded
+                                          : Icons.savings_rounded,
+                                      size: 40,
+                                      color: loanSetting.shareSaving == 'SHARE'
+                                          ? Colors.blue[300]
+                                          : Colors.green[300],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Divider(color: Colors.grey[300]),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Mkopo Unaostahili',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          NumberFormat.currency(symbol: 'TSh ')
+                                              .format(eligibleAmount),
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w700,
+                                            color: loanSetting.shareSaving ==
+                                                    'SHARE'
+                                                ? Colors.blue[700]
+                                                : Colors.green[700],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color:
+                                              loanSetting.shareSaving == 'SHARE'
+                                                  ? Colors.blue[200]!
+                                                  : Colors.green[200]!,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        loanSetting.multiplier != null
+                                            ? '${loanSetting.multiplier}x mara'
+                                            : '${loanSetting.percentage}%',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color:
+                                              loanSetting.shareSaving == 'SHARE'
+                                                  ? Colors.blue[700]
+                                                  : Colors.green[700],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          // Amount Field
+                          TextFormField(
+                            controller: amountController,
+                            decoration: InputDecoration(
+                              labelText: 'Kiasi cha Mkopo',
+                              hintText: 'Ingiza kiasi unachotaka',
+                              prefixIcon: Container(
+                                margin: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: mainFontColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(Icons.payments_rounded,
+                                    color: mainFontColor, size: 20),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[50],
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[300]!),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[300]!),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: mainFontColor, width: 2),
+                              ),
+                            ),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Tafadhali ingiza kiasi';
+                              }
+                              final amount = double.tryParse(value);
+                              if (amount == null || amount <= 0) {
+                                return 'Ingiza kiasi sahihi';
+                              }
+                              if (loanSetting.minAmounts != null &&
+                                  amount < loanSetting.minAmounts!) {
+                                return 'Kiasi kidogo ni Tsh ${loanSetting.minAmounts}';
+                              }
+                              if (loanSetting.maxAmounts != null &&
+                                  amount > loanSetting.maxAmounts!) {
+                                return 'Kiasi kikubwa ni Tsh ${loanSetting.maxAmounts}';
+                              }
+                              if (amount > eligibleAmount) {
+                                return 'Kiasi kimezidi unaostahili';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          // Months Field
+                          TextFormField(
+                            controller: monthsController,
+                            decoration: InputDecoration(
+                              labelText: 'Muda wa Malipo (Miezi)',
+                              hintText: 'Ingiza muda',
+                              prefixIcon: Container(
+                                margin: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: mainFontColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(Icons.calendar_month_rounded,
+                                    color: mainFontColor, size: 20),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[50],
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[300]!),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[300]!),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: mainFontColor, width: 2),
+                              ),
+                            ),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Tafadhali ingiza muda';
+                              }
+                              final months = int.tryParse(value);
+                              if (months == null || months <= 0) {
+                                return 'Ingiza muda sahihi';
+                              }
+                              if (months > loanSetting.maxPeriodMonths) {
+                                return 'Muda wa juu ni miezi ${loanSetting.maxPeriodMonths}';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 24),
+                          // Calculation Summary
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.orange[50],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.orange[200]!),
+                            ),
+                            child: Column(
+                              children: [
+                                _buildSummaryRow(
+                                  'Riba',
+                                  '${loanSetting.interestRate}%',
+                                  false,
+                                ),
+                                const SizedBox(height: 12),
+                                Divider(color: Colors.orange[200]),
+                                const SizedBox(height: 12),
+                                _buildSummaryRow(
+                                  'Jumla ya Malipo',
+                                  NumberFormat.currency(symbol: 'TSh ')
+                                      .format(totalAmount),
+                                  true,
+                                ),
+                                const SizedBox(height: 12),
+                                Divider(color: Colors.orange[200]),
+                                const SizedBox(height: 12),
+                                _buildSummaryRow(
+                                  'Malipo ya Kila Mwezi',
+                                  NumberFormat.currency(symbol: 'TSh ')
+                                      .format(monthlyInstallment),
+                                  true,
+                                  color: Colors.orange[700],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 28),
+                          // Submit Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 56,
+                            child: ElevatedButton(
+                              onPressed: isSubmitting
+                                  ? null
+                                  : () async {
+                                      if (!formKey.currentState!.validate())
+                                        return;
+
+                                      setModalState(() => isSubmitting = true);
+
+                                      try {
+                                        final amount =
+                                            double.parse(amountController.text);
+                                        final response = await http.post(
+                                          Uri.parse(
+                                              '$baseUrl/loans/loan_application.php'),
+                                          headers: {
+                                            'Content-Type': 'application/json'
+                                          },
+                                          body: json.encode({
+                                            'user_id': userData!.user.id,
+                                            'jumuiya_id':
+                                                userData!.user.jumuiya_id,
+                                            'loan_setting_id': loanSetting.id,
+                                            'amount': amount,
+                                            'interest_rate':
+                                                loanSetting.interestRate,
+                                            'total_amount': totalAmount,
+                                            'monthly_installment':
+                                                monthlyInstallment,
+                                            'status': 'pending',
+                                            'loan_type':
+                                                loanSetting.multiplier != null
+                                                    ? 'multiplier'
+                                                    : 'percentage',
+                                          }),
+                                        );
+
+                                        if (response.statusCode == 200) {
+                                          final data =
+                                              json.decode(response.body);
+                                          if (data['status'] == '200') {
+                                            Navigator.pop(context);
+                                            _showSuccess(
+                                                'Ombi la mkopo limewasilishwa kikamilifu');
+                                            _fetchUserLoans();
+                                          } else {
+                                            setModalState(
+                                                () => isSubmitting = false);
+                                            _showError(data['message']);
+                                          }
+                                        } else {
+                                          setModalState(
+                                              () => isSubmitting = false);
+                                          _showError(
+                                              'Imeshindwa kuwasilisha ombi');
+                                        }
+                                      } catch (e) {
+                                        setModalState(
+                                            () => isSubmitting = false);
+                                        _showError('Hitilafu: $e');
+                                      }
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: mainFontColor,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                elevation: 4,
+                              ),
+                              child: isSubmitting
+                                  ? const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                        SizedBox(width: 12),
+                                        Text(
+                                          'Inawasilisha...',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : const Text(
+                                      'Wasilisha Ombi',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -258,12 +987,34 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         },
       ),
     ).whenComplete(() {
-      // Restore original listeners when modal closes
-      _amountController.removeListener(() => _calculateLoanDetails(null));
-      _monthsController.removeListener(() => _calculateLoanDetails(null));
-      _amountController.addListener(() => _calculateLoanDetails(null));
-      _monthsController.addListener(() => _calculateLoanDetails(null));
+      // amountController.dispose();
+      // monthsController.dispose();
     });
+  }
+
+  Widget _buildSummaryRow(String label, String value, bool bold,
+      {Color? color}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[700],
+            fontWeight: bold ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+            color: color ?? Colors.black87,
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -274,10 +1025,10 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     final maxWidth = isTablet ? 800.0 : screenWidth;
 
     return Scaffold(
-      backgroundColor: surfaceColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         foregroundColor: mainFontColor,
-        backgroundColor: surfaceColor,
+        backgroundColor: Colors.white,
         title: Text(
           'Maombi ya Mkopo',
           style: TextStyle(
@@ -289,12 +1040,12 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.add,
+            icon: Icon(
+              Icons.add_rounded,
               color: mainFontColor,
-              fontWeight: FontWeight.bold,
+              size: 28,
             ),
-            onPressed: () => _showLoanApplicationBottomSheet(context),
+            onPressed: () => _showLoanSelectionBottomSheet(context),
           ),
         ],
       ),
@@ -310,7 +1061,6 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      _buildSavingsCard(screenWidth, isTablet),
                       _buildUserLoansSection(screenWidth, isTablet),
                       SizedBox(height: screenHeight * 0.02),
                     ],
@@ -318,413 +1068,6 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                 ),
               ),
             ),
-    );
-  }
-
-  Widget _buildSavingsCard(double screenWidth, bool isTablet) {
-    final horizontalPadding = screenWidth * 0.04;
-    final verticalPadding = screenWidth * 0.05;
-
-    return Container(
-      margin: EdgeInsets.all(screenWidth * 0.04),
-      padding: EdgeInsets.symmetric(
-        horizontal: horizontalPadding,
-        vertical: verticalPadding,
-      ),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.blue[700]!, Colors.blue[500]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(screenWidth * 0.04),
-        boxShadow: [
-          BoxShadow(
-            color: mainFontColor.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Jumla ya Akiba',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: isTablet ? 16 : 14,
-                      ),
-                    ),
-                    SizedBox(height: screenWidth * 0.01),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        NumberFormat.currency(symbol: 'TSh ')
-                            .format(totalSavings),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: isTablet ? 28 : 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.savings,
-                color: Colors.white70,
-                size: isTablet ? 50 : 40,
-              ),
-            ],
-          ),
-          Divider(
-            color: Colors.white24,
-            height: screenWidth * 0.08,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Mkopo Unaostahili',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: isTablet ? 16 : 14,
-                      ),
-                    ),
-                    SizedBox(height: screenWidth * 0.01),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        NumberFormat.currency(symbol: 'TSh ')
-                            .format(eligibleAmount),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: isTablet ? 24 : 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.03,
-                  vertical: screenWidth * 0.015,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white24,
-                  borderRadius: BorderRadius.circular(screenWidth * 0.05),
-                ),
-                child: Text(
-                  loanType == 'multiplier'
-                      ? '${loanSettings?.multiplier}x mara'
-                      : '${loanSettings?.percentage}% ya akiba',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: isTablet ? 14 : 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLoanApplicationForm(double screenWidth, bool isTablet,
-      [StateSetter? setModalState]) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: screenWidth * 0.04,
-        vertical: screenWidth * 0.005,
-      ),
-      padding: EdgeInsets.all(screenWidth * 0.05),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(screenWidth * 0.04),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Omba Mkopo',
-              style: TextStyle(
-                fontSize: isTablet ? 24 : 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: screenWidth * 0.05),
-            TextFormField(
-              controller: _amountController,
-              decoration: InputDecoration(
-                labelText: 'Kiasi cha Mkopo',
-                labelStyle: TextStyle(fontSize: isTablet ? 16 : 14),
-                hintText: 'Weka kiasi',
-                prefixIcon: Icon(Icons.money, size: isTablet ? 28 : 24),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.04,
-                  vertical: screenWidth * 0.04,
-                ),
-              ),
-              style: TextStyle(fontSize: isTablet ? 18 : 16),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Tafadhali weka kiasi';
-                }
-                final amount = double.tryParse(value);
-                if (amount == null || amount <= 0) {
-                  return 'Tafadhali weka kiasi sahihi';
-                }
-                if (amount > eligibleAmount) {
-                  return 'Kiasi kimezidi kikomo';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: screenWidth * 0.04),
-            TextFormField(
-              controller: _monthsController,
-              decoration: InputDecoration(
-                labelText: 'Muda wa Malipo (Miezi)',
-                labelStyle: TextStyle(fontSize: isTablet ? 16 : 14),
-                hintText: 'Weka miezi',
-                prefixIcon:
-                    Icon(Icons.calendar_today, size: isTablet ? 28 : 24),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.04,
-                  vertical: screenWidth * 0.04,
-                ),
-              ),
-              style: TextStyle(fontSize: isTablet ? 18 : 16),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Tafadhali weka muda wa malipo';
-                }
-                final months = int.tryParse(value);
-                if (months == null || months <= 0) {
-                  return 'Tafadhali weka muda sahihi';
-                }
-                if (months > maxMonths) {
-                  return 'Muda wa juu ni miezi $maxMonths';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: screenWidth * 0.05),
-            Container(
-              padding: EdgeInsets.all(screenWidth * 0.04),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(screenWidth * 0.03),
-              ),
-              child: Column(
-                children: [
-                  _buildDetailRow('Riba', '$interestRate%', isTablet),
-                  Divider(height: screenWidth * 0.05),
-                  _buildDetailRow(
-                    'Jumla ya Malipo',
-                    NumberFormat.currency(symbol: 'TSh ').format(totalAmount),
-                    isTablet,
-                    bold: true,
-                  ),
-                  Divider(height: screenWidth * 0.05),
-                  _buildDetailRow(
-                    'Malipo ya Kila Mwezi',
-                    NumberFormat.currency(symbol: 'TSh ')
-                        .format(monthlyInstallment),
-                    isTablet,
-                    color: Colors.blue[700],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: screenWidth * 0.06),
-            SizedBox(
-              width: double.infinity,
-              height: isTablet ? 60 : 50,
-              child: ElevatedButton(
-                onPressed: _isSubmitting
-                    ? null
-                    : () async {
-                        if (!_formKey.currentState!.validate()) return;
-
-                        final amount = double.parse(_amountController.text);
-                        if (amount > eligibleAmount) {
-                          _showError('Amount exceeds eligible loan amount');
-                          return;
-                        }
-
-                        if (setModalState != null) {
-                          setModalState(() => _isSubmitting = true);
-                        }
-                        setState(() => _isSubmitting = true);
-
-                        try {
-                          final response = await http.post(
-                            Uri.parse('$baseUrl/loans/loan_application.php'),
-                            headers: {'Content-Type': 'application/json'},
-                            body: json.encode({
-                              'user_id': userData!.user.id,
-                              'jumuiya_id': userData!.user.jumuiya_id,
-                              'amount': amount,
-                              'interest_rate': interestRate,
-                              'total_amount': totalAmount,
-                              'monthly_installment': monthlyInstallment,
-                              'status': 'pending',
-                              'loan_type': loanType,
-                            }),
-                          );
-
-                          if (response.statusCode == 200) {
-                            final data = json.decode(response.body);
-                            if (data['status'] == '200') {
-                              if (setModalState != null) {
-                                setModalState(() => _isSubmitting = false);
-                              }
-                              setState(() => _isSubmitting = false);
-                              Navigator.pop(context);
-                              _showSuccess(
-                                  'Ombi la mkopo limewasilishwa kikamilifu');
-                              _amountController.clear();
-                              _monthsController.text = maxMonths.toString();
-                              _fetchUserLoans();
-                            } else {
-                              if (setModalState != null) {
-                                setModalState(() => _isSubmitting = false);
-                              }
-                              setState(() => _isSubmitting = false);
-                              Navigator.pop(context);
-                              _showError(data['message']);
-                            }
-                          } else {
-                            if (setModalState != null) {
-                              setModalState(() => _isSubmitting = false);
-                            }
-                            setState(() => _isSubmitting = false);
-                            Navigator.pop(context);
-                            _showError('Failed to submit loan application');
-                          }
-                        } catch (e) {
-                          if (setModalState != null) {
-                            setModalState(() => _isSubmitting = false);
-                          }
-                          setState(() => _isSubmitting = false);
-                          Navigator.pop(context);
-                          _showError('Error: $e');
-                        }
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      _isSubmitting ? Colors.grey : Colors.blue[700],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                  ),
-                ),
-                child: _isSubmitting
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Inawasilisha...',
-                            style: TextStyle(
-                              fontSize: isTablet ? 18 : 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      )
-                    : Text(
-                        'Wasilisha Ombi',
-                        style: TextStyle(
-                          fontSize: isTablet ? 18 : 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value, bool isTablet,
-      {bool bold = false, Color? color}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: isTablet ? 16 : 14,
-              color: Colors.grey[700],
-            ),
-          ),
-        ),
-        Flexible(
-          child: Text(
-            value,
-            style: TextStyle(
-              fontSize: isTablet ? 18 : 16,
-              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-              color: color ?? Colors.black87,
-            ),
-            textAlign: TextAlign.right,
-          ),
-        ),
-      ],
     );
   }
 

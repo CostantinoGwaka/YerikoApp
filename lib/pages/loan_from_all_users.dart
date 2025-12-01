@@ -792,6 +792,14 @@ class LoanCard extends StatelessWidget {
                                         backgroundColor: Colors.green,
                                       ),
                                     );
+                                    // Refresh data after closing bottom sheet
+                                    if (context.mounted) {
+                                      final state =
+                                          context.findAncestorStateOfType<
+                                              _LoanFromAllUsersPageState>();
+                                      state?.fetchLoans();
+                                      state?.fetchLoanStatistics();
+                                    }
                                   } else {
                                     throw Exception(data['message']);
                                   }

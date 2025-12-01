@@ -27,6 +27,7 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
   List<UserLoan> loans = [];
   List<UserLoan> filteredLoans = [];
   bool isLoading = false;
+  bool _showStatistics = false;
   String errorMessage = '';
   final TextEditingController _searchController = TextEditingController();
   String searchQuery = '';
@@ -219,345 +220,404 @@ class _LoanFromAllUsersPageState extends State<LoanFromAllUsersPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Search Bar
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await Future.wait([
+            fetchLoans(),
+            fetchLoanStatistics(),
+          ]);
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              // Search Bar
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search by name or loan type...',
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                suffixIcon: searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, color: Colors.grey),
-                        onPressed: () {
-                          _searchController.clear();
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-            ),
-          ),
-
-          // Statistics Section
-          if (isLoadingStats)
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            )
-          else if (loanStatistics != null)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                    child: Text(
-                      'Takwimu za Mikopo',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search by name or loan type...',
+                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                    suffixIcon: searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, color: Colors.grey),
+                            onPressed: () {
+                              _searchController.clear();
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
                     ),
                   ),
-                  // Loan Statistics Row
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _MiniStatCard(
-                          icon: Icons.account_balance_rounded,
-                          label: 'Jumla ya Mikopo',
-                          value:
-                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['loan_statistics']['totalLoanGiven'])}',
-                          color: Colors.blue,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _MiniStatCard(
-                          icon: Icons.trending_up_rounded,
-                          label: 'Riba Inayotarajiwa',
-                          value:
-                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['loan_statistics']['totalInterestExpected'])}',
-                          color: Colors.orange,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _MiniStatCard(
-                          icon: Icons.payments_rounded,
-                          label: 'Jumla ya Kukusanya',
-                          value:
-                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['loan_statistics']['totalExpectedToBeCollected'])}',
-                          color: Colors.purple,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _MiniStatCard(
-                          icon: Icons.numbers_rounded,
-                          label: 'Idadi ya Mikopo',
-                          value:
-                              '${loanStatistics!['loan_statistics']['totalLoansCount']}',
-                          color: Colors.teal,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  // Collection Statistics Row
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _MiniStatCard(
-                          icon: Icons.check_circle_rounded,
-                          label: 'Imekusanywa',
-                          value:
-                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['collection_statistics']['totalCollected'])}',
-                          color: Colors.green,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _MiniStatCard(
-                          icon: Icons.pending_actions_rounded,
-                          label: 'Baki',
-                          value:
-                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['collection_statistics']['remainingBalance'])}',
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  // User Statistics Row
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _MiniUserStatCard(
-                          icon: Icons.arrow_upward_rounded,
-                          label: 'Mkopo Mkubwa',
-                          userName: loanStatistics!['biggest_loan_user']
-                              ['user_name'],
-                          value:
-                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['biggest_loan_user']['totalLoan'])}',
-                          color: Colors.indigo,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _MiniUserStatCard(
-                          icon: Icons.arrow_downward_rounded,
-                          label: 'Mkopo Mdogo',
-                          userName: loanStatistics!['smallest_loan_user']
-                              ['user_name'],
-                          value:
-                              'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['smallest_loan_user']['totalLoan'])}',
-                          color: Colors.pink,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-          // Status Filter Chips
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.05),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
                 ),
-              ],
-            ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: LoanSettingService.statusList.map((status) {
-                  final isSelected = selectedStatus == status['value'];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: FilterChip(
-                      selected: isSelected,
-                      label: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            status['icon'],
-                            size: 16,
-                            color: isSelected ? Colors.white : status['color'],
+              ),
+
+              // Statistics Section
+              if (isLoadingStats)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else if (loanStatistics != null)
+                Column(
+                  children: [
+                    // Toggle Button
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
                           ),
-                          const SizedBox(width: 6),
-                          Text(status['label']),
                         ],
                       ),
-                      selectedColor: status['color'],
-                      checkmarkColor: Colors.white,
-                      labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black87,
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
-                      ),
-                      onSelected: (selected) {
-                        if (selected) {
+                      child: InkWell(
+                        onTap: () {
                           setState(() {
-                            selectedStatus = status['value'];
+                            _showStatistics = !_showStatistics;
                           });
-                          fetchLoans();
-                        }
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-
-          // Results Count
-          if (!isLoading && errorMessage.isEmpty)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '${filteredLoans.length} loan${filteredLoans.length != 1 ? 's' : ''} found',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  if (searchQuery.isNotEmpty)
-                    Text(
-                      'of ${loans.length} total',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                ],
-              ),
-            ),
-
-          // Loans List
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : errorMessage.isNotEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Icon(Icons.error_outline,
-                                size: 60, color: Colors.red.shade300),
-                            const SizedBox(height: 16),
-                            Text(errorMessage,
-                                style: const TextStyle(color: Colors.red)),
-                            const SizedBox(height: 16),
-                            ElevatedButton.icon(
-                              onPressed: fetchLoans,
-                              icon: const Icon(Icons.refresh),
-                              label: const Text('Retry'),
+                            const Text(
+                              'Takwimu za Mikopo',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Icon(
+                              _showStatistics
+                                  ? Icons.keyboard_arrow_up
+                                  : Icons.keyboard_arrow_down,
+                              color: mainFontColor,
                             ),
                           ],
                         ),
-                      )
-                    : filteredLoans.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                      ),
+                    ),
+
+                    // Statistics Content (collapsible)
+                    if (_showStatistics)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Loan Statistics Row
+                            Row(
                               children: [
-                                Icon(Icons.inbox,
-                                    size: 80, color: Colors.grey.shade300),
-                                const SizedBox(height: 16),
-                                Text(
-                                  searchQuery.isNotEmpty
-                                      ? 'No loans match your search'
-                                      : 'No $selectedStatus loans found',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey.shade600),
-                                ),
-                                if (searchQuery.isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  TextButton.icon(
-                                    onPressed: () {
-                                      _searchController.clear();
-                                    },
-                                    icon: const Icon(Icons.clear),
-                                    label: const Text('Clear search'),
+                                Expanded(
+                                  child: _MiniStatCard(
+                                    icon: Icons.account_balance_rounded,
+                                    label: 'Jumla ya Mikopo',
+                                    value:
+                                        'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['loan_statistics']['totalLoanGiven'])}',
+                                    color: Colors.blue,
                                   ),
-                                ],
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _MiniStatCard(
+                                    icon: Icons.trending_up_rounded,
+                                    label: 'Riba Inayotarajiwa',
+                                    value:
+                                        'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['loan_statistics']['totalInterestExpected'])}',
+                                    color: Colors.orange,
+                                  ),
+                                ),
                               ],
                             ),
-                          )
-                        : RefreshIndicator(
-                            onRefresh: fetchLoans,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.all(12),
-                              itemCount: filteredLoans.length,
-                              itemBuilder: (context, index) {
-                                final loan = filteredLoans[index];
-                                return LoanCard(
-                                  loan: loan,
-                                  statusColor:
-                                      LoanSettingService.getStatusColor(
-                                          loan.status),
-                                  formatCurrency:
-                                      LoanSettingService.formatCurrency,
-                                  formatDate: LoanSettingService.formatDate,
-                                  searchQuery: searchQuery,
-                                );
-                              },
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _MiniStatCard(
+                                    icon: Icons.payments_rounded,
+                                    label: 'Jumla ya Kukusanya',
+                                    value:
+                                        'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['loan_statistics']['totalExpectedToBeCollected'])}',
+                                    color: Colors.purple,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _MiniStatCard(
+                                    icon: Icons.numbers_rounded,
+                                    label: 'Idadi ya Mikopo',
+                                    value:
+                                        '${loanStatistics!['loan_statistics']['totalLoansCount']}',
+                                    color: Colors.teal,
+                                  ),
+                                ),
+                              ],
                             ),
+                            const SizedBox(height: 8),
+                            // Collection Statistics Row
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _MiniStatCard(
+                                    icon: Icons.check_circle_rounded,
+                                    label: 'Imekusanywa',
+                                    value:
+                                        'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['collection_statistics']['totalCollected'])}',
+                                    color: Colors.green,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _MiniStatCard(
+                                    icon: Icons.pending_actions_rounded,
+                                    label: 'Baki',
+                                    value:
+                                        'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['collection_statistics']['remainingBalance'])}',
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            // User Statistics Row
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _MiniUserStatCard(
+                                    icon: Icons.arrow_upward_rounded,
+                                    label: 'Mkopo Mkubwa',
+                                    userName:
+                                        loanStatistics!['biggest_loan_user']
+                                            ['user_name'],
+                                    value:
+                                        'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['biggest_loan_user']['totalLoan'])}',
+                                    color: Colors.indigo,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _MiniUserStatCard(
+                                    icon: Icons.arrow_downward_rounded,
+                                    label: 'Mkopo Mdogo',
+                                    userName:
+                                        loanStatistics!['smallest_loan_user']
+                                            ['user_name'],
+                                    value:
+                                        'Tsh ${LoanSettingService.formatCurrency(loanStatistics!['smallest_loan_user']['totalLoan'])}',
+                                    color: Colors.pink,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+
+              // Status Filter Chips
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.05),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: LoanSettingService.statusList.map((status) {
+                      final isSelected = selectedStatus == status['value'];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: FilterChip(
+                          selected: isSelected,
+                          label: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                status['icon'],
+                                size: 16,
+                                color:
+                                    isSelected ? Colors.white : status['color'],
+                              ),
+                              const SizedBox(width: 6),
+                              Text(status['label']),
+                            ],
                           ),
+                          selectedColor: status['color'],
+                          checkmarkColor: Colors.white,
+                          labelStyle: TextStyle(
+                            color: isSelected ? Colors.white : Colors.black87,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                          onSelected: (selected) {
+                            if (selected) {
+                              setState(() {
+                                selectedStatus = status['value'];
+                              });
+                              fetchLoans();
+                            }
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+
+              // Results Count
+              if (!isLoading && errorMessage.isEmpty)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${filteredLoans.length} loan${filteredLoans.length != 1 ? 's' : ''} found',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (searchQuery.isNotEmpty)
+                        Text(
+                          'of ${loans.length} total',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+
+              // Loans List
+              if (isLoading)
+                Container(
+                  padding: const EdgeInsets.all(50),
+                  child: const Center(child: CircularProgressIndicator()),
+                )
+              else if (errorMessage.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(50),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error_outline,
+                            size: 60, color: Colors.red.shade300),
+                        const SizedBox(height: 16),
+                        Text(errorMessage,
+                            style: const TextStyle(color: Colors.red)),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: fetchLoans,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else if (filteredLoans.isEmpty)
+                Container(
+                  padding: const EdgeInsets.all(50),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.inbox,
+                            size: 80, color: Colors.grey.shade300),
+                        const SizedBox(height: 16),
+                        Text(
+                          searchQuery.isNotEmpty
+                              ? 'No loans match your search'
+                              : 'No $selectedStatus loans found',
+                          style: TextStyle(
+                              fontSize: 16, color: Colors.grey.shade600),
+                        ),
+                        if (searchQuery.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          TextButton.icon(
+                            onPressed: () {
+                              _searchController.clear();
+                            },
+                            icon: const Icon(Icons.clear),
+                            label: const Text('Clear search'),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                )
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(12),
+                  itemCount: filteredLoans.length,
+                  itemBuilder: (context, index) {
+                    final loan = filteredLoans[index];
+                    return LoanCard(
+                      loan: loan,
+                      statusColor:
+                          LoanSettingService.getStatusColor(loan.status),
+                      formatCurrency: LoanSettingService.formatCurrency,
+                      formatDate: LoanSettingService.formatDate,
+                      searchQuery: searchQuery,
+                    );
+                  },
+                ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

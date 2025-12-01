@@ -1,4 +1,4 @@
-// ignore_for_file: unrelated_type_equality_checks, deprecated_member_use, use_build_context_synchronously
+// ignore_for_file: unrelated_type_equality_checks, deprecated_member_use, use_build_context_synchronously, curly_braces_in_flow_control_structures
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

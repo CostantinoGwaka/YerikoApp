@@ -1175,28 +1175,30 @@ class _DailyPageState extends State<DailyPage> {
                       ),
                     );
                   } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                    return Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: size.width * 0.05),
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey[200]!),
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(Icons.inbox_rounded,
-                              color: Colors.grey[400], size: 32),
-                          SizedBox(height: 8),
-                          Text(
-                            "Hakuna michango",
-                            style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ],
+                    return Center(
+                      child: Container(
+                        margin:
+                            EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[200]!),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(Icons.inbox_rounded,
+                                color: Colors.grey[400], size: 32),
+                            SizedBox(height: 8),
+                            Text(
+                              "Hakuna michango",
+                              style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }

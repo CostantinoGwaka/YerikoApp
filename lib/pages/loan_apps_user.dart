@@ -108,12 +108,18 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final loansResponse = UserLoansResponse.fromJson(data);
-
-        setState(() {
-          userLoans = loansResponse.data;
-          _filterLoansByStatus();
-        });
+        if (data['status'] == 200) {
+          final loansResponse = UserLoansResponse.fromJson(data);
+          setState(() {
+            userLoans = loansResponse.data;
+            _filterLoansByStatus();
+          });
+        } else {
+          setState(() {
+            userLoans = [];
+            filteredLoans = [];
+          });
+        }
       }
     } catch (e) {
       _showError('Imeshindwa kupakia mikopo: $e');
@@ -134,6 +140,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        print(data);
         if (data['status'] == 200 || data['status'] == '200') {
           setState(() {
             userLoanStatistics = data['data'];
@@ -1102,7 +1109,8 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      _buildUserLoansSection(screenWidth, isTablet),
+                      if (userLoanStatistics != null)
+                        _buildUserLoansSection(screenWidth, isTablet),
                       SizedBox(height: screenHeight * 0.02),
                     ],
                   ),
@@ -1268,34 +1276,37 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
                         ),
                         const SizedBox(height: 8),
                         // Loan Details Row
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _MiniLoanCard(
-                                icon: Icons.arrow_upward_rounded,
-                                label: 'Mkopo Mkubwa',
-                                amount: userLoanStatistics!['biggest_loan']
-                                    ['amount'],
-                                totalAmount: userLoanStatistics!['biggest_loan']
-                                    ['total_amount'],
-                                color: Colors.indigo,
+                        if (userLoanStatistics!['biggest_loan'] != null &&
+                            userLoanStatistics!['smallest_loan'] != null)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _MiniLoanCard(
+                                  icon: Icons.arrow_upward_rounded,
+                                  label: 'Mkopo Mkubwa',
+                                  amount: userLoanStatistics!['biggest_loan']
+                                      ['amount'],
+                                  totalAmount:
+                                      userLoanStatistics!['biggest_loan']
+                                          ['total_amount'],
+                                  color: Colors.indigo,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: _MiniLoanCard(
-                                icon: Icons.arrow_downward_rounded,
-                                label: 'Mkopo Mdogo',
-                                amount: userLoanStatistics!['smallest_loan']
-                                    ['amount'],
-                                totalAmount:
-                                    userLoanStatistics!['smallest_loan']
-                                        ['total_amount'],
-                                color: Colors.pink,
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: _MiniLoanCard(
+                                  icon: Icons.arrow_downward_rounded,
+                                  label: 'Mkopo Mdogo',
+                                  amount: userLoanStatistics!['smallest_loan']
+                                      ['amount'],
+                                  totalAmount:
+                                      userLoanStatistics!['smallest_loan']
+                                          ['total_amount'],
+                                  color: Colors.pink,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                       ],
                     ),
                   ),

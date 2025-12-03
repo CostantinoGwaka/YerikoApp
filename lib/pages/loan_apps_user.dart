@@ -108,7 +108,8 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data['status'] == 200) {
+
+        if (data['status'] == '200') {
           final loansResponse = UserLoansResponse.fromJson(data);
           setState(() {
             userLoans = loansResponse.data;
@@ -140,8 +141,9 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print(data);
-        if (data['status'] == 200 || data['status'] == '200') {
+        if (data['status'] == 200) {
+          print(data);
+
           setState(() {
             userLoanStatistics = data['data'];
             isLoadingUserStats = false;

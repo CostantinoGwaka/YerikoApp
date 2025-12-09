@@ -35,7 +35,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Widget> get pages => [
         const DailyPage(), // index 0
         const ChurchTimeTable(), // index 1
-        (userData != null && userData!.user.role == "ADMIN")
+        (userData != null && userData!.user.role == "ADMIN" ||
+                userData!.user.role == "MHAZINI")
             ? admin.AdminAllUserCollections()
             : AllUserCollections(), // index 2
         AllViewerUserWithAdmin(), // index 3

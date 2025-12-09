@@ -103,7 +103,7 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     try {
       final response = await http.get(
         Uri.parse(
-            '$baseUrl/loans/get_loans_application_by_user_id.php?user_id=${userData!.user.id}'),
+            '$baseUrl/loans/get_loans_application_by_user_id.php?user_id=${userData!.user.id}&jumuiya_id=${userData!.user.jumuiya_id}'),
       );
 
       if (response.statusCode == 200) {
@@ -135,15 +135,13 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
     try {
       final response = await http.get(
         Uri.parse(
-            '$baseUrl/loans/get_loan_statistics_by_user.php?user_id=${userData!.user.id}'),
+            '$baseUrl/loans/get_loan_statistics_by_user.php?user_id=${userData!.user.id}&jumuiya_id=${userData!.user.jumuiya_id}'),
         headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['status'] == 200) {
-          print(data);
-
           setState(() {
             userLoanStatistics = data['data'];
             isLoadingUserStats = false;

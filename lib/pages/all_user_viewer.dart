@@ -46,7 +46,11 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
     getUsersCollections();
     getUserTrialsNumber();
     if (userData != null &&
-        (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
+        (userData!.user.role == "USER" ||
+            userData!.user.role == "ADMIN" ||
+            userData!.user.role == "KATIBU" ||
+            userData!.user.role == "KATIBU MSAIDIZI" ||
+            userData!.user.role == "MWENYEKITI MSAIDIZI")) {
       checkUserPendingRequests();
     }
     _searchController.addListener(() {
@@ -65,10 +69,15 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
   Future<void> _reloadData() async {
     await getUsersCollections();
     if (userData != null &&
-        (userData!.user.role == "USER" || userData!.user.role == "ADMIN")) {
+        (userData!.user.role == "USER" ||
+            userData!.user.role == "ADMIN" ||
+            userData!.user.role == "KATIBU" ||
+            userData!.user.role == "KATIBU MSAIDIZI" ||
+            userData!.user.role == "MWENYEKITI MSAIDIZI")) {
+      setState(() {}); // Refresh UI after fetching data
+
       await checkUserPendingRequests();
     }
-    setState(() {}); // Refresh UI after fetching data
   }
 
   Future<UserTrialsNumberResponse?> getUserTrialsNumber() async {
@@ -1131,7 +1140,11 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                           Row(
                             children: [
                               if (userData != null &&
-                                  userData!.user.role == "ADMIN") ...[
+                                      userData!.user.role == "ADMIN" ||
+                                  userData!.user.role == "KATIBU" ||
+                                  userData!.user.role ==
+                                      "MWENYEKITI MSAIDIZI" ||
+                                  userData!.user.role == "KATIBU MSAIDIZI") ...[
                                 Container(
                                   decoration: BoxDecoration(
                                     color: Colors.orange.withValues(alpha: 0.2),
@@ -1159,7 +1172,12 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                               const SizedBox(width: 5),
                               if (userData != null &&
                                   (userData!.user.role == "USER" ||
-                                      userData!.user.role == "ADMIN") &&
+                                      userData!.user.role == "ADMIN" ||
+                                      userData!.user.role == "KATIBU" ||
+                                      userData!.user.role ==
+                                          "MWENYEKITI MSAIDIZI" ||
+                                      userData!.user.role ==
+                                          "KATIBU MSAIDIZI") &&
                                   _hasUserPendingRequests) ...[
                                 GestureDetector(
                                   onTap: () async {
@@ -1317,7 +1335,10 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                         ),
                       ),
                     ),
-                    if (userData != null && userData!.user.role == "ADMIN") ...[
+                    if (userData != null && userData!.user.role == "ADMIN" ||
+                        userData!.user.role == "KATIBU" ||
+                        userData!.user.role == "MWENYEKITI MSAIDIZI" ||
+                        userData!.user.role == "KATIBU MSAIDIZI") ...[
                       const SizedBox(width: 12),
                       Container(
                         decoration: BoxDecoration(
@@ -1545,7 +1566,11 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                                         horizontal: 12, vertical: 6),
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
-                                        colors: item.role == "ADMIN"
+                                        colors: item.role == "ADMIN" ||
+                                                item.role == "KATIBU" ||
+                                                item.role ==
+                                                    "MWENYEKITI MSAIDIZI" ||
+                                                item.role == "KATIBU MSAIDIZI"
                                             ? [
                                                 Colors.red[400]!,
                                                 Colors.red[600]!
@@ -1588,7 +1613,13 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
 
                               // Admin-only details
                               if (userData != null &&
-                                  userData!.user.role == "ADMIN") ...[
+                                      userData!.user.role == "ADMIN" ||
+                                  userData!.user.role == "KATIBU" ||
+                                  userData!.user.role == "MWENYEKITI" ||
+                                  userData!.user.role == "MHAZINI" ||
+                                  userData!.user.role ==
+                                      "MWENYEKITI MSAIDIZI" ||
+                                  userData!.user.role == "KATIBU MSAIDIZI") ...[
                                 const SizedBox(height: 8),
                                 _buildInfoRow(
                                   icon: Icons.location_on,
@@ -1635,7 +1666,11 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
                           child: Row(
                             children: [
                               if (userData != null &&
-                                  userData!.user.role == "ADMIN") ...[
+                                      userData!.user.role == "ADMIN" ||
+                                  userData!.user.role == "KATIBU" ||
+                                  userData!.user.role ==
+                                      "MWENYEKITI MSAIDIZI" ||
+                                  userData!.user.role == "KATIBU MSAIDIZI") ...[
                                 Expanded(
                                   child: _buildActionButton(
                                     icon: Icons.edit_outlined,

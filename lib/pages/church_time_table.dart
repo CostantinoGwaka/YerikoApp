@@ -138,7 +138,9 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
         color: primaryGradient[0],
         child: getBody(),
       ),
-      floatingActionButton: userData?.user.role == "ADMIN"
+      floatingActionButton: userData?.user.role == "ADMIN" ||
+              userData!.user.role == "KATIBU" ||
+              userData!.user.role == "KATIBU MSAIDIZI"
           ? FloatingActionButton.extended(
               heroTag: 'home_church',
               onPressed: () {
@@ -221,9 +223,14 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                     icon: Icons.schedule_rounded,
                     title: "Hakuna Ratiba",
                     subtitle: "Hakuna ratiba za jumuiya zilizosajiliwa bado.",
-                    actionText:
-                        userData?.user.role == "ADMIN" ? "Ongeza Ratiba" : null,
-                    onAction: userData?.user.role == "ADMIN"
+                    actionText: userData?.user.role == "ADMIN" ||
+                            userData!.user.role == "KATIBU" ||
+                            userData!.user.role == "KATIBU MSAIDIZI"
+                        ? "Ongeza Ratiba"
+                        : null,
+                    onAction: userData?.user.role == "ADMIN" ||
+                            userData!.user.role == "KATIBU" ||
+                            userData!.user.role == "KATIBU MSAIDIZI"
                         ? () {
                             showModalBottomSheet(
                               context: context,
@@ -473,7 +480,9 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
                           ],
                         ),
                       ),
-                      if (userData?.user.role == "ADMIN")
+                      if (userData?.user.role == "ADMIN" ||
+                          userData!.user.role == "KATIBU" ||
+                          userData!.user.role == "KATIBU MSAIDIZI")
                         PopupMenuButton<String>(
                           icon: Icon(Icons.more_vert_rounded,
                               color: textSecondary),

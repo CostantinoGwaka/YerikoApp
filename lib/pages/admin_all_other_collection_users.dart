@@ -1252,7 +1252,10 @@ class _AdminOtherAllUserCollectionsState
                           ],
                         ),
                       ),
-                      if (userData!.user.role == "ADMIN") ...[
+                      if (userData!.user.role == "ADMIN" ||
+                          userData!.user.role == "KATIBU" ||
+                          userData!.user.role == "MWENYEKITI MSAIDIZI" ||
+                          userData!.user.role == "KATIBU MSAIDIZI") ...[
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.blue.withValues(alpha: 0.1),

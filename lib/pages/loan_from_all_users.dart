@@ -1228,7 +1228,8 @@ class LoanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isAdmin = userData?.user.role == "ADMIN";
+    final isAdmin =
+        userData?.user.role == "ADMIN" || userData!.user.role == "MHAZINI";
     final canApprove = loan.status == 'pending' && isAdmin;
     final canRepay =
         (loan.status == 'approved' || loan.status == 'in-progress') && isAdmin;

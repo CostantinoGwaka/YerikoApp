@@ -1077,7 +1077,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             onTap: () => _showChangePasswordDialog(context),
                             color: orange,
                           ),
-                          if (userData?.user.role == "ADMIN") ...[
+                          if (userData?.user.role == "ADMIN" ||
+                              userData!.user.role == "KATIBU" ||
+                              userData!.user.role == "MWENYEKITI MSAIDIZI" ||
+                              userData!.user.role == "KATIBU MSAIDIZI") ...[
                             Divider(height: 1, color: Colors.grey[100]),
                             _buildModernMenuItem(
                               icon: Icons.wallet_outlined,

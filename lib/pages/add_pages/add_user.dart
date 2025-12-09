@@ -45,7 +45,15 @@ class _AddUserPageAdminState extends State<AddUserPageAdmin> {
   bool _isSearchMode = false; // Toggle between create and search modes
   bool _isSearching = false;
   User? _searchedUser;
-  final roles = ["USER", "ADMIN"];
+  final roles = [
+    "USER",
+    "ADMIN",
+    "MWENYEKITI",
+    "MWENYEKITI MSAIDIZI",
+    "MHAZINI",
+    "KATIBU",
+    "KATIBU MSAIDIZI"
+  ];
   final listGenders = ["MWANAUME", "MWANAMKE"];
   final listStatus = [
     "AMEOLEWA",

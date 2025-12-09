@@ -402,7 +402,8 @@ class _PendingRequestsViewerState extends State<PendingRequestsViewer> {
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: request.role == "ADMIN"
+                              colors: request.role == "ADMIN" ||
+                                      request.role == "MHAZINI"
                                   ? [Colors.red[400]!, Colors.red[600]!]
                                   : [Colors.blue[400]!, Colors.blue[600]!],
                             ),

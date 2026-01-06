@@ -73,7 +73,19 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         }
       }
     } catch (e) {
-      _showError('Imeshindwa kupakia mipangilio ya mikopo: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.yellow,
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -95,7 +107,19 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         });
       }
     } catch (e) {
-      _showError('Imeshindwa kupakia akiba: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.yellow,
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -123,7 +147,19 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         }
       }
     } catch (e) {
-      _showError('Imeshindwa kupakia mikopo: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.yellow,
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -305,14 +341,16 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
       eligibleAmount = baseAmount * (loanSetting.percentage! / 100);
     }
 
-    // Apply min/max constraints
-    if (loanSetting.minAmounts != null &&
-        eligibleAmount < loanSetting.minAmounts!) {
-      eligibleAmount = loanSetting.minAmounts!;
-    }
-    if (loanSetting.maxAmounts != null &&
-        eligibleAmount > loanSetting.maxAmounts!) {
-      eligibleAmount = loanSetting.maxAmounts!;
+    // Apply min/max constraints only if user has base amount (savings/shares)
+    if (baseAmount > 0) {
+      if (loanSetting.minAmounts != null &&
+          eligibleAmount < loanSetting.minAmounts!) {
+        eligibleAmount = loanSetting.minAmounts!;
+      }
+      if (loanSetting.maxAmounts != null &&
+          eligibleAmount > loanSetting.maxAmounts!) {
+        eligibleAmount = loanSetting.maxAmounts!;
+      }
     }
 
     return Container(
@@ -333,6 +371,13 @@ class _LoanAppsUserPageState extends State<LoanAppsUserPage> {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
+            if (eligibleAmount <= 0) {
+              Navigator.pop(context);
+              _showError(
+                'Samahani, huna kiasi cha kutosha cha ${loanSetting.shareSaving == 'SHARE' ? 'hisa' : 'akiba'} kuomba mkopo huu. Tafadhali ongeza ${loanSetting.shareSaving == 'SHARE' ? 'hisa' : 'akiba'} zako kwanza.',
+              );
+              return;
+            }
             Navigator.pop(context);
             _showLoanApplicationForm(loanSetting, eligibleAmount, baseAmount);
           },

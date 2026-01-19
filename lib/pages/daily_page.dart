@@ -57,7 +57,7 @@ class _DailyPageState extends State<DailyPage> {
     try {
       final response = await http.get(
         Uri.parse(
-            '$baseUrl/loans/get_loans_statistics.php?user_id=${userData!.user.id}'),
+            '$baseUrl/loans/get_loans_statistics.php?user_id=${userData!.user.id}&jumuiya_id=${userData!.user.jumuiya_id}'),
         headers: {'Accept': 'application/json'},
       );
 

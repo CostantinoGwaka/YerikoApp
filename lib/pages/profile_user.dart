@@ -1457,7 +1457,7 @@ class _ProfilePageState extends State<ProfilePage> {
     // "https://apps.apple.com/tz/app/jumuiya-yangu/id6748091565";
     const String appName = "Jumuiya Yangu";
     const String message =
-        "Habari! Jaribu $appName - App bora wa usimamizi wa Jumuiya yako. Pakua sasa:\n\nAndroid: $androidLink\niOS: $iosLink\n\nUngana nasi kuboresha usimamizi wa Jumuiya yako!";
+        "Habari! Jaribu $appName - App bora wa usimamizi wa Jumuiya yako. Pakua sasa:\n\nAndroid: $androidLink\niOS: $iosLink\n\n✅ *BURE*\n✅ Ripoti\n✅ SMS\n✅ Michango\n✅ Taarifa\n✅ etc\n\nUngana nasi kuboresha usimamizi wa Jumuiya yako!";
 
     Share.share(message);
   }

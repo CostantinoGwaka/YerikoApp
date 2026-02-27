@@ -19,6 +19,8 @@ import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
 import 'package:restart_app/restart_app.dart';
 import 'package:jumuiya_yangu/models/loan_statistics_model.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class DailyPage extends StatefulWidget {
   const DailyPage({super.key});
@@ -30,6 +32,7 @@ class DailyPage extends StatefulWidget {
 class _DailyPageState extends State<DailyPage> {
   bool _isLoading = false;
   bool _isLoadingJumuiya = false;
+  bool _isLoadingCollections = false;
   UserTotalsResponse? userTotalData;
   CollectionResponse? collections;
   OtherCollectionResponse? otherCollectionResponse;
@@ -39,27 +42,126 @@ class _DailyPageState extends State<DailyPage> {
   LoanStatisticsData? loanStatistics;
   bool _isLoadingLoans = false;
 
+  // Offline support
+  bool _isOnline = true;
+  final Connectivity _connectivity = Connectivity();
+  late Box _dailyDataBox;
+  bool _isHiveInitialized = false;
+
   @override
   void initState() {
     super.initState();
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
+    await _initHive();
+    _checkConnectivity();
     if (userData != null && currentYear != null) {
       setState(() {});
+      // Load cached data first for immediate display
+      _loadAllCachedData();
+      // Then attempt to fetch fresh data if online
       getTotalSummary(userData!.user.id!, currentYear!.data.churchYear);
+      getUserCollections();
       getUserOtherCollections();
       fetchJumuiyaNames();
       _fetchLoanStatistics();
     }
   }
 
+  void _loadAllCachedData() {
+    // Load all cached data immediately for offline support
+    _loadCollectionsFromCache();
+    _loadOtherCollectionsFromCache();
+    _loadJumuiyaFromCache();
+    _loadLoanStatsFromCache();
+    _loadTotalSummaryFromCache(
+        userData!.user.id!, currentYear!.data.churchYear);
+  }
+
+  Future<void> _initHive() async {
+    try {
+      _dailyDataBox = await Hive.openBox('daily_page_cache');
+      setState(() {
+        _isHiveInitialized = true;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error initializing Hive: $e');
+      }
+    }
+  }
+
+  Future<void> _checkConnectivity() async {
+    final connectivityResult = await _connectivity.checkConnectivity();
+    setState(() {
+      _isOnline = !connectivityResult.contains(ConnectivityResult.none);
+    });
+
+    _connectivity.onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
+      final wasOffline = !_isOnline;
+      setState(() {
+        _isOnline = !result.contains(ConnectivityResult.none);
+      });
+
+      // Sync when coming back online
+      if (_isOnline && wasOffline) {
+        _syncDataWhenOnline();
+      }
+    });
+  }
+
+  Future<void> _syncDataWhenOnline() async {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green,
+          content: Text(
+            "🔄 Kuunganisha data...",
+            style: TextStyle(color: Colors.white),
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+    await reloadData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Future<void> _fetchLoanStatistics() async {
+    print("data3: ");
+
+    if (!_isHiveInitialized) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (!_isHiveInitialized) return;
+    }
+
     setState(() => _isLoadingLoans = true);
+
+    // Check connectivity first
+    final connectivityResult = await _connectivity.checkConnectivity();
+    final isConnected = !connectivityResult.contains(ConnectivityResult.none);
+
+    print("data3: $isConnected");
+
+    if (!isConnected) {
+      // Cache already loaded in _loadAllCachedData, just stop loading
+      setState(() => _isLoadingLoans = false);
+      return;
+    }
 
     try {
       final response = await http.get(
         Uri.parse(
             '$baseUrl/loans/get_loans_statistics.php?user_id=${userData!.user.id}&jumuiya_id=${userData!.user.jumuiya_id}'),
         headers: {'Accept': 'application/json'},
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -69,11 +171,47 @@ class _DailyPageState extends State<DailyPage> {
             loanStatistics = loanStatsResponse.data;
             _isLoadingLoans = false;
           });
+          // Save to cache
+          await _saveLoanStatsToCache(data);
         } else {
           setState(() {
             _isLoadingLoans = false;
           });
+          _loadLoanStatsFromCache();
         }
+      } else {
+        setState(() {
+          _isLoadingLoans = false;
+        });
+        _loadLoanStatsFromCache();
+      }
+    } catch (e) {
+      _loadLoanStatsFromCache();
+    }
+  }
+
+  Future<void> _saveLoanStatsToCache(Map<String, dynamic> data) async {
+    try {
+      await _dailyDataBox.put(
+          'loan_stats_${userData!.user.id}_${userData!.user.jumuiya_id}', data);
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  void _loadLoanStatsFromCache() {
+    try {
+      final data = _dailyDataBox
+          .get('loan_stats_${userData!.user.id}_${userData!.user.jumuiya_id}');
+
+      print("saved data $data");
+      if (data != null) {
+        final cachedData = Map<String, dynamic>.from(data);
+        final loanStatsResponse = LoanStatisticsResponse.fromJson(cachedData);
+        setState(() {
+          loanStatistics = loanStatsResponse.data;
+          _isLoadingLoans = false;
+        });
       } else {
         setState(() {
           _isLoadingLoans = false;
@@ -83,25 +221,18 @@ class _DailyPageState extends State<DailyPage> {
       setState(() {
         _isLoadingLoans = false;
       });
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Colors.red,
-            content: Text("⚠️ Imeshindikana kupata taarifa za mikopo"),
-          ),
-        );
-      }
     }
   }
 
   Future<void> reloadData() async {
+    print("data 4");
+    _fetchLoanStatistics();
     await getUserCollections();
+    await getUserOtherCollections();
     if (userData != null && currentYear != null) {
       getTotalSummary(userData!.user.id!, currentYear!.data.churchYear);
     }
     fetchJumuiyaNames();
-    _fetchLoanStatistics();
     setState(() {});
   }
 
@@ -133,13 +264,27 @@ class _DailyPageState extends State<DailyPage> {
   }
 
   Future<void> fetchJumuiyaNames() async {
+    if (!_isHiveInitialized) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (!_isHiveInitialized) return;
+    }
+
+    // Check connectivity first
+    final connectivityResult = await _connectivity.checkConnectivity();
+    final isConnected = !connectivityResult.contains(ConnectivityResult.none);
+
+    if (!isConnected) {
+      // Cache already loaded in _loadAllCachedData
+      return;
+    }
+
     try {
       final response = await http.post(
           headers: {'Accept': 'application/json'},
           Uri.parse('$baseUrl/auth/get_my_jumuiya.php'),
           body: jsonEncode({
             "user_id": userData!.user.id.toString(),
-          }));
+          })).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -152,13 +297,46 @@ class _DailyPageState extends State<DailyPage> {
                     })
                 .toList();
           });
+          // Save to cache
+          await _saveJumuiyaToCache(data);
         }
+      } else {
+        _loadJumuiyaFromCache();
       }
     } catch (e) {
-      // Handle error silently or show message
+      _loadJumuiyaFromCache();
       if (kDebugMode) {
         print('Error fetching jumuiya data');
       }
+    }
+  }
+
+  Future<void> _saveJumuiyaToCache(Map<String, dynamic> data) async {
+    try {
+      await _dailyDataBox.put('jumuiya_${userData!.user.id}', data);
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  void _loadJumuiyaFromCache() {
+    try {
+      final data = _dailyDataBox.get('jumuiya_${userData!.user.id}');
+      if (data != null) {
+        final cachedData = Map<String, dynamic>.from(data);
+        if (cachedData['data'] != null) {
+          setState(() {
+            jumuiyaData = (cachedData['data'] as List)
+                .map((item) => {
+                      'name': item['name'] as String,
+                      'id': item['id'] as dynamic,
+                    })
+                .toList();
+          });
+        }
+      }
+    } catch (e) {
+      // Silent fail
     }
   }
 
@@ -366,6 +544,11 @@ class _DailyPageState extends State<DailyPage> {
   }
 
   Future<dynamic> getTotalSummary(int userId, String year) async {
+    if (!_isHiveInitialized) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (!_isHiveInitialized) return;
+    }
+
     try {
       setState(() {
         _isLoading = true;
@@ -381,61 +564,114 @@ class _DailyPageState extends State<DailyPage> {
           _isLoading = false;
         });
         return;
+      }
+
+      // Check connectivity first
+      final connectivityResult = await _connectivity.checkConnectivity();
+      final isConnected = !connectivityResult.contains(ConnectivityResult.none);
+
+      if (!isConnected) {
+        // Cache already loaded in _loadAllCachedData
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      String myApi =
+          "$baseUrl/monthly/get_total_by_user_statistics.php?userId=$userId&year=$year&jumuiya_id=${userData!.user.jumuiya_id}";
+      final response = await http
+          .get(
+            Uri.parse(myApi),
+            headers: await authHeader,
+          )
+          .timeout(const Duration(seconds: 10));
+
+      var jsonResponse = json.decode(response.body);
+
+      if (response.statusCode == 200 && jsonResponse != null) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        userTotalData = UserTotalsResponse.fromJson(jsonResponse);
+        // Save to cache
+        await _saveTotalSummaryToCache(userId, year, jsonResponse);
+      } else if (response.statusCode == 404) {
+        setState(() {
+          _isLoading = false;
+        });
+        _loadTotalSummaryFromCache(userId, year);
       } else {
-        String myApi =
-            "$baseUrl/monthly/get_total_by_user_statistics.php?userId=$userId&year=$year&jumuiya_id=${userData!.user.jumuiya_id}";
-        final response = await http.get(
-          Uri.parse(myApi),
-          headers: await authHeader,
-        );
+        setState(() {
+          _isLoading = false;
+        });
+        _loadTotalSummaryFromCache(userId, year);
+      }
+    } catch (e) {
+      _loadTotalSummaryFromCache(userId, year);
+    }
+  }
 
-        var jsonResponse = json.decode(response.body);
+  Future<void> _saveTotalSummaryToCache(
+      int userId, String year, Map<String, dynamic> data) async {
+    try {
+      await _dailyDataBox.put(
+          'total_summary_${userId}_${year}_${userData!.user.jumuiya_id}', data);
+    } catch (e) {
+      // Silent fail
+    }
+  }
 
-        if (response.statusCode == 200 && jsonResponse != null) {
-          setState(() {
-            _isLoading = false;
-          });
-
-          userTotalData = UserTotalsResponse.fromJson(jsonResponse);
-        } else if (response.statusCode == 404) {
-          //end here
-          setState(() {
-            _isLoading = false;
-          });
-          // ignore: use_build_context_synchronously
+  void _loadTotalSummaryFromCache(int userId, String year) {
+    try {
+      final data = _dailyDataBox
+          .get('total_summary_${userId}_${year}_${userData!.user.jumuiya_id}');
+      if (data != null) {
+        final cachedData = Map<String, dynamic>.from(data);
+        setState(() {
+          userTotalData = UserTotalsResponse.fromJson(cachedData);
+          _isLoading = false;
+        });
+        if (context.mounted && !_isOnline) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                backgroundColor: Colors.red,
-                content: Text(jsonResponse['message'])),
+            const SnackBar(
+              backgroundColor: Colors.orange,
+              content: Text(
+                "📱 Kuonyesha data iliyohifadhiwa (Offline mode)",
+                style: TextStyle(color: Colors.white),
+              ),
+              duration: Duration(seconds: 2),
+            ),
           );
-        } else {
-          setState(() {
-            _isLoading = false;
-          });
         }
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.yellow,
-          content: Text(
-            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
-            style: TextStyle(
-              color: Colors.black,
-            ),
-          ),
-        ),
-      );
     }
   }
 
   Future<CollectionResponse?> getUserCollections() async {
+    if (!_isHiveInitialized) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (!_isHiveInitialized) return null;
+    }
+
+    setState(() {
+      _isLoadingCollections = true;
+    });
+
     try {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
+        setState(() {
+          _isLoadingCollections = false;
+        });
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -444,51 +680,90 @@ class _DailyPageState extends State<DailyPage> {
                     Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
         }
-        // setState(() => _isLoading = false);
         return null;
+      }
+
+      // Check connectivity first
+      final connectivityResult = await _connectivity.checkConnectivity();
+      final isConnected = !connectivityResult.contains(ConnectivityResult.none);
+
+      if (!isConnected) {
+        // Load from cache offline - already loaded in _loadAllCachedData
+        setState(() {
+          _isLoadingCollections = false;
+        });
+        return collections;
       }
 
       final String myApi =
           "$baseUrl/monthly/get_collection_by_user_id.php?user_id=${userData!.user.id}&jumuiya_id=${userData!.user.jumuiya_id}";
-      final response = await http
-          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+      final response = await http.get(Uri.parse(myApi), headers: {
+        'Accept': 'application/json'
+      }).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
-          // setState(() => _isLoading = false);
-          collections = CollectionResponse.fromJson(jsonResponse);
+          setState(() {
+            collections = CollectionResponse.fromJson(jsonResponse);
+            _isLoadingCollections = false;
+          });
+          // Save to cache
+          await _saveCollectionsToCache(jsonResponse);
           return collections;
         }
       } else {
-        if (context.mounted) {
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                backgroundColor: Colors.red,
-                content: Text("Error: ${response.statusCode}")),
-          );
-        }
+        setState(() {
+          _isLoadingCollections = false;
+        });
+        return _loadCollectionsFromCache();
       }
     } catch (e) {
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.red,
-            content: Text(
-              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
-            ),
-          ),
-        );
-      }
+      setState(() {
+        _isLoadingCollections = false;
+      });
+      return _loadCollectionsFromCache();
     }
 
-    // 🔁 Always return something to complete Future
+    setState(() {
+      _isLoadingCollections = false;
+    });
+    return null;
+  }
+
+  Future<void> _saveCollectionsToCache(Map<String, dynamic> data) async {
+    try {
+      await _dailyDataBox.put(
+          'collections_${userData!.user.id}_${userData!.user.jumuiya_id}',
+          data);
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  CollectionResponse? _loadCollectionsFromCache() {
+    try {
+      final data = _dailyDataBox
+          .get('collections_${userData!.user.id}_${userData!.user.jumuiya_id}');
+      if (data != null) {
+        final cachedData = Map<String, dynamic>.from(data);
+        setState(() {
+          collections = CollectionResponse.fromJson(cachedData);
+        });
+        return collections;
+      }
+    } catch (e) {
+      // Silent fail
+    }
     return null;
   }
 
   Future<OtherCollectionResponse?> getUserOtherCollections() async {
+    if (!_isHiveInitialized) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (!_isHiveInitialized) return null;
+    }
+
     try {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
         if (context.mounted) {
@@ -499,49 +774,70 @@ class _DailyPageState extends State<DailyPage> {
                     Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa")),
           );
         }
-        // setState(() => _isLoading = false);
         return null;
+      }
+
+      // Check connectivity first
+      final connectivityResult = await _connectivity.checkConnectivity();
+      final isConnected = !connectivityResult.contains(ConnectivityResult.none);
+
+      if (!isConnected) {
+        // Cache already loaded in _loadAllCachedData
+        return otherCollectionResponse;
       }
 
       final String myApi =
           "$baseUrl/monthly/get_all_other_collection_by_user.php?userId=${userData!.user.id}&jumuiyaId=${userData!.user.jumuiya_id}";
-      final response = await http
-          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+      final response = await http.get(Uri.parse(myApi), headers: {
+        'Accept': 'application/json'
+      }).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
-          // setState(() => _isLoading = false);
-          otherCollectionResponse =
-              OtherCollectionResponse.fromJson(jsonResponse);
+          setState(() {
+            otherCollectionResponse =
+                OtherCollectionResponse.fromJson(jsonResponse);
+          });
+          // Save to cache
+          await _saveOtherCollectionsToCache(jsonResponse);
           return otherCollectionResponse;
         }
       } else {
-        if (context.mounted) {
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${response.statusCode}")),
-          );
-        }
+        return _loadOtherCollectionsFromCache();
       }
     } catch (e) {
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.yellow,
-            content: Text(
-              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
-              style: TextStyle(
-                color: Colors.black,
-              ),
-            ),
-          ),
-        );
-      }
+      return _loadOtherCollectionsFromCache();
     }
 
-    // 🔁 Always return something to complete Future
+    return null;
+  }
+
+  Future<void> _saveOtherCollectionsToCache(Map<String, dynamic> data) async {
+    try {
+      await _dailyDataBox.put(
+          'other_collections_${userData!.user.id}_${userData!.user.jumuiya_id}',
+          data);
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  OtherCollectionResponse? _loadOtherCollectionsFromCache() {
+    try {
+      final data = _dailyDataBox.get(
+          'other_collections_${userData!.user.id}_${userData!.user.jumuiya_id}');
+      if (data != null) {
+        final cachedData = Map<String, dynamic>.from(data);
+        setState(() {
+          otherCollectionResponse =
+              OtherCollectionResponse.fromJson(cachedData);
+        });
+        return otherCollectionResponse;
+      }
+    } catch (e) {
+      // Silent fail
+    }
     return null;
   }
 
@@ -575,6 +871,100 @@ class _DailyPageState extends State<DailyPage> {
               : [],
         ),
       ),
+    );
+  }
+
+  // Build collections list from state
+  Widget _buildCollectionsList(Size size, bool isSmallScreen) {
+    if (_isLoadingCollections) {
+      return Container(
+        margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+        height: 120,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(mainFontColor),
+                ),
+              ),
+              SizedBox(height: 10),
+              Text("Inapakia...",
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (collections == null || collections!.data.isEmpty) {
+      return Center(
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[200]!),
+          ),
+          child: Column(
+            children: [
+              Icon(Icons.inbox_rounded, color: Colors.grey[400], size: 32),
+              SizedBox(height: 8),
+              Text(
+                "Hakuna michango",
+                style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final collectionsList = collections!.data;
+    final displayCount =
+        collectionsList.length > 4 ? 4 : collectionsList.length;
+
+    return Column(
+      children: [
+        ListView.builder(
+          itemCount: displayCount,
+          shrinkWrap: true,
+          padding: EdgeInsets.zero,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            final item = collectionsList[index];
+            return _buildCollectionCard(
+                context, item, index, collectionsList, isSmallScreen);
+          },
+        ),
+        if (collectionsList.length > 4)
+          Container(
+            margin: EdgeInsets.symmetric(
+                horizontal: size.width * 0.05, vertical: 10),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                foregroundColor: mainFontColor,
+                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide(color: mainFontColor.withValues(alpha: 0.3)),
+                ),
+              ),
+              icon: Icon(Icons.expand_more_rounded, size: 16),
+              label: Text("+${collectionsList.length - 4} zaidi",
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+              onPressed: () => _navigateToCollections(),
+            ),
+          ),
+      ],
     );
   }
 
@@ -777,6 +1167,43 @@ class _DailyPageState extends State<DailyPage> {
                                 ),
                               ),
                             ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Connectivity indicator
+                    Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _isOnline
+                            ? Colors.green.withOpacity(0.15)
+                            : Colors.orange.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _isOnline ? Colors.green : Colors.orange,
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _isOnline
+                                ? Icons.wifi_rounded
+                                : Icons.wifi_off_rounded,
+                            size: 12,
+                            color: _isOnline ? Colors.green : Colors.orange,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _isOnline ? 'Online' : 'Offline',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: _isOnline ? Colors.green : Colors.orange,
+                            ),
                           ),
                         ],
                       ),
@@ -1118,135 +1545,8 @@ class _DailyPageState extends State<DailyPage> {
 
               SizedBox(height: 10),
 
-              // Collections List
-              FutureBuilder(
-                future: getUserCollections(),
-                builder:
-                    (context, AsyncSnapshot<CollectionResponse?> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: size.width * 0.05),
-                      height: 120,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    mainFontColor),
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Text("Inapakia...",
-                                style: TextStyle(
-                                    color: Colors.grey[600], fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: size.width * 0.05),
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.red[50],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.red[200]!),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.error_outline_rounded,
-                              color: Colors.red[400], size: 20),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              "Imeshindikana kupakia",
-                              style: TextStyle(
-                                  color: Colors.red[700], fontSize: 12),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                    return Center(
-                      child: Container(
-                        margin:
-                            EdgeInsets.symmetric(horizontal: size.width * 0.05),
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[200]!),
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(Icons.inbox_rounded,
-                                color: Colors.grey[400], size: 32),
-                            SizedBox(height: 8),
-                            Text(
-                              "Hakuna michango",
-                              style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-
-                  final collections = snapshot.data!.data;
-                  final displayCount =
-                      collections.length > 4 ? 4 : collections.length;
-
-                  return Column(
-                    children: [
-                      ListView.builder(
-                        itemCount: displayCount,
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          final item = collections[index];
-                          return _buildCollectionCard(
-                              context, item, index, collections, isSmallScreen);
-                        },
-                      ),
-                      if (collections.length > 4)
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                              horizontal: size.width * 0.05, vertical: 10),
-                          child: TextButton.icon(
-                            style: TextButton.styleFrom(
-                              foregroundColor: mainFontColor,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 10),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                side: BorderSide(
-                                    color:
-                                        mainFontColor.withValues(alpha: 0.3)),
-                              ),
-                            ),
-                            icon: Icon(Icons.expand_more_rounded, size: 16),
-                            label: Text("+${collections.length - 4} zaidi",
-                                style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w600)),
-                            onPressed: () => _navigateToCollections(),
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
+              // Collections List - Using state variable
+              _buildCollectionsList(size, isSmallScreen),
 
               SizedBox(height: 20),
 

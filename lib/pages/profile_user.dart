@@ -2,8 +2,10 @@
 
 import 'dart:convert';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/sms_bando_summary_model.dart';
 import 'package:jumuiya_yangu/models/sms_bando_used_model.dart';
@@ -42,81 +44,222 @@ class _ProfilePageState extends State<ProfilePage> {
   List<Map<String, dynamic>> jumuiyaData = [];
   List<SmsBandoSummaryModel> smsBandoSummaryList = [];
 
+  // Offline support
+  final Connectivity _connectivity = Connectivity();
+  late Box _profileCache;
+  bool _isHiveInitialized = false;
+
   Future<void> fetchCollectionTypes() async {
-    collectionTypeResponse = [];
-    final response = await http.get(Uri.parse(
-        '$baseUrl/collectiontype/get_all_collection_type.php?jumuiya_id=${userData!.user.jumuiya_id}'));
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      setState(() {
-        collectionTypeResponse = (data['data'] as List)
-            .map((u) => CollectionType.fromJson(u))
-            .toList();
-      });
-      setState(() {});
-    } else {
-      // handle error
+    if (!_isHiveInitialized) {
+      await _initHive();
     }
-  }
 
-  Future<void> fetchJumuiyaNames() async {
     try {
-      final response = await http.post(
-          headers: {'Accept': 'application/json'},
-          Uri.parse('$baseUrl/auth/get_my_jumuiya.php'),
-          body: jsonEncode({
-            "user_id": userData!.user.id.toString(),
-          }));
+      // Check connectivity first
+      final connectivityResult = await _connectivity.checkConnectivity();
+      final isConnected = !connectivityResult.contains(ConnectivityResult.none);
+
+      if (!isConnected) {
+        // Load from cache when offline
+        _loadCollectionTypesFromCache();
+        return;
+      }
+
+      final response = await http
+          .get(Uri.parse(
+              '$baseUrl/collectiontype/get_all_collection_type.php?jumuiya_id=${userData!.user.jumuiya_id}'))
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        if (data['status'] == "200" && data['data'] != null) {
+        if (mounted) {
           setState(() {
-            jumuiyaData = (data['data'] as List)
-                .map((item) => {
-                      'name': item['name'] as String,
-                      'id': item['id'] as dynamic,
-                    })
+            collectionTypeResponse = (data['data'] as List)
+                .map((u) => CollectionType.fromJson(u))
+                .toList();
+          });
+        }
+        // Save to cache
+        await _saveCollectionTypesToCache(data);
+      } else {
+        _loadCollectionTypesFromCache();
+      }
+    } catch (e) {
+      // Load from cache on error
+      _loadCollectionTypesFromCache();
+      if (kDebugMode) {
+        print('Error fetching collection types: $e');
+      }
+    }
+  }
+
+  Future<void> _initHive() async {
+    try {
+      _profileCache = await Hive.openBox('profile_cache');
+      setState(() {
+        _isHiveInitialized = true;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error initializing Hive: $e');
+      }
+    }
+  }
+
+  Future<void> _saveCollectionTypesToCache(Map<String, dynamic> data) async {
+    try {
+      await _profileCache.put(
+          'collection_types_${userData!.user.jumuiya_id}', data);
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  void _loadCollectionTypesFromCache() {
+    try {
+      final data =
+          _profileCache.get('collection_types_${userData!.user.jumuiya_id}');
+      if (data != null) {
+        final cachedData = Map<String, dynamic>.from(data);
+        if (mounted) {
+          setState(() {
+            collectionTypeResponse = (cachedData['data'] as List)
+                .map((u) => CollectionType.fromJson(u))
                 .toList();
           });
         }
       }
     } catch (e) {
-      // Handle error silently or show message
+      // Silent fail
+    }
+  }
+
+  Future<void> fetchJumuiyaNames() async {
+    if (!_isHiveInitialized) {
+      await _initHive();
+    }
+
+    try {
+      // Check connectivity first
+      final connectivityResult = await _connectivity.checkConnectivity();
+      final isConnected = !connectivityResult.contains(ConnectivityResult.none);
+
+      if (!isConnected) {
+        _loadJumuiyaNamesFromCache();
+        return;
+      }
+
+      final response = await http.post(
+          headers: {'Accept': 'application/json'},
+          Uri.parse('$baseUrl/auth/get_my_jumuiya.php'),
+          body: jsonEncode({
+            "user_id": userData!.user.id.toString(),
+          })).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == "200" && data['data'] != null) {
+          if (mounted) {
+            setState(() {
+              jumuiyaData = (data['data'] as List)
+                  .map((item) => {
+                        'name': item['name'] as String,
+                        'id': item['id'] as dynamic,
+                      })
+                  .toList();
+            });
+          }
+          // Save to cache
+          await _saveJumuiyaNamesToCache(data);
+        }
+      } else {
+        _loadJumuiyaNamesFromCache();
+      }
+    } catch (e) {
+      _loadJumuiyaNamesFromCache();
       if (kDebugMode) {
         print('Error fetching jumuiya data');
       }
     }
   }
 
+  Future<void> _saveJumuiyaNamesToCache(Map<String, dynamic> data) async {
+    try {
+      await _profileCache.put('jumuiya_names_${userData!.user.id}', data);
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  void _loadJumuiyaNamesFromCache() {
+    try {
+      final data = _profileCache.get('jumuiya_names_${userData!.user.id}');
+      if (data != null) {
+        final cachedData = Map<String, dynamic>.from(data);
+        if (cachedData['data'] != null) {
+          if (mounted) {
+            setState(() {
+              jumuiyaData = (cachedData['data'] as List)
+                  .map((item) => {
+                        'name': item['name'] as String,
+                        'id': item['id'] as dynamic,
+                      })
+                  .toList();
+            });
+          }
+        }
+      }
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
   Future<void> fetchSmsBandoSummary() async {
     if (userData?.user.jumuiya_id == null) return;
 
-    setState(() {
-      _isLoadingSmsSummary = true;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoadingSmsSummary = true;
+      });
+    }
 
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/sms_bando/get_sms_bando_summary.php'),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          "jumuiya_id": userData!.user.jumuiya_id.toString(),
-        }),
-      );
+      // Check connectivity first
+      final connectivityResult = await _connectivity.checkConnectivity();
+      final isConnected = !connectivityResult.contains(ConnectivityResult.none);
+
+      if (!isConnected) {
+        if (mounted) {
+          setState(() {
+            _isLoadingSmsSummary = false;
+          });
+        }
+        return;
+      }
+
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/sms_bando/get_sms_bando_summary.php'),
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              "jumuiya_id": userData!.user.jumuiya_id.toString(),
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['status'].toString() == "200" && data['data'] != null) {
-          setState(() {
-            smsBandoSummaryList = (data['data'] as List)
-                .map((item) => SmsBandoSummaryModel.fromJson(item))
-                .toList();
-          });
+          if (mounted) {
+            setState(() {
+              smsBandoSummaryList = (data['data'] as List)
+                  .map((item) => SmsBandoSummaryModel.fromJson(item))
+                  .toList();
+            });
+          }
         }
       }
     } catch (e) {
@@ -125,9 +268,11 @@ class _ProfilePageState extends State<ProfilePage> {
         print('Error fetching SMS bando summary');
       }
     } finally {
-      setState(() {
-        _isLoadingSmsSummary = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoadingSmsSummary = false;
+        });
+      }
     }
   }
 
@@ -504,21 +649,38 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> fetchSmsBandoSummaryUsed() async {
     if (userData?.user.jumuiya_id == null) return;
 
-    setState(() {
-      _isLoadingSmsSummary = true;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoadingSmsSummary = true;
+      });
+    }
 
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/sms_bando/get_summary_used_sms.php'),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          "jumuiya_id": userData!.user.jumuiya_id.toString(),
-        }),
-      );
+      // Check connectivity first
+      final connectivityResult = await _connectivity.checkConnectivity();
+      final isConnected = !connectivityResult.contains(ConnectivityResult.none);
+
+      if (!isConnected) {
+        if (mounted) {
+          setState(() {
+            _isLoadingSmsSummary = false;
+          });
+        }
+        return;
+      }
+
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/sms_bando/get_summary_used_sms.php'),
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              "jumuiya_id": userData!.user.jumuiya_id.toString(),
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -533,9 +695,11 @@ class _ProfilePageState extends State<ProfilePage> {
         print('Error fetching used SMS summary');
       }
     } finally {
-      setState(() {
-        _isLoadingSmsSummary = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoadingSmsSummary = false;
+        });
+      }
     }
   }
 

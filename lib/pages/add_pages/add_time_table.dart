@@ -7,6 +7,8 @@ import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/church_time_table.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:http/http.dart' as http;
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class AddPrayerSchedulePage extends StatefulWidget {
   final void Function(Map<String, dynamic>)? onSubmit;
@@ -41,25 +43,79 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
   late TextEditingController userRoleController = TextEditingController();
   late TextEditingController yearRegisteredController = TextEditingController();
   bool _isLoading = false;
+  late Box _usersBox;
+  final Connectivity _connectivity = Connectivity();
+
+  Future<void> _initHive() async {
+    _usersBox = await Hive.openBox('users_cache');
+  }
 
   Future<void> fetchUsers() async {
-    final response = await http.get(Uri.parse(
-        '$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}'));
+    // Check connectivity first
+    final connectivityResult = await _connectivity.checkConnectivity();
+    final isConnected = !connectivityResult.contains(ConnectivityResult.none);
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      setState(() {
-        users = (data['data'] as List).map((u) => User.fromJson(u)).toList();
-      });
-    } else {
-      // handle error
+    if (!isConnected) {
+      // Load from cache when offline
+      _loadUsersFromCache();
+      return;
+    }
+
+    try {
+      final response = await http
+          .get(Uri.parse(
+              '$baseUrl/auth/get_all_users.php?jumuiya_id=${userData!.user.jumuiya_id}'))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final usersList =
+            (data['data'] as List).map((u) => User.fromJson(u)).toList();
+
+        setState(() {
+          users = usersList;
+        });
+
+        // Save to cache
+        await _saveUsersToCache(data);
+      } else {
+        // Load from cache if API fails
+        _loadUsersFromCache();
+      }
+    } catch (e) {
+      // Load from cache on error
+      _loadUsersFromCache();
+    }
+  }
+
+  Future<void> _saveUsersToCache(Map<String, dynamic> data) async {
+    try {
+      await _usersBox.put('users_${userData!.user.jumuiya_id}', data);
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  void _loadUsersFromCache() {
+    try {
+      final data = _usersBox.get('users_${userData!.user.jumuiya_id}');
+      if (data != null) {
+        final cachedData = Map<String, dynamic>.from(data);
+        setState(() {
+          users = (cachedData['data'] as List)
+              .map((u) => User.fromJson(u))
+              .toList();
+        });
+      }
+    } catch (e) {
+      // Silent fail
     }
   }
 
   @override
   void initState() {
     super.initState();
-    fetchUsers();
+    _initHive().then((_) => fetchUsers());
 
     if (widget.initialData != null) {
       final data = widget.initialData!;
@@ -285,14 +341,57 @@ class _AddPrayerSchedulePageState extends State<AddPrayerSchedulePage> {
                 const Text("📆 Mwaka",
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                _buildChurchYearInfo(
-                  churchYear: currentYear!.data.churchYear,
-                  isActive: currentYear!.data.isActive,
-                ),
+                if (currentYear != null)
+                  _buildChurchYearInfo(
+                    churchYear: currentYear!.data.churchYear,
+                    isActive: currentYear!.data.isActive,
+                  )
+                else
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      "⚠️ Taarifa za mwaka hazipatikani",
+                      style: TextStyle(color: Colors.orange),
+                    ),
+                  ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      // Check connectivity before saving
+                      final connectivityResult =
+                          await _connectivity.checkConnectivity();
+                      final isConnected =
+                          !connectivityResult.contains(ConnectivityResult.none);
+
+                      if (!isConnected) {
+                        // ignore: use_build_context_synchronously
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            backgroundColor: Colors.orange,
+                            content: Text(
+                              "⚠️ Huwezi kuongeza/kuhariri wakati uko offline",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+
+                      if (currentYear == null) {
+                        // ignore: use_build_context_synchronously
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            backgroundColor: Colors.orange,
+                            content: Text(
+                              "⚠️ Taarifa za mwaka hazipatikani. Jaribu tena baadaye.",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+
                       final data = {
                         "id": widget.initialData?.id,
                         "datePrayer": datePrayerController.text,

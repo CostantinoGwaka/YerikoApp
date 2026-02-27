@@ -74,8 +74,9 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
             userData!.user.role == "KATIBU" ||
             userData!.user.role == "KATIBU MSAIDIZI" ||
             userData!.user.role == "MWENYEKITI MSAIDIZI")) {
-      setState(() {}); // Refresh UI after fetching data
-
+      if (mounted) {
+        setState(() {}); // Refresh UI after fetching data
+      }
       await checkUserPendingRequests();
     }
   }
@@ -104,10 +105,12 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
-          setState(() {
-            userTrialsNumber = UserTrialsNumberResponse.fromJson(jsonResponse);
-          });
-
+          if (mounted) {
+            setState(() {
+              userTrialsNumber =
+                  UserTrialsNumberResponse.fromJson(jsonResponse);
+            });
+          }
           return userTrialsNumber;
         }
       } else {
@@ -175,22 +178,28 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null && jsonResponse['data'] != null) {
           final dataList = jsonResponse['data'] as List;
-          setState(() {
-            _pendingRequestsCount = dataList.length;
-            _hasUserPendingRequests = dataList.isNotEmpty;
-          });
+          if (mounted) {
+            setState(() {
+              _pendingRequestsCount = dataList.length;
+              _hasUserPendingRequests = dataList.isNotEmpty;
+            });
+          }
         } else {
-          setState(() {
-            _pendingRequestsCount = 0;
-            _hasUserPendingRequests = false;
-          });
+          if (mounted) {
+            setState(() {
+              _pendingRequestsCount = 0;
+              _hasUserPendingRequests = false;
+            });
+          }
         }
       }
     } catch (e) {
-      setState(() {
-        _pendingRequestsCount = 0;
-        _hasUserPendingRequests = false;
-      });
+      if (mounted) {
+        setState(() {
+          _pendingRequestsCount = 0;
+          _hasUserPendingRequests = false;
+        });
+      }
     }
   }
 
@@ -579,6 +588,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
         ),
       );
     }
+    if (!mounted) return;
     setState(() => isLoading = true);
     try {
       final pdf = pw.Document();
@@ -774,7 +784,9 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
         SnackBar(backgroundColor: Colors.red, content: Text('Hitilafu: $e')),
       );
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -920,6 +932,7 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
         ),
       );
     }
+    if (!mounted) return;
     setState(() => isLoading = true);
     try {
       // Create Excel workbook
@@ -1063,7 +1076,9 @@ class _AllViewerUserWithAdminState extends State<AllViewerUserWithAdmin> {
         SnackBar(backgroundColor: Colors.red, content: Text('Hitilafu: $e')),
       );
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 

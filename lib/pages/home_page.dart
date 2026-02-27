@@ -71,11 +71,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     Future.delayed(
       const Duration(seconds: 1),
-      () => _fabAnimationController.forward(),
+      () {
+        if (mounted) {
+          _fabAnimationController.forward();
+        }
+      },
     );
     Future.delayed(
       const Duration(seconds: 1),
-      () => _borderRadiusAnimationController.forward(),
+      () {
+        if (mounted) {
+          _borderRadiusAnimationController.forward();
+        }
+      },
     );
   }
 

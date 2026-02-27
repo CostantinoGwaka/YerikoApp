@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart' show Hive;
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:jumuiya_yangu/models/auth_model.dart';
 import 'package:jumuiya_yangu/models/current_fy_model.dart';
 // ignore: depend_on_referenced_packages
@@ -45,6 +47,9 @@ Future<void> getCurrentChurchYearData() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterLocalization.instance.ensureInitialized();
+  await Hive.initFlutter();
+  await Hive.openBox('app_cache');
+  runApp(MyApp());
 
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: mainFontColor, // 🔹 Status bar color

@@ -9,6 +9,8 @@ import 'package:jumuiya_yangu/theme/colors.dart';
 import 'package:jumuiya_yangu/utils/url.dart';
 import 'package:jumuiya_yangu/shared/components/modern_widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class ChurchTimeTable extends StatefulWidget {
   const ChurchTimeTable({super.key});
@@ -19,11 +21,42 @@ class ChurchTimeTable extends StatefulWidget {
 
 class _ChurchTimeTableState extends State<ChurchTimeTable> {
   TimeTableModel.ChurchTimeTableResponse? collections;
+  late Box _timeTableBox;
+  bool _isOnline = true;
+  final Connectivity _connectivity = Connectivity();
 
   @override
   void initState() {
     super.initState();
+    _initHive();
+    _checkConnectivity();
     getTimeTableCollections();
+  }
+
+  Future<void> _initHive() async {
+    _timeTableBox = await Hive.openBox('church_time_table');
+  }
+
+  Future<void> _checkConnectivity() async {
+    final connectivityResult = await _connectivity.checkConnectivity();
+    setState(() {
+      _isOnline = !connectivityResult.contains(ConnectivityResult.none);
+    });
+
+    _connectivity.onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
+      setState(() {
+        _isOnline = !result.contains(ConnectivityResult.none);
+      });
+      if (_isOnline) {
+        getTimeTableCollections();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<void> _reloadData() async {
@@ -33,17 +66,31 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
 
   Future<TimeTableModel.ChurchTimeTableResponse?>
       getTimeTableCollections() async {
+    // Check connectivity first
+    final connectivityResult = await _connectivity.checkConnectivity();
+    final isConnected = !connectivityResult.contains(ConnectivityResult.none);
+
+    if (!isConnected) {
+      // Load from Hive when offline
+      return _loadFromHive();
+    }
+
     try {
       final String myApi =
           "$baseUrl/church_timetable/get_all.php?jumuiya_id=${userData!.user.jumuiya_id}";
-      final response = await http
-          .get(Uri.parse(myApi), headers: {'Accept': 'application/json'});
+      final response = await http.get(Uri.parse(myApi), headers: {
+        'Accept': 'application/json'
+      }).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
           collections =
               TimeTableModel.ChurchTimeTableResponse.fromJson(jsonResponse);
+
+          // Save to Hive for offline access
+          await _saveToHive(jsonResponse);
+
           return collections;
         }
       } else {
@@ -53,27 +100,83 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
               backgroundColor: Colors.red,
               content: Text("Error: ${response.statusCode}")),
         );
+        // Load from cache if API fails
+        return _loadFromHive();
       }
     } catch (e) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.yellow,
-          content: Text(
-            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
-            style: TextStyle(
-              color: Colors.black,
+      // Load from Hive when there's an error
+      final cachedData = _loadFromHive();
+
+      if (cachedData != null) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.orange,
+            content: Text(
+              "📱 Kuonyesha data iliyohifadhiwa (Offline mode)",
+              style: TextStyle(color: Colors.white),
             ),
           ),
-        ),
-      );
+        );
+        return cachedData;
+      } else {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.yellow,
+            content: Text(
+              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
+          ),
+        );
+      }
     }
 
     // 🔁 Always return something to complete Future
     return null;
   }
 
+  Future<void> _saveToHive(Map<String, dynamic> data) async {
+    try {
+      await _timeTableBox.put('timetable_${userData!.user.jumuiya_id}', data);
+      await _timeTableBox.put('last_updated', DateTime.now().toIso8601String());
+    } catch (e) {
+      // Silent fail for caching
+    }
+  }
+
+  TimeTableModel.ChurchTimeTableResponse? _loadFromHive() {
+    try {
+      final data = _timeTableBox.get('timetable_${userData!.user.jumuiya_id}');
+      if (data != null) {
+        return TimeTableModel.ChurchTimeTableResponse.fromJson(
+          Map<String, dynamic>.from(data),
+        );
+      }
+    } catch (e) {
+      // Silent fail
+    }
+    return null;
+  }
+
   Future<void> deleteTimeTable(dynamic id) async {
+    // Check if online
+    if (!_isOnline) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.orange,
+          content: Text(
+            "⚠️ Huwezi kufuta wakati uko offline",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+      return;
+    }
+
     try {
       final String myApi =
           "$baseUrl/church_timetable/delete_time_table.php?id=$id";
@@ -83,9 +186,6 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
       );
 
       if (response.statusCode == 200) {
-        // final jsonResponse = json.decode(response.body);
-        // print(jsonResponse);
-        // Example: await deleteTimeTable(item.id);
         // ignore: use_build_context_synchronously
         Navigator.pop(context); // Close bottom sheet
         // ignore: use_build_context_synchronously
@@ -106,7 +206,7 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           backgroundColor: Colors.yellow,
           content: Text(
             "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
@@ -127,6 +227,35 @@ class _ChurchTimeTableState extends State<ChurchTimeTable> {
         title: "Ratiba za Jumuiya",
         automaticallyImplyLeading: false,
         actions: [
+          // Connectivity indicator
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: _isOnline
+                  ? Colors.green.withOpacity(0.2)
+                  : Colors.orange.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  _isOnline ? Icons.wifi_rounded : Icons.wifi_off_rounded,
+                  size: 16,
+                  color: _isOnline ? Colors.green : Colors.orange,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  _isOnline ? 'Online' : 'Offline',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: _isOnline ? Colors.green : Colors.orange,
+                  ),
+                ),
+              ],
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.search_rounded),
             onPressed: () {},

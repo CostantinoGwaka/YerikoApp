@@ -21,6 +21,14 @@ class CollectionResponse {
           [],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status,
+      'message': message,
+      'data': data.map((e) => e.toJson()).toList(),
+    };
+  }
 }
 
 class CollectionItem {
@@ -55,6 +63,19 @@ class CollectionItem {
       churchYearEntity: ChurchYear.fromJson(json['churchYearEntity']),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'amount': amount,
+      'total': total,
+      'monthly': monthly,
+      'registered_by': registeredBy,
+      'registered_date': registeredDate,
+      'user': user.toJson(),
+      'churchYearEntity': churchYearEntity.toJson(),
+    };
+  }
 }
 
 class ChurchYear {
@@ -74,5 +95,13 @@ class ChurchYear {
       churchYear: json['churchYear'],
       isActive: json['isActive'] == true || json['isActive'] == "1",
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'churchYear': churchYear,
+      'isActive': isActive,
+    };
   }
 }

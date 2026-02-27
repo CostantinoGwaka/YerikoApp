@@ -17,6 +17,14 @@ class OtherCollectionResponse {
       ),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status,
+      'message': message,
+      'data': data.map((e) => e.toJson()).toList(),
+    };
+  }
 }
 
 class OtherCollection {
@@ -53,6 +61,20 @@ class OtherCollection {
       churchYearEntity: ChurchYearEntity.fromJson(json['churchYearEntity']),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'amount': amount,
+      'monthly': monthly,
+      'registered_by': registeredBy,
+      'registered_date': registeredDate,
+      'collection_type': collectionType.toJson(),
+      'user': user.toJson(),
+      'churchYearEntity': churchYearEntity.toJson(),
+      'total': total,
+    };
+  }
 }
 
 class CollectionType {
@@ -75,6 +97,15 @@ class CollectionType {
       dateRegistered: json['date_registered'],
       jumuiyaId: json['jumuiya_id']?.toString(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'collection_name': collectionName,
+      'date_registered': dateRegistered,
+      'jumuiya_id': jumuiyaId,
+    };
   }
 
   // ✅ override equality so DropdownButton can compare correctly
@@ -106,5 +137,12 @@ class ChurchYearEntity {
       churchYear: json['churchYear'],
       isActive: json['isActive'] == true || json['isActive'] == 1,
     );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'churchYear': churchYear,
+      'isActive': isActive,
+    };
   }
 }

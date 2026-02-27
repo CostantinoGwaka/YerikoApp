@@ -15,8 +15,18 @@ class ChurchTimeTableResponse {
     return ChurchTimeTableResponse(
       status: json['status']?.toString(),
       message: json['message']?.toString(),
-      data: (json['data'] as List?)?.map((e) => ChurchTimeTable.fromJson(e)).toList(),
+      data: (json['data'] as List?)
+          ?.map((e) => ChurchTimeTable.fromJson(e))
+          .toList(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status,
+      'message': message,
+      'data': data?.map((e) => e.toJson()).toList(),
+    };
   }
 }
 
@@ -62,8 +72,27 @@ class ChurchTimeTable {
       registeredBy: json['registeredBy'],
       createdAt: json['createdAt'],
       user: json['user'] != null ? User.fromJson(json['user']) : null,
-      churchYearEntity: json['churchYearEntity'] != null ? ChurchYearEntity.fromJson(json['churchYearEntity']) : null,
+      churchYearEntity: json['churchYearEntity'] != null
+          ? ChurchYearEntity.fromJson(json['churchYearEntity'])
+          : null,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'eventName': eventName,
+      'time': time,
+      'datePrayer': datePrayer,
+      'latId': latId,
+      'longId': longId,
+      'location': location,
+      'message': message,
+      'registeredBy': registeredBy,
+      'createdAt': createdAt,
+      'user': user?.toJson(),
+      'churchYearEntity': churchYearEntity?.toJson(),
+    };
   }
 }
 

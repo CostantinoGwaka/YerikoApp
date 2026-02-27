@@ -10,12 +10,15 @@ class GlobalProvider extends ChangeNotifier {
   Future<String> checkAppSettings() async {
     AppVersion globalResponse = await getMobileSettings();
     if (globalResponse.lockStatus == 'OFF') {
-      if (AppSettings.oldversionCode == "" || AppSettings.newversionCode == "") {
+      if (AppSettings.oldversionCode == "" ||
+          AppSettings.newversionCode == "") {
         return "UPDATE_NEEDED";
       }
 
-      if (int.parse(globalResponse.appVersion) > int.parse(AppSettings.oldversionCode) &&
-          int.parse(globalResponse.appVersion) != int.parse(AppSettings.newversionCode)) {
+      if (int.parse(globalResponse.appVersion) >
+              int.parse(AppSettings.oldversionCode) &&
+          int.parse(globalResponse.appVersion) !=
+              int.parse(AppSettings.newversionCode)) {
         return "UPDATE_NEEDED";
       }
     } else if (globalResponse.lockStatus == 'ON') {
@@ -41,7 +44,8 @@ class GlobalProvider extends ChangeNotifier {
         // Check if "data" exists and is not a List
         if (jsonResponse["data"] is Map<String, dynamic>) {
           // If "data" is a single object (not a list), handle it here
-          var appSetting = jsonResponse["data"]; // Single object instead of a list
+          var appSetting =
+              jsonResponse["data"]; // Single object instead of a list
 
           // Initialize higherList
           List<AppVersion> setting = [];
@@ -56,14 +60,31 @@ class GlobalProvider extends ChangeNotifier {
           return setting[0];
         } else {
           // Handle the case where "data" is neither a List nor a Map
-          return []; // Return an empty list if the format is unexpected
+          return AppVersion(
+              id: 0,
+              appVersion: "0",
+              appBuild: "0",
+              dateTime: "",
+              lockStatus: "OFF"); // Return default AppVersion
         }
       } else {
         // Handle invalid response or status code
-        return []; // Return an empty list if the response status is not 200
+        return AppVersion(
+            id: 0,
+            appVersion: "0",
+            appBuild: "0",
+            dateTime: "",
+            lockStatus: "OFF"); // Return default AppVersion
       }
     } catch (e) {
-      return [];
+      // Silently return default when offline or error occurs
+      // No need to print error as it's expected when offline
+      return AppVersion(
+          id: 0,
+          appVersion: "0",
+          appBuild: "0",
+          dateTime: "",
+          lockStatus: "OFF"); // Return default AppVersion
     }
   }
 }

@@ -37,6 +37,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   // Add new state variables
   bool isPremiumUser = false;
   bool showPremiumDialog = false;
+  bool _isInitializing = true;
 
   CollectionResponse? collectionsMonthly;
   UserTrialsNumberResponse? userTrialsNumber;
@@ -109,7 +110,23 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
 
     setState(() {
       isDataLoaded = true;
+      _isInitializing = false;
     });
+  }
+
+  void _showSnackBar(SnackBar snackBar) {
+    if (!mounted) return;
+
+    if (_isInitializing) {
+      // Schedule snackbar to show after first frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   Future<void> getOtherUserCollections() async {
@@ -132,8 +149,7 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       }
     } catch (e) {
       // Handle error silently
-
-      ScaffoldMessenger.of(context).showSnackBar(
+      _showSnackBar(
         SnackBar(
           backgroundColor: Colors.yellow,
           content: Text(
@@ -289,14 +305,12 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   Future<CollectionResponse?> getUserCollections() async {
     try {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              backgroundColor: Colors.yellow,
-              content: Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa"),
-            ),
-          );
-        }
+        _showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.yellow,
+            content: Text("⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa"),
+          ),
+        );
         // setState(() => _isLoading = false);
         return null;
       }
@@ -315,29 +329,25 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
           return collectionsMonthly;
         }
       } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Colors.red,
-              content: Text("Error: ${response.statusCode}"),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        _showSnackBar(
           SnackBar(
-            backgroundColor: Colors.yellow,
-            content: Text(
-              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
-              style: TextStyle(
-                color: Colors.black,
-              ),
-            ),
+            backgroundColor: Colors.red,
+            content: Text("Error: ${response.statusCode}"),
           ),
         );
       }
+    } catch (e) {
+      _showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.yellow,
+          content: Text(
+            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+        ),
+      );
     }
 
     // 🔁 Always return something to complete Future
@@ -347,16 +357,14 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
   Future<UserTrialsNumberResponse?> getUserTrialsNumber() async {
     try {
       if (userData?.user.id == null || userData!.user.id.toString().isEmpty) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              backgroundColor: Colors.yellow,
-              content: Text(
-                "⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa",
-              ),
+        _showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.yellow,
+            content: Text(
+              "⚠️ Hakuna taarifa zaidi kuwezesha kupata taarifa",
             ),
-          );
-        }
+          ),
+        );
         return null;
       }
 
@@ -368,36 +376,34 @@ class _AdminAllUserCollectionsState extends State<AdminAllUserCollections> {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse != null) {
-          setState(() {
-            userTrialsNumber = UserTrialsNumberResponse.fromJson(jsonResponse);
-          });
-
+          if (mounted) {
+            setState(() {
+              userTrialsNumber =
+                  UserTrialsNumberResponse.fromJson(jsonResponse);
+            });
+          }
           return userTrialsNumber;
         }
       } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Colors.red,
-              content: Text("Error: ${response.statusCode}"),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        _showSnackBar(
           SnackBar(
-            backgroundColor: Colors.yellow,
-            content: Text(
-              "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
-              style: TextStyle(
-                color: Colors.black,
-              ),
-            ),
+            backgroundColor: Colors.red,
+            content: Text("Error: ${response.statusCode}"),
           ),
         );
       }
+    } catch (e) {
+      _showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.yellow,
+          content: Text(
+            "⚠️ Tafadhali hakikisha umeunganishwa na intaneti",
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+        ),
+      );
     }
 
     // 🔁 Always return something to complete Future
